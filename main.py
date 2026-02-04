@@ -912,11 +912,23 @@ async def inventory_cmd(ctx, *args):
     while i < len(args):
         arg = args[i]
         if arg == "-r" and i + 1 < len(args):
-            filter_rarity = args[i + 1]  # Keep as-is for now, will split later
-            i += 2
+            # Capture all args until next flag or end
+            values = []
+            j = i + 1
+            while j < len(args) and not args[j].startswith('-'):
+                values.append(args[j])
+                j += 1
+            filter_rarity = ' '.join(values)
+            i = j
         elif arg == "-n" and i + 1 < len(args):
-            filter_name = args[i + 1]  # Keep as-is for now, will split later
-            i += 2
+            # Capture all args until next flag or end
+            values = []
+            j = i + 1
+            while j < len(args) and not args[j].startswith('-'):
+                values.append(args[j])
+                j += 1
+            filter_name = ' '.join(values)
+            i = j
         elif arg.isdigit():
             page = int(arg)
             i += 1
@@ -1111,11 +1123,23 @@ async def dex_cmd(ctx, *args):
     while i < len(args):
         arg = args[i]
         if arg == "-r" and i + 1 < len(args):
-            filter_rarity = args[i + 1]  # Keep as-is for now, will split later
-            i += 2
+            # Capture all args until next flag or end
+            values = []
+            j = i + 1
+            while j < len(args) and not args[j].startswith('-'):
+                values.append(args[j])
+                j += 1
+            filter_rarity = ' '.join(values)
+            i = j
         elif arg == "-n" and i + 1 < len(args):
-            filter_name = args[i + 1]  # Keep as-is for now, will split later
-            i += 2
+            # Capture all args until next flag or end
+            values = []
+            j = i + 1
+            while j < len(args) and not args[j].startswith('-'):
+                values.append(args[j])
+                j += 1
+            filter_name = ' '.join(values)
+            i = j
         elif arg.isdigit():
             page = int(arg)
             i += 1
@@ -2196,72 +2220,115 @@ async def team_cmd(ctx, action: str = None, *args):
     
     # TEAM SET
     if action and action.lower() == "set":
-        if len(args) != 3:
-            await ctx.send("❌ You must select exactly 3 cards. Usage: `-team set <card1> <card2> <card3>`")
-            return
-        
-        try:
-            indices = [int(x) for x in args]
-        except ValueError:
-            await ctx.send("❌ Invalid card indices. Use numbers.")
-            return
-        
-        # Check for duplicates
-        if len(set(indices)) != 3:
-            await ctx.send("❌ You must select 3 different cards!")
-            return
-        
-        # Validate indices
-        for idx in indices:
-            if idx < 1 or idx > len(sorted_inv):
-                await ctx.send(f"❌ Invalid card index {idx}. Valid range: 1-{len(sorted_inv)}")
+        if len(args) == 1:
+            # Single card - ask for position
+            try:
+                card_idx = int(args[0])
+            except ValueError:
+                await ctx.send("❌ Invalid card index. Use a number.")
                 return
+            
+            if card_idx < 1 or card_idx > len(sorted_inv):
+                await ctx.send(f"❌ Invalid card index. Valid range: 1-{len(sorted_inv)}")
+                return
+            
+            card = sorted_inv[card_idx - 1]
+            
+            # Ask for position
+            await ctx.send(
+                f"🎴 Selected **{card['name']}** ({card['rarity']}) Lv.{card.get('level', 1)}\n"
+                f"Which position do you want to place it in? Reply with **1**, **2**, or **3**"
+            )
+            
+            def check(m):
+                return m.author == ctx.author and m.channel == ctx.channel and m.content in ["1", "2", "3"]
+            
+            try:
+                msg = await bot.wait_for("message", check=check, timeout=30.0)
+                position = int(msg.content) - 1  # 0-indexed
+                
+                # Initialize team if necessary
+                if not user.get("team") or len(user["team"]) != 3:
+                    user["team"] = [None, None, None]
+                
+                # Insert card in position
+                user["team"][position] = card["instance_id"]
+                
+                await save_data()
+                await ctx.send(f"✅ **{card['name']}** placed in position {position + 1} of your team!")
+                
+            except asyncio.TimeoutError:
+                await ctx.send("⏰ Timeout expired. Try again with `-team set <card_number>`")
+            return
         
-        # Get the cards
-        team_cards = [sorted_inv[idx - 1] for idx in indices]
-        team_ids = [c["instance_id"] for c in team_cards]
+        elif len(args) == 3:
+            # Three cards - existing behavior
+            try:
+                indices = [int(x) for x in args]
+            except ValueError:
+                await ctx.send("❌ Invalid card indices. Use numbers.")
+                return
+            
+            # Check for duplicates
+            if len(set(indices)) != 3:
+                await ctx.send("❌ You must select 3 different cards!")
+                return
+            
+            # Validate indices
+            for idx in indices:
+                if idx < 1 or idx > len(sorted_inv):
+                    await ctx.send(f"❌ Invalid card index {idx}. Valid range: 1-{len(sorted_inv)}")
+                    return
+            
+            # Get the cards
+            team_cards = [sorted_inv[idx - 1] for idx in indices]
+            team_ids = [c["instance_id"] for c in team_cards]
+            
+            user["team"] = team_ids
+            await save_data()
+            
+            # Calculate combined stats
+            stats = calc_team_stats(team_cards)
+            
+            # Display the selected team with abilities
+            embed = discord.Embed(
+                title="✅ Team Set!",
+                color=discord.Color.green()
+            )
+            
+            team_display = []
+            abilities_list = []
+            for i, c in enumerate(team_cards, 1):
+                ability_type = get_ability_type(c)
+                ability_name = c.get("ability", "")
+                if not ability_name:
+                    base = CHARACTERS_BY_ID.get(c.get("id"))
+                    if base:
+                        ability_name = base.get("ability", "No ability")
+                team_display.append(f"`{i}.` **{c['name']}** `{c['rarity']}` Lv.{c.get('level', 1)}")
+                if ability_type:
+                    abilities_list.append(f"• **{c['name']}**: {ability_name}")
+            
+            embed.add_field(name="👥 Team Members", value="\n".join(team_display), inline=False)
+            embed.add_field(
+                name="📊 Combined Stats",
+                value=f"HP: `{stats['hp']}` | ATK: `{stats['atk']}` | DEF: `{stats['def']}` | SPD: `{stats['spd']}`",
+                inline=False
+            )
+            if abilities_list:
+                embed.add_field(name="✨ Active Abilities", value="\n".join(abilities_list), inline=False)
+            
+            # Show first card's image as thumbnail
+            if team_cards[0].get("image"):
+                embed.set_thumbnail(url=team_cards[0].get("image"))
+            
+            embed.set_footer(text="Use -boss to start a boss battle!")
+            await ctx.send(embed=embed)
+            return
         
-        user["team"] = team_ids
-        await save_data()
-        
-        # Calculate combined stats
-        stats = calc_team_stats(team_cards)
-        
-        # Display the selected team with abilities
-        embed = discord.Embed(
-            title="✅ Team Set!",
-            color=discord.Color.green()
-        )
-        
-        team_display = []
-        abilities_list = []
-        for i, c in enumerate(team_cards, 1):
-            ability_type = get_ability_type(c)
-            ability_name = c.get("ability", "")
-            if not ability_name:
-                base = CHARACTERS_BY_ID.get(c.get("id"))
-                if base:
-                    ability_name = base.get("ability", "No ability")
-            team_display.append(f"`{i}.` **{c['name']}** `{c['rarity']}` Lv.{c.get('level', 1)}")
-            if ability_type:
-                abilities_list.append(f"• **{c['name']}**: {ability_name}")
-        
-        embed.add_field(name="👥 Team Members", value="\n".join(team_display), inline=False)
-        embed.add_field(
-            name="📊 Combined Stats",
-            value=f"HP: `{stats['hp']}` | ATK: `{stats['atk']}` | DEF: `{stats['def']}` | SPD: `{stats['spd']}`",
-            inline=False
-        )
-        if abilities_list:
-            embed.add_field(name="✨ Active Abilities", value="\n".join(abilities_list), inline=False)
-        
-        # Show first card's image as thumbnail
-        if team_cards[0].get("image"):
-            embed.set_thumbnail(url=team_cards[0].get("image"))
-        
-        embed.set_footer(text="Use -boss to start a boss battle!")
-        await ctx.send(embed=embed)
-        return
+        else:
+            await ctx.send("❌ Use `-team set <card>` for one card or `-team set <c1> <c2> <c3>` for three cards.")
+            return
     
     # TEAM VIEW (default, or if action is not recognized)
     if action is not None and action.lower() not in ["set", "clear"]:
@@ -2273,20 +2340,24 @@ async def team_cmd(ctx, action: str = None, *args):
         await ctx.send("👥 You don't have a team set. Use `-team set <card1> <card2> <card3>` to set one.")
         return
     
-    # Get team cards
+    # Get team cards (handle None values)
     team_cards = []
     for instance_id in team_ids:
-        for c in inv:
-            if c.get("instance_id") == instance_id:
-                team_cards.append(c)
-                break
+        if instance_id is None:
+            team_cards.append(None)
+        else:
+            found = False
+            for c in inv:
+                if c.get("instance_id") == instance_id:
+                    team_cards.append(c)
+                    found = True
+                    break
+            if not found:
+                team_cards.append(None)
     
-    if len(team_cards) != 3:
-        await ctx.send("❌ Some cards in your team are missing. Please set a new team with `-team set`.")
-        return
-    
-    # Calculate combined stats
-    stats = calc_team_stats(team_cards)
+    # Calculate combined stats (skip None cards)
+    valid_cards = [c for c in team_cards if c is not None]
+    stats = calc_team_stats(valid_cards) if valid_cards else {"hp": 0, "atk": 0, "def": 0, "spd": 0}
     
     # Create embed
     embed = discord.Embed(
@@ -2297,23 +2368,26 @@ async def team_cmd(ctx, action: str = None, *args):
     team_display = []
     abilities_list = []
     for i, c in enumerate(team_cards, 1):
-        # Find position in sorted inventory
-        inv_pos = "?"
-        for j, sc in enumerate(sorted_inv, 1):
-            if sc.get("instance_id") == c.get("instance_id"):
-                inv_pos = j
-                break
-        
-        ability_type = get_ability_type(c)
-        ability_name = c.get("ability", "")
-        if not ability_name:
-            base = CHARACTERS_BY_ID.get(c.get("id"))
-            if base:
-                ability_name = base.get("ability", "No ability")
-        
-        team_display.append(f"`{i}.` **{c['name']}** `{c['rarity']}` Lv.{c.get('level', 1)} (inv #{inv_pos})")
-        if ability_type:
-            abilities_list.append(f"• **{c['name']}**: {ability_name}")
+        if c is None:
+            team_display.append(f"`{i}.` *Empty slot*")
+        else:
+            # Find position in sorted inventory
+            inv_pos = "?"
+            for j, sc in enumerate(sorted_inv, 1):
+                if sc.get("instance_id") == c.get("instance_id"):
+                    inv_pos = j
+                    break
+            
+            ability_type = get_ability_type(c)
+            ability_name = c.get("ability", "")
+            if not ability_name:
+                base = CHARACTERS_BY_ID.get(c.get("id"))
+                if base:
+                    ability_name = base.get("ability", "No ability")
+            
+            team_display.append(f"`{i}.` **{c['name']}** `{c['rarity']}` Lv.{c.get('level', 1)} (inv #{inv_pos})")
+            if ability_type:
+                abilities_list.append(f"• **{c['name']}**: {ability_name}")
     
     embed.add_field(name="🎴 Team Members", value="\n".join(team_display), inline=False)
     embed.add_field(
@@ -2324,9 +2398,10 @@ async def team_cmd(ctx, action: str = None, *args):
     if abilities_list:
         embed.add_field(name="✨ Active Abilities", value="\n".join(abilities_list), inline=False)
     
-    # Show first card's image as thumbnail
-    if team_cards[0].get("image"):
-        embed.set_thumbnail(url=team_cards[0].get("image"))
+    # Show first non-None card's image as thumbnail
+    first_card = next((c for c in team_cards if c is not None), None)
+    if first_card and first_card.get("image"):
+        embed.set_thumbnail(url=first_card.get("image"))
     
     embed.set_footer(text="Use -team set 1 2 3 to change | -team clear to remove")
     await ctx.send(embed=embed)
@@ -2913,7 +2988,12 @@ async def boss_cmd(ctx, boss_number: int = None):
     # Check if team is set
     team_ids = user.get("team", [])
     if len(team_ids) != 3:
-        await ctx.send("❌ You need to set a team of 3 cards first! Use `-team <card1> <card2> <card3>`")
+        await ctx.send("❌ You need to set a team of 3 cards first! Use `-team set <card1> <card2> <card3>`")
+        return
+    
+    # Check if all positions are filled (no None values)
+    if any(id is None for id in team_ids):
+        await ctx.send("❌ Your team has empty slots! Use `-team set` to fill all 3 positions before fighting bosses.")
         return
     
     # Get team cards
