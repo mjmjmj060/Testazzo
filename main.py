@@ -194,6 +194,30 @@ CHARACTERS = [
         "ability_type": "turn3_heal",
         "image": "https://media.discordapp.net/attachments/1467048963415871621/1467944233175617639/IMG_6307.webp?ex=6982391a&is=6980e79a&hm=6ea5933cbac24768162937bf8093519651aec5ecaac7134f5464fe3c284f110f&=&format=webp&width=250&height=350"
     },
+    {
+        "id": "kalisa",
+        "name": "Kalisa",
+        "base": {"hp": 75, "atk": 75, "def": 75, "spd": 79},
+        "ability": "After 3 turns: +20% ATK and +20% DEF",
+        "ability_type": "turn3_atk_def_boost",
+        "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1468707381247475723/IMG_6316.webp?ex=6984ffd6&is=6983ae56&hm=811db3ebbd9eab0312b4a5f156a7530e1f0100022a92c7760550986ff5df18e0&"
+    },
+    {
+        "id": "trixi",
+        "name": "Trixi",
+        "base": {"hp": 70, "atk": 75, "def": 70, "spd": 92},
+        "ability": "Every turn: +20% SPD (stacks)",
+        "ability_type": "spd_rampage",
+        "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1468708225028325530/IMG_6315.webp?ex=698500a0&is=6983af20&hm=9a116c7c9bc971ad9d5a09914423c16e2a241a51d45eec0653de908f7ce8d13b&"
+    },
+    {
+        "id": "sidmi",
+        "name": "Sidmi",
+        "base": {"hp": 85, "atk": 80, "def": 75, "spd": 65},
+        "ability": "After 3 turns: +50% bonus damage",
+        "ability_type": "turn3_bonus_damage",
+        "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1468709244382744675/IMG_6314.webp?ex=69850193&is=6983b013&hm=53dc82cd67097cff821246e70e179f79e583554e2455556f8c7cb09feda29ef7&"
+    },
 ]
 
 # Catbox URLs for composite battle images (permanent hosting, used only for create_battle_image)
@@ -219,6 +243,9 @@ CATBOX_IMAGES = {
     "Deale": "https://files.catbox.moe/vzpzkz.webp",
     "Kuu": "https://files.catbox.moe/cmuqok.webp",
     "Himeyuri": "https://files.catbox.moe/3l2cyv.webp",
+    "Kalisa": "https://files.catbox.moe/7p18b6.jpeg",
+    "Trixi": "https://files.catbox.moe/w845px.jpeg",
+    "Sidmi": "https://files.catbox.moe/j1m90q.jpeg",
 }
 
 # Boss images on Catbox (permanent hosting for composite battle images)
@@ -1522,6 +1549,12 @@ async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user
                 p["ability_type"] = "atk_boost_and_heal"
             elif char_id == "luminalia":
                 p["ability_type"] = "spd_boost_3turns"
+            elif char_id == "kalisa":
+                p["ability_type"] = "turn3_atk_def_boost"
+            elif char_id == "trixi":
+                p["ability_type"] = "spd_rampage"
+            elif char_id == "sidmi":
+                p["ability_type"] = "turn3_bonus_damage"
     
     # Initialize ability flags for player 1
     p1_flags = {
@@ -1544,7 +1577,10 @@ async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user
         "kuu_boosted": False,
         "himeyuri_healed": False,
         "kasli_stacks": 0,
-        "izanagi_stacks": 0
+        "izanagi_stacks": 0,
+        "kalisa_boosted": False,
+        "trixi_stacks": 0,
+        "sidmi_active": False,
     }
     
     # Initialize ability flags for player 2
@@ -1568,7 +1604,10 @@ async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user
         "kuu_boosted": False,
         "himeyuri_healed": False,
         "kasli_stacks": 0,
-        "izanagi_stacks": 0
+        "izanagi_stacks": 0,
+        "kalisa_boosted": False,
+        "trixi_stacks": 0,
+        "sidmi_active": False,
     }
     
     ability_text = ""
@@ -1864,6 +1903,28 @@ async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user
                     attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal)
                     attacker_flags["himeyuri_healed"] = True
                     round_log.append(f"🌸 **{attacker['name']}'s rejuvenation!** Heals {heal} HP")
+                
+                # Kalisa - After 3 turns: +20% ATK and +20% DEF (permanent)
+                if attacker["ability_type"] == "turn3_atk_def_boost":
+                    if current_round >= 3:
+                        if not attacker_flags.get("kalisa_boosted", False):
+                            attacker_flags["kalisa_boosted"] = True
+                            round_log.append(f"✨ **{attacker['name']}'s power awakens!** ATK +20%, DEF +20%")
+                        attacker["atk"] = int(attacker["atk_base"] * 1.2)
+                        attacker["def"] = int(attacker["def_base"] * 1.2)
+                
+                # Trixi - Every turn: +20% SPD (stacks)
+                if attacker["ability_type"] == "spd_rampage":
+                    attacker_flags["trixi_stacks"] = attacker_flags.get("trixi_stacks", 0) + 1
+                    attacker["spd"] = int(attacker["spd_base"] * (1 + 0.2 * attacker_flags["trixi_stacks"]))
+                    round_log.append(f"💨 **{attacker['name']}'s speed increases!** SPD +{attacker_flags['trixi_stacks'] * 20}%")
+                
+                # Sidmi - After 3 turns: +50% bonus damage (permanent)
+                if attacker["ability_type"] == "turn3_bonus_damage":
+                    if current_round >= 3:
+                        if not attacker_flags.get("sidmi_active", False):
+                            attacker_flags["sidmi_active"] = True
+                            round_log.append(f"💥 **{attacker['name']}'s true power unleashed!** +50% bonus damage")
             
             # Calculate damage
             base_dmg = damage_formula(attacker["atk"], defender["def"])
@@ -1876,6 +1937,11 @@ async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user
                     bonus_dmg = int(attacker["atk"] * 0.5)
                     dmg += bonus_dmg
                     round_log.append(f"💨 **{attacker['name']}'s speed advantage!** +{bonus_dmg} bonus damage!")
+                
+                # Sidmi's bonus damage (after turn 3)
+                if attacker_flags.get("sidmi_active", False):
+                    bonus = int(attacker["atk"] * 0.5)
+                    dmg += bonus
             
             # Deal damage
             defender["hp"] -= dmg
@@ -2611,6 +2677,9 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
         "turn3_atk_boost_done": False,    # Kuu
         "turn3_heal_done": False,         # Himeyuri
         "heal_and_def_done": False,       # Jeanne
+        "kalisa_boosted": False,          # Kalisa
+        "trixi_stacks": 0,                # Trixi
+        "sidmi_active": False,            # Sidmi
     }
     
     # Get all ability types from team
@@ -2799,6 +2868,28 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
                     team_flags["turn3_heal_done"] = True
                     round_log.append(f"🌸 **Himeyuri's blessing!** Team heals {heal} HP")
                 
+                # Kalisa - After 3 turns: +20% ATK and +20% DEF (permanent)
+                if "turn3_atk_def_boost" in team_abilities:
+                    if current_round >= 3:
+                        if not team_flags.get("kalisa_boosted", False):
+                            team_flags["kalisa_boosted"] = True
+                            round_log.append(f"✨ **Kalisa's power awakens!** Team ATK +20%, DEF +20%")
+                        atk_bonus += 0.2
+                        def_bonus += 0.2
+                
+                # Trixi - Every turn: +20% SPD (stacks)
+                if "spd_rampage" in team_abilities:
+                    team_flags["trixi_stacks"] = team_flags.get("trixi_stacks", 0) + 1
+                    spd_bonus += 0.2 * team_flags["trixi_stacks"]
+                    round_log.append(f"💨 **Trixi's speed surge!** Team SPD +{int(team_flags['trixi_stacks'] * 20)}%")
+                
+                # Sidmi - After 3 turns: +50% bonus damage (permanent)
+                if "turn3_bonus_damage" in team_abilities:
+                    if current_round >= 3:
+                        if not team_flags.get("sidmi_active", False):
+                            team_flags["sidmi_active"] = True
+                            round_log.append(f"💥 **Sidmi's true power unleashed!** +50% bonus damage")
+                
                 # Balrog rampage (+20% ATK per turn, stacking)
                 if "rampage" in team_abilities:
                     team_flags["balrog_stacks"] += 1
@@ -2875,6 +2966,11 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
                     bonus = int(team["atk"] * 0.5)
                     dmg += bonus
                     round_log.append(f"💨 **Lunacia's speed bonus!** +{bonus} damage")
+                
+                # Sidmi bonus damage (after turn 3)
+                if team_flags.get("sidmi_active", False):
+                    bonus = int(team["atk"] * 0.5)
+                    dmg += bonus
                 
                 boss["hp"] -= dmg
                 round_log.append(f"⚔️ **Team attacks!** Deals `{dmg}` damage")
