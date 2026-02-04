@@ -225,8 +225,8 @@ CATBOX_IMAGES = {
 BOSS_CATBOX_IMAGES = {
     "crazed_cat_phase1": "https://files.catbox.moe/xr9aku.webp",
     "crazed_cat_phase2": "https://files.catbox.moe/cvk5bn.webp",
-    "crazed_tank_phase1": "https://files.catbox.moe/s0dky4.webp",
-    "crazed_tank_phase2": "https://files.catbox.moe/k69vr8.webp",
+    "crazed_tank_phase1": "https://files.catbox.moe/htt56w.webp",
+    "crazed_tank_phase2": "https://files.catbox.moe/civgc5.png",
 }
 
 RARITY_MAX_LEVEL = {
@@ -912,10 +912,10 @@ async def inventory_cmd(ctx, *args):
     while i < len(args):
         arg = args[i]
         if arg == "-r" and i + 1 < len(args):
-            filter_rarity = args[i + 1].capitalize()
+            filter_rarity = args[i + 1]  # Keep as-is for now, will split later
             i += 2
         elif arg == "-n" and i + 1 < len(args):
-            filter_name = args[i + 1].lower()
+            filter_name = args[i + 1]  # Keep as-is for now, will split later
             i += 2
         elif arg.isdigit():
             page = int(arg)
@@ -929,9 +929,13 @@ async def inventory_cmd(ctx, *args):
     # Poi applica i filtri
     filtered_inv = full_sorted_inv
     if filter_rarity:
-        filtered_inv = [c for c in filtered_inv if c.get("rarity", "").lower() == filter_rarity.lower()]
+        # Split by comma and strip whitespace
+        rarities = [r.strip().capitalize() for r in filter_rarity.split(',')]
+        filtered_inv = [c for c in filtered_inv if c.get("rarity", "").lower() in [r.lower() for r in rarities]]
     if filter_name:
-        filtered_inv = [c for c in filtered_inv if filter_name in c.get("name", "").lower()]
+        # Split by comma and strip whitespace
+        names = [n.strip().lower() for n in filter_name.split(',')]
+        filtered_inv = [c for c in filtered_inv if any(name in c.get("name", "").lower() for name in names)]
     
     if not filtered_inv:
         await ctx.send("🎴 No cards match your filters.")
@@ -1107,10 +1111,10 @@ async def dex_cmd(ctx, *args):
     while i < len(args):
         arg = args[i]
         if arg == "-r" and i + 1 < len(args):
-            filter_rarity = args[i + 1].capitalize()
+            filter_rarity = args[i + 1]  # Keep as-is for now, will split later
             i += 2
         elif arg == "-n" and i + 1 < len(args):
-            filter_name = args[i + 1].lower()
+            filter_name = args[i + 1]  # Keep as-is for now, will split later
             i += 2
         elif arg.isdigit():
             page = int(arg)
@@ -1121,7 +1125,9 @@ async def dex_cmd(ctx, *args):
     # Apply filters
     filtered_chars = CHARACTERS.copy()
     if filter_name:
-        filtered_chars = [c for c in filtered_chars if filter_name in c["name"].lower()]
+        # Split by comma and strip whitespace
+        names = [n.strip().lower() for n in filter_name.split(',')]
+        filtered_chars = [c for c in filtered_chars if any(name in c["name"].lower() for name in names)]
     
     if not filtered_chars:
         await ctx.send("📖 No cards match your filters.")
@@ -2703,11 +2709,13 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
                 if team_flags.get("heal_and_def_done"):
                     def_bonus += 0.3
                 
-                # Kuu - After 3 turns: +50% ATK (one-time)
-                if "turn3_atk_boost" in team_abilities and current_round == 3 and not team_flags["turn3_atk_boost_done"]:
-                    atk_bonus += 0.5
-                    team_flags["turn3_atk_boost_done"] = True
-                    round_log.append(f"🔥 **Kuu's power awakens!** Team ATK +50%")
+                # Kuu - After 3 turns: +50% ATK (permanent after activation)
+                if "turn3_atk_boost" in team_abilities:
+                    if current_round >= 3:
+                        if not team_flags["turn3_atk_boost_done"]:
+                            team_flags["turn3_atk_boost_done"] = True
+                            round_log.append(f"🔥 **Kuu's power awakens!** Team ATK +50%")
+                        atk_bonus += 0.5  # Apply bonus EVERY turn after activation
                 
                 # Himeyuri - After 3 turns: Heals 50% max HP (one-time)
                 if "turn3_heal" in team_abilities and current_round == 3 and not team_flags["turn3_heal_done"]:
