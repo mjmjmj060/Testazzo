@@ -2258,7 +2258,7 @@ async def team_cmd(ctx, action: str = None, *args):
                 await ctx.send(f"✅ **{card['name']}** placed in position {position + 1} of your team!")
                 
             except asyncio.TimeoutError:
-                await ctx.send("⏰ Timeout expired. Try again with `-team set <number>`")
+                await ctx.send("⏰ Timeout expired. Try again with `-team set <card_number>`")
             return
         
         elif len(args) == 3:
