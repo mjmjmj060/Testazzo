@@ -224,11 +224,9 @@ CATBOX_IMAGES = {
 # Boss images on Catbox (permanent hosting for composite battle images)
 BOSS_CATBOX_IMAGES = {
     "crazed_cat_phase1": "https://files.catbox.moe/xr9aku.webp",
-    "crazed_cat_phase2": "https://files.catbox.moe/4s1cvx.webp",
-    "crazed_cat_phase3": "https://files.catbox.moe/cvk5bn.webp",
+    "crazed_cat_phase2": "https://files.catbox.moe/cvk5bn.webp",
     "crazed_tank_phase1": "https://files.catbox.moe/s0dky4.webp",
-    "crazed_tank_phase2": "https://files.catbox.moe/6qz8he.webp",
-    "crazed_tank_phase3": "https://files.catbox.moe/k69vr8.webp",
+    "crazed_tank_phase2": "https://files.catbox.moe/k69vr8.webp",
 }
 
 RARITY_MAX_LEVEL = {
@@ -277,13 +275,6 @@ BOSSES = [
             },
             {
                 "hp": 5000,
-                "atk": 140,
-                "def": 95,
-                "spd": 70,
-                "image": "https://cdn.discordapp.com/attachments/815650716730654743/1467647917081890908/IMG_6297.webp?ex=6981cde3&is=69807c63&hm=d8282a4bafc91e9f9741f78e69fefd3fd3cbd3ac4f5f273b33103b2a688f307a&"
-            },
-            {
-                "hp": 5000,
                 "atk": 160,
                 "def": 110,
                 "spd": 80,
@@ -302,13 +293,6 @@ BOSSES = [
                 "def": 50,
                 "spd": 60,
                 "image": "https://cdn.discordapp.com/attachments/815650716730654743/1467919226970050560/IMG_6301.webp?ex=698221d0&is=6980d050&hm=3b813a9b8b9cf8351ba50e89c5b82db90c71e72f01f95945f1fa1022d5711c9c&"
-            },
-            {
-                "hp": 9999,
-                "atk": 120,
-                "def": 65,
-                "spd": 70,
-                "image": "https://cdn.discordapp.com/attachments/815650716730654743/1467919227267715276/IMG_6302.webp?ex=698221d0&is=6980d050&hm=8ed933a83348b587c35aed2a2489a9f74d475a24b909c0b5a71a56cbc0f6e488&"
             },
             {
                 "hp": 9999,
@@ -2509,8 +2493,9 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
     
     def get_boss_stats(phase_idx):
         phase = phases[phase_idx]
+        total_phases = len(phases)
         return {
-            "name": f"{boss_data['name']} (Phase {phase_idx + 1}/3)",
+            "name": f"{boss_data['name']} (Phase {phase_idx + 1}/{total_phases})",
             "hp_max": phase["hp"],
             "hp": phase["hp"],
             "atk_base": phase["atk"],
@@ -2636,10 +2621,10 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
     )
     embed.add_field(name="👹 Boss", value=boss_stats, inline=False)
     
-    # Pre-generate ALL 3 composite images (one per phase) at battle start
+    # Pre-generate composite images (one per phase) at battle start
     composite_urls = {}
     
-    for phase_idx in range(3):
+    for phase_idx in range(len(phases)):
         phase_num = phase_idx + 1
         phase_url = await create_battle_image(ctx.bot, team_cards, boss_data["id"], phase_num)
         if phase_url:
@@ -2669,7 +2654,7 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
     max_turns = 60
     current_round = 0
     
-    while team["hp"] > 0 and (boss["hp"] > 0 or current_phase < 2):
+    while team["hp"] > 0 and (boss["hp"] > 0 or current_phase < len(phases) - 1):
         current_round += 1
         if current_round > max_turns:
             break
@@ -2823,12 +2808,12 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
                     round_log.append(f"⚡ **Thundia paralyzes the boss for 2 turns!**")
                 
                 # Check if boss phase changes
-                if boss["hp"] <= 0 and current_phase < 2:
+                if boss["hp"] <= 0 and current_phase < len(phases) - 1:
                     current_phase += 1
                     boss = get_boss_stats(current_phase)
                     # Update composite image URL for new phase
                     composite_image_url = composite_urls.get(current_phase + 1, boss["image"])
-                    round_log.append(f"\n💀 **{boss_data['name']} transforms!** Phase {current_phase + 1}/3!")
+                    round_log.append(f"\n💀 **{boss_data['name']} transforms!** Phase {current_phase + 1}/{len(phases)}!")
                     round_log.append(f"Boss HP restored! New stats: ATK `{boss['atk']}` DEF `{boss['def']}` SPD `{boss['spd']}`")
             
             else:  # Boss turn
@@ -2890,7 +2875,7 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
         await asyncio.sleep(1.5)
     
     # Determine winner
-    if team["hp"] > 0 and boss["hp"] <= 0 and current_phase >= 2:
+    if team["hp"] > 0 and boss["hp"] <= 0 and current_phase >= len(phases) - 1:
         winner = "team"
     elif team["hp"] <= 0:
         winner = "boss"
@@ -3021,7 +3006,7 @@ async def boss_cmd(ctx, boss_number: int = None):
             reward_text = "\n".join(lvl_msgs) + "\n" + reward_text
         
         embed.add_field(name="🎁 Rewards", value=reward_text, inline=False)
-        embed.set_image(url=boss_data["phases"][2]["image"])
+        embed.set_image(url=boss_data["phases"][-1]["image"])
         
         await message.edit(embed=embed)
     
