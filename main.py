@@ -1910,6 +1910,7 @@ async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user
                         if not attacker_flags.get("kalisa_boosted", False):
                             attacker_flags["kalisa_boosted"] = True
                             round_log.append(f"✨ **{attacker['name']}'s power awakens!** ATK +20%, DEF +20%")
+                        # Apply the bonus every turn after activation (permanent)
                         attacker["atk"] = int(attacker["atk_base"] * 1.2)
                         attacker["def"] = int(attacker["def_base"] * 1.2)
                 
@@ -2874,6 +2875,7 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
                         if not team_flags.get("kalisa_boosted", False):
                             team_flags["kalisa_boosted"] = True
                             round_log.append(f"✨ **Kalisa's power awakens!** Team ATK +20%, DEF +20%")
+                        # Only add the bonus after activation (permanent)
                         atk_bonus += 0.2
                         def_bonus += 0.2
                 
