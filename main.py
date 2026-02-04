@@ -2237,7 +2237,7 @@ async def team_cmd(ctx, action: str = None, *args):
             # Ask for position
             await ctx.send(
                 f"🎴 Selected **{card['name']}** ({card['rarity']}) Lv.{card.get('level', 1)}\n"
-                f"In quale posizione vuoi metterla nel team? Rispondi con **1**, **2** o **3**"
+                f"Which position do you want to place it in? Reply with **1**, **2**, or **3**"
             )
             
             def check(m):
@@ -2255,10 +2255,10 @@ async def team_cmd(ctx, action: str = None, *args):
                 user["team"][position] = card["instance_id"]
                 
                 await save_data()
-                await ctx.send(f"✅ **{card['name']}** inserita nella posizione {position + 1} del team!")
+                await ctx.send(f"✅ **{card['name']}** placed in position {position + 1} of your team!")
                 
             except asyncio.TimeoutError:
-                await ctx.send("⏰ Tempo scaduto. Riprova con `-team set <numero>`")
+                await ctx.send("⏰ Timeout expired. Try again with `-team set <number>`")
             return
         
         elif len(args) == 3:
@@ -2327,7 +2327,7 @@ async def team_cmd(ctx, action: str = None, *args):
             return
         
         else:
-            await ctx.send("❌ Usa `-team set <carta>` per una carta o `-team set <c1> <c2> <c3>` per tre carte.")
+            await ctx.send("❌ Use `-team set <card>` for one card or `-team set <c1> <c2> <c3>` for three cards.")
             return
     
     # TEAM VIEW (default, or if action is not recognized)
