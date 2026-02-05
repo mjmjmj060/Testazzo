@@ -1540,16 +1540,20 @@ def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", 
         if turn == 1 and not flags.get("heal_and_def_used"):
             heal_amount = int(attacker["hp_max"] * 0.3)
             attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal_amount)
-            if mode == "bonus":
-                bonuses["def"] += 0.3
-            else:
-                flags["jeanne_def_boost"] = 1.3
-                attacker["def"] = int(attacker["def_base"] * flags["jeanne_def_boost"])
             flags["heal_and_def_used"] = True
             if is_team_battle:
                 messages.append(f"✨ **Jeanne's protection!** Team heals {heal_amount} HP, DEF +30%")
             else:
                 messages.append(f"✨ **{attacker['name']} heals {heal_amount} HP and gains +30% DEF!**")
+        
+        # Apply DEF bonus every turn after activation (permanent)
+        if flags.get("heal_and_def_used"):
+            if mode == "bonus":
+                bonuses["def"] += 0.3
+            else:
+                if not flags.get("jeanne_def_boost"):
+                    flags["jeanne_def_boost"] = 1.3
+                attacker["def"] = int(attacker["def_base"] * flags.get("jeanne_def_boost", 1.3))
     
     # === TURN 3+ ACTIVATION ===
     elif ability_type == "turn3_atk_boost":  # Kuu - After turn 3: +50% ATK
@@ -2975,31 +2979,6 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
                 atk_bonus = 0.0  # bonus additivo (es: +0.2 = +20%)
                 def_bonus = 0.0
                 spd_bonus = 0.0
-                
-                # Ruri - 3 turns +50% DEF
-                if team_flags["ruri_turns"] > 0:
-                    def_bonus += 0.5
-                
-                # Luminalia - 3 turns +50% SPD
-                if team_flags["luminalia_turns"] > 0:
-                    spd_bonus += 0.5
-                
-                # First turn buffs (Kai, Valkyrie, Shishilan)
-                if team_flags["buff_applied"] and current_round == 1:
-                    if "first_turn_def" in team_abilities:
-                        def_bonus += 1.0  # Kai +100% DEF
-                    if "first_turn_spd" in team_abilities:
-                        spd_bonus += 1.0  # Valkyrie +100% SPD
-                    if "first_turn_atk" in team_abilities:
-                        atk_bonus += 0.5  # Shishilan +50% ATK
-                
-                # Deale - First attack SPD
-                if team_flags.get("first_attack_spd_done") and current_round == 1:
-                    spd_bonus += 0.5
-                
-                # Jeanne - First attack DEF (permanent)
-                if team_flags.get("heal_and_def_done"):
-                    def_bonus += 0.3
                 
                 # Apply individual abilities
                 for ability in team_abilities:
