@@ -1688,7 +1688,7 @@ def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", 
             heal = int(attacker["hp_max"] * 0.2)
             attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal)
             if is_team_battle:
-                messages.append(f"🛡️ **Kasli's dominance!** DEF +{int(flags['kasli_stacks'] * 20)}%, heals {heal}")
+                messages.append(f"🛡️ **Kasli's dominance!** DEF +{flags['kasli_stacks'] * 20}%, heals {heal}")
             else:
                 messages.append(f"🛡️ **{attacker['name']}'s DEF dominance!** DEF +{flags['kasli_stacks'] * 20}% and heals {heal} HP")
     
@@ -1702,7 +1702,7 @@ def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", 
             heal = int(attacker["hp_max"] * 0.2)
             attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal)
             if is_team_battle:
-                messages.append(f"⚔️ **Izanagi's power!** ATK +{int(flags['izanagi_stacks'] * 20)}%, heals {heal}")
+                messages.append(f"⚔️ **Izanagi's power!** ATK +{flags['izanagi_stacks'] * 20}%, heals {heal}")
             else:
                 messages.append(f"⚔️ **{attacker['name']}'s ATK dominance!** ATK +{flags['izanagi_stacks'] * 20}% and heals {heal} HP")
     
@@ -1714,7 +1714,7 @@ def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", 
         else:
             attacker["atk"] = int(attacker["atk_base"] * (1 + 0.2 * flags["balrog_stacks"]))
         if is_team_battle:
-            messages.append(f"🔥 **Balrog's rage!** Team ATK +{int(flags['balrog_stacks'] * 20)}%")
+            messages.append(f"🔥 **Balrog's rage!** Team ATK +{flags['balrog_stacks'] * 20}%")
         else:
             if flags["balrog_stacks"] == 1:
                 messages.append(f"🔥 **{attacker['name']}'s rage grows!** ATK +20% (Total: +{flags['balrog_stacks'] * 20}%)")
@@ -1728,7 +1728,7 @@ def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", 
         else:
             attacker["spd"] = int(attacker["spd_base"] * (1 + 0.2 * flags["trixi_stacks"]))
         if is_team_battle:
-            messages.append(f"💨 **Trixi's speed surge!** Team SPD +{int(flags['trixi_stacks'] * 20)}%")
+            messages.append(f"💨 **Trixi's speed surge!** Team SPD +{flags['trixi_stacks'] * 20}%")
         else:
             messages.append(f"💨 **{attacker['name']}'s speed increases!** SPD +{flags['trixi_stacks'] * 20}%")
     
