@@ -1796,7 +1796,8 @@ def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", 
         if turn >= 3:
             if not flags.get("sidmi_active"):
                 flags["sidmi_active"] = True
-            # Message EVERY TURN (like Lunacia)
+            # DESIGN DECISION: Show message every turn from turn 3 onwards (to indicate bonus is active)
+            # This matches the behavior of Lunacia's speed_bonus which displays a message every turn
             if is_team_battle:
                 messages.append(f"💥 **Sidmi's power!** +50% bonus damage")
             else:
