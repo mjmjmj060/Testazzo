@@ -29,7 +29,7 @@ CHARACTERS = [
     {
         "id": "kai",
         "name": "Kai",
-        "base": {"hp": 70, "atk": 80, "def": 85, "spd": 75},
+        "base": {"hp": 81, "atk": 79, "def": 85, "spd": 75},
         "ability": "First turn: +100% DEF",
         "ability_type": "first_turn_def",
         "image": "https://media.discordapp.net/attachments/1467048963415871621/1467230569225257021/IMG_6242.webp?ex=697fa073&is=697e4ef3&hm=fcf57c98aa851d3720a077233c986ff8ca097d9f627f8f3d0015418dec20b63f&=&format=webp&width=691&height=967"
@@ -270,9 +270,9 @@ RARITY_RANK = {"Common": 1, "Rare": 2, "Epic": 3, "Legendary": 4}
 
 # Fuse system constants
 FUSE_COSTS = {
-    "Common": 1000,      # Common -> Rare
-    "Rare": 10000,       # Rare -> Epic
-    "Epic": 100000,      # Epic -> Legendary
+    "Common": 5000,      # Common -> Rare
+    "Rare": 50000,       # Rare -> Epic
+    "Epic": 500000,      # Epic -> Legendary
 }
 
 RARITY_UPGRADE = {
@@ -286,7 +286,7 @@ CHARACTERS_BY_ID = {c["id"]: c for c in CHARACTERS}
 
 # ------------------------
 # BOSSES (3v1 Boss Battle Mode)
-# Each boss has 3 phases - when defeated, resurrects with full HP and increased stats
+# Each boss can have 1 phase or 2 phases (if it has 2 phases, when defeated, resurrects with full HP and increased stats)
 # ------------------------
 BOSSES = [
     {
@@ -295,15 +295,15 @@ BOSSES = [
         "phases": [
             {
                 "hp": 5000,
-                "atk": 120,
+                "atk": 160,
                 "def": 80,
                 "spd": 60,
                 "image": "https://cdn.discordapp.com/attachments/815650716730654743/1467647916746211509/IMG_6296.webp?ex=6981cde2&is=69807c62&hm=79e7bcb2a615071592b3c0cc79ecde8594231ae8b205a6ed63ce86a623fbe2c4&"
             },
             {
                 "hp": 5000,
-                "atk": 160,
-                "def": 110,
+                "atk": 200,
+                "def": 120,
                 "spd": 80,
                 "image": "https://cdn.discordapp.com/attachments/815650716730654743/1467647917400784926/IMG_6298.webp?ex=6981cde3&is=69807c63&hm=a4d3098a6f923479d627295d5f929d99301b4b974d1da10b7d62e1eea37205d2&"
             }
@@ -316,15 +316,15 @@ BOSSES = [
         "phases": [
             {
                 "hp": 9999,
-                "atk": 100,
-                "def": 50,
+                "atk": 140,
+                "def": 100,
                 "spd": 60,
                 "image": "https://cdn.discordapp.com/attachments/815650716730654743/1467919226970050560/IMG_6301.webp?ex=698221d0&is=6980d050&hm=3b813a9b8b9cf8351ba50e89c5b82db90c71e72f01f95945f1fa1022d5711c9c&"
             },
             {
                 "hp": 9999,
-                "atk": 140,
-                "def": 80,
+                "atk": 180,
+                "def": 140,
                 "spd": 80,
                 "image": "https://cdn.discordapp.com/attachments/815650716730654743/1467919227527888999/IMG_6303.webp?ex=698221d0&is=6980d050&hm=571ad25ae8bbccf3a501a1958a392751baf32d66fa35cfd3160c4b89869cc34f&"
             }
