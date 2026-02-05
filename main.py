@@ -254,6 +254,10 @@ BOSS_CATBOX_IMAGES = {
     "crazed_cat_phase2": "https://files.catbox.moe/cvk5bn.webp",
     "crazed_tank_phase1": "https://files.catbox.moe/htt56w.webp",
     "crazed_tank_phase2": "https://files.catbox.moe/civgc5.png",
+    "crazed_axe_phase1": "https://files.catbox.moe/ise7fq.webp",
+    "crazed_axe_phase2": "https://files.catbox.moe/i9dusb.webp",
+    "crazed_legs_phase1": "https://files.catbox.moe/9u3ona.webp",
+    "crazed_legs_phase2": "https://files.catbox.moe/shwre4.webp",
 }
 
 RARITY_MAX_LEVEL = {
@@ -327,6 +331,48 @@ BOSSES = [
                 "def": 140,
                 "spd": 80,
                 "image": "https://cdn.discordapp.com/attachments/815650716730654743/1467919227527888999/IMG_6303.webp?ex=698221d0&is=6980d050&hm=571ad25ae8bbccf3a501a1958a392751baf32d66fa35cfd3160c4b89869cc34f&"
+            }
+        ],
+        "rewards": {"gold": 2500, "exp": 1000, "guaranteed_rarity": "Legendary"}
+    },
+    {
+        "id": "crazed_axe",
+        "name": "Crazed Axe",
+        "phases": [
+            {
+                "hp": 7500,
+                "atk": 200,
+                "def": 100,
+                "spd": 300,
+                "image": "https://cdn.discordapp.com/attachments/815650716730654743/1468969510047449242/IMG_6330.webp?ex=6985f3f7&is=6984a277&hm=511afc60727b43d7b262c36406c1347f33e0d854e96142e136a84e1d4e9a3c25&"
+            },
+            {
+                "hp": 7500,
+                "atk": 250,
+                "def": 150,
+                "spd": 350,
+                "image": "https://cdn.discordapp.com/attachments/815650716730654743/1468969510307627301/IMG_6332.webp?ex=6985f3f7&is=6984a277&hm=3be5cdcf40db67af2942e28f3a3824659a323a26796ed60dc31028b0e095c3a1&"
+            }
+        ],
+        "rewards": {"gold": 2500, "exp": 1000, "guaranteed_rarity": "Legendary"}
+    },
+    {
+        "id": "crazed_legs",
+        "name": "Crazed Legs",
+        "phases": [
+            {
+                "hp": 8000,
+                "atk": 250,
+                "def": 250,
+                "spd": 250,
+                "image": "https://cdn.discordapp.com/attachments/815650716730654743/1468969567194972371/IMG_6333.webp?ex=6985f404&is=6984a284&hm=06ae526394b3aaad96ee58eac391a441c71c8397051e592e08a1c4cf827601a4&"
+            },
+            {
+                "hp": 8000,
+                "atk": 300,
+                "def": 300,
+                "spd": 300,
+                "image": "https://cdn.discordapp.com/attachments/815650716730654743/1468969567467474975/IMG_6334.webp?ex=6985f405&is=6984a285&hm=4ed79faa6bb22284515cc1190116b9b6b901b74c4af8241bbd8d40bb85ff4694&"
             }
         ],
         "rewards": {"gold": 2500, "exp": 1000, "guaranteed_rarity": "Legendary"}
