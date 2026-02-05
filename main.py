@@ -1670,28 +1670,30 @@ def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", 
     
     # === LOW HP TRIGGERS ===
     elif ability_type == "low_hp_def_boost":  # Emma - Low HP: +50% DEF
-        if attacker["hp"] < (attacker["hp_max"] * 0.5) and not flags.get("low_hp_def_active"):
+        if attacker["hp"] < (attacker["hp_max"] * 0.5):
+            if not flags.get("low_hp_def_active"):
+                flags["low_hp_def_active"] = True
+                if is_team_battle:
+                    messages.append(f"💚 **Emma's protection!** Team DEF +50%")
+                else:
+                    messages.append(f"💚 **{attacker['name']}'s low HP ability activates!** DEF +50%")
             if mode == "bonus":
                 bonuses["def"] += 0.5
             else:
                 attacker["def"] = int(attacker["def_base"] * 1.5)
-            flags["low_hp_def_active"] = True
-            if is_team_battle:
-                messages.append(f"💚 **Emma's protection!** Team DEF +50%")
-            else:
-                messages.append(f"💚 **{attacker['name']}'s low HP ability activates!** DEF +50%")
     
     elif ability_type == "low_hp_atk_boost":  # Bahamut - Low HP: +50% ATK
-        if attacker["hp"] < (attacker["hp_max"] * 0.5) and not flags.get("bahamut_active"):
+        if attacker["hp"] < (attacker["hp_max"] * 0.5):
+            if not flags.get("bahamut_active"):
+                flags["bahamut_active"] = True
+                if is_team_battle:
+                    messages.append(f"⚡ **Bahamut's fury!** Team ATK +50%")
+                else:
+                    messages.append(f"⚡ **{attacker['name']}'s fury awakens!** ATK +50%")
             if mode == "bonus":
                 bonuses["atk"] += 0.5
             else:
                 attacker["atk"] = int(attacker["atk_base"] * 1.5)
-            flags["bahamut_active"] = True
-            if is_team_battle:
-                messages.append(f"⚡ **Bahamut's fury!** Team ATK +50%")
-            else:
-                messages.append(f"⚡ **{attacker['name']}'s fury awakens!** ATK +50%")
     
     elif ability_type == "lifesteal":  # Yukimura - Low HP: Lifesteal activation
         if attacker["hp"] < (attacker["hp_max"] * 0.5) and not flags.get("lifesteal_active"):
@@ -1783,7 +1785,10 @@ def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", 
     elif ability_type == "turn3_bonus_damage":  # Sidmi - After turn 3: +50% bonus damage
         if turn >= 3 and not flags.get("sidmi_active"):
             flags["sidmi_active"] = True
-            messages.append(f"💥 **{attacker['name']}'s true power unleashed!** +50% bonus damage")
+            if is_team_battle:
+                messages.append(f"💥 **Sidmi's true power unleashed!** +50% bonus damage")
+            else:
+                messages.append(f"💥 **{attacker['name']}'s true power unleashed!** +50% bonus damage")
     
     # Note: speed_bonus, survive, and paralyze are handled in their respective sections
     # (damage calculation, defender death, first attack) and don't need stat modifications here
