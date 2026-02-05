@@ -1670,26 +1670,32 @@ def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", 
     
     # === LOW HP TRIGGERS ===
     elif ability_type == "low_hp_def_boost":  # Emma - Low HP: +50% DEF
-        if attacker["hp"] < (attacker["hp_max"] * 0.5):
-            if not flags.get("low_hp_def_active"):
-                flags["low_hp_def_active"] = True
-                if is_team_battle:
-                    messages.append(f"💚 **Emma's protection!** Team DEF +50%")
-                else:
-                    messages.append(f"💚 **{attacker['name']}'s low HP ability activates!** DEF +50%")
+        # Check if we need to activate the ability (only if HP < 50% and not yet activated)
+        if attacker["hp"] < (attacker["hp_max"] * 0.5) and not flags.get("low_hp_def_active"):
+            flags["low_hp_def_active"] = True
+            if is_team_battle:
+                messages.append(f"💚 **Emma's protection!** Team DEF +50%")
+            else:
+                messages.append(f"💚 **{attacker['name']}'s low HP ability activates!** DEF +50%")
+        
+        # Apply the bonus ALWAYS if the ability is active (permanent)
+        if flags.get("low_hp_def_active"):
             if mode == "bonus":
                 bonuses["def"] += 0.5
             else:
                 attacker["def"] = int(attacker["def_base"] * 1.5)
     
     elif ability_type == "low_hp_atk_boost":  # Bahamut - Low HP: +50% ATK
-        if attacker["hp"] < (attacker["hp_max"] * 0.5):
-            if not flags.get("bahamut_active"):
-                flags["bahamut_active"] = True
-                if is_team_battle:
-                    messages.append(f"⚡ **Bahamut's fury!** Team ATK +50%")
-                else:
-                    messages.append(f"⚡ **{attacker['name']}'s fury awakens!** ATK +50%")
+        # Check if we need to activate the ability (only if HP < 50% and not yet activated)
+        if attacker["hp"] < (attacker["hp_max"] * 0.5) and not flags.get("bahamut_active"):
+            flags["bahamut_active"] = True
+            if is_team_battle:
+                messages.append(f"⚡ **Bahamut's fury!** Team ATK +50%")
+            else:
+                messages.append(f"⚡ **{attacker['name']}'s fury awakens!** ATK +50%")
+        
+        # Apply the bonus ALWAYS if the ability is active (permanent)
+        if flags.get("bahamut_active"):
             if mode == "bonus":
                 bonuses["atk"] += 0.5
             else:
@@ -1714,16 +1720,20 @@ def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", 
                 messages.append(f"🌬️ **{attacker['name']}'s emergency heal!** Heals {heal} HP")
     
     elif ability_type == "low_hp_spd_boost":  # Nobunaga - Low HP: +50% SPD
+        # Check if we need to activate the ability (only if HP < 50% and not yet activated)
         if attacker["hp"] < (attacker["hp_max"] * 0.5) and not flags.get("nobunaga_active"):
-            if mode == "bonus":
-                bonuses["spd"] += 0.5
-            else:
-                attacker["spd"] = int(attacker["spd_base"] * 1.5)
             flags["nobunaga_active"] = True
             if is_team_battle:
                 messages.append(f"⚡ **Nobunaga's speed!** Team SPD +50%")
             else:
                 messages.append(f"⚡ **{attacker['name']}'s speed surge!** SPD +50%")
+        
+        # Apply the bonus ALWAYS if the ability is active (permanent)
+        if flags.get("nobunaga_active"):
+            if mode == "bonus":
+                bonuses["spd"] += 0.5
+            else:
+                attacker["spd"] = int(attacker["spd_base"] * 1.5)
     
     # === SCALING ABILITIES ===
     elif ability_type == "def_boost_and_heal":  # Kasli - DEF comparison with stacking
@@ -1783,12 +1793,14 @@ def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", 
     # === SPECIAL DAMAGE/PASSIVE ABILITIES ===
     # These are handled separately in damage calculation, but we track activation
     elif ability_type == "turn3_bonus_damage":  # Sidmi - After turn 3: +50% bonus damage
-        if turn >= 3 and not flags.get("sidmi_active"):
-            flags["sidmi_active"] = True
+        if turn >= 3:
+            if not flags.get("sidmi_active"):
+                flags["sidmi_active"] = True
+            # Message EVERY TURN (like Lunacia)
             if is_team_battle:
-                messages.append(f"💥 **Sidmi's true power unleashed!** +50% bonus damage")
+                messages.append(f"💥 **Sidmi's power!** +50% bonus damage")
             else:
-                messages.append(f"💥 **{attacker['name']}'s true power unleashed!** +50% bonus damage")
+                messages.append(f"💥 **{attacker['name']}'s true power!** +50% bonus damage")
     
     # Note: speed_bonus, survive, and paralyze are handled in their respective sections
     # (damage calculation, defender death, first attack) and don't need stat modifications here
