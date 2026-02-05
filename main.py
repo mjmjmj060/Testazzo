@@ -1477,7 +1477,15 @@ def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", 
     
     # === FIRST-TURN ABILITIES ===
     if ability_type == "first_turn_def":  # Kai - First turn +100% DEF
-        if turn == 1 and not flags.get("buff_applied"):
+        # For boss battles (bonus mode): apply on turn 1 if buff_applied is True
+        # For regular battles (direct mode): apply on turn 1 if buff_applied is False
+        should_apply = False
+        if mode == "bonus":
+            should_apply = (turn == 1 and flags.get("buff_applied", False))
+        else:
+            should_apply = (turn == 1 and not flags.get("buff_applied", False))
+        
+        if should_apply:
             if mode == "bonus":
                 bonuses["def"] += 1.0
             else:
@@ -1485,7 +1493,13 @@ def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", 
                 flags["buff_applied"] = True
     
     elif ability_type == "first_turn_spd":  # Valkyrie - First turn +100% SPD
-        if turn == 1 and not flags.get("buff_applied"):
+        should_apply = False
+        if mode == "bonus":
+            should_apply = (turn == 1 and flags.get("buff_applied", False))
+        else:
+            should_apply = (turn == 1 and not flags.get("buff_applied", False))
+        
+        if should_apply:
             if mode == "bonus":
                 bonuses["spd"] += 1.0
             else:
@@ -1493,7 +1507,13 @@ def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", 
                 flags["buff_applied"] = True
     
     elif ability_type == "first_turn_atk":  # Shishilan - First turn +50% ATK
-        if turn == 1 and not flags.get("buff_applied"):
+        should_apply = False
+        if mode == "bonus":
+            should_apply = (turn == 1 and flags.get("buff_applied", False))
+        else:
+            should_apply = (turn == 1 and not flags.get("buff_applied", False))
+        
+        if should_apply:
             if mode == "bonus":
                 bonuses["atk"] += 0.5
             else:
@@ -1525,15 +1545,23 @@ def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", 
                 messages.append(f"✨ **{attacker['name']}'s divine blessing!** Heals {heal} HP")
     
     elif ability_type == "first_attack_spd":  # Deale - First attack: +50% SPD
-        if turn == 1 and not flags.get("deale_boosted"):
+        # For boss battles: apply on turn 1 if already done (flag set during initialization)
+        # For regular battles: apply on turn 1 if not done yet
+        should_apply = False
+        show_message = False
+        if mode == "bonus":
+            should_apply = (turn == 1 and flags.get("deale_boosted", False))
+        else:
+            should_apply = (turn == 1 and not flags.get("deale_boosted", False))
+            show_message = should_apply  # Only show message in direct mode
+        
+        if should_apply:
             if mode == "bonus":
                 bonuses["spd"] += 0.5
             else:
                 attacker["spd"] = int(attacker["spd_base"] * 1.5)
-            flags["deale_boosted"] = True
-            if is_team_battle:
-                messages.append(f"⚡ **Deale's swiftness!** Team SPD +50%")
-            else:
+                flags["deale_boosted"] = True
+            if show_message:
                 messages.append(f"💨 **{attacker['name']}'s swift strike!** SPD +50%")
     
     elif ability_type == "heal_and_def":  # Jeanne - First attack: Heal 30% HP + 30% DEF
