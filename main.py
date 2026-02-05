@@ -1454,6 +1454,296 @@ def damage_formula(attacker_atk: int, defender_def: int) -> int:
     dmg = max(1, int(attacker_atk - defender_def * 0.5))
     return dmg
 
+def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", is_team_battle=False):
+    """
+    Apply ability effects based on ability_type.
+    
+    Args:
+        ability_type: The type of ability (e.g., "first_turn_def", "lifesteal", etc.)
+        attacker: Dict with attacker stats (hp, atk, def, spd, hp_max, atk_base, def_base, spd_base, name, etc.)
+        defender: Dict with defender stats
+        flags: Dict with ability state flags (buff_applied, lifesteal_active, etc.)
+        turn: Current turn number (round number)
+        mode: "direct" for run_battle (modifies stats directly), "bonus" for run_boss_battle (returns bonuses)
+        is_team_battle: True for boss battles (team mode), False for regular battles
+    
+    Returns:
+        dict with:
+            - "messages": List of messages to display
+            - "bonuses": Dict with atk_bonus, def_bonus, spd_bonus (for mode="bonus")
+    """
+    messages = []
+    bonuses = {"atk": 0.0, "def": 0.0, "spd": 0.0}
+    
+    # === FIRST-TURN ABILITIES ===
+    if ability_type == "first_turn_def":  # Kai - First turn +100% DEF
+        # For boss battles (bonus mode): apply on turn 1 if buff_applied is True
+        # For regular battles (direct mode): apply on turn 1 if buff_applied is False
+        should_apply = False
+        if mode == "bonus":
+            should_apply = (turn == 1 and flags.get("buff_applied", False))
+        else:
+            should_apply = (turn == 1 and not flags.get("buff_applied", False))
+        
+        if should_apply:
+            if mode == "bonus":
+                bonuses["def"] += 1.0
+            else:
+                attacker["def"] = int(attacker["def_base"] * 2)
+                flags["buff_applied"] = True
+    
+    elif ability_type == "first_turn_spd":  # Valkyrie - First turn +100% SPD
+        should_apply = False
+        if mode == "bonus":
+            should_apply = (turn == 1 and flags.get("buff_applied", False))
+        else:
+            should_apply = (turn == 1 and not flags.get("buff_applied", False))
+        
+        if should_apply:
+            if mode == "bonus":
+                bonuses["spd"] += 1.0
+            else:
+                attacker["spd"] = int(attacker["spd_base"] * 2)
+                flags["buff_applied"] = True
+    
+    elif ability_type == "first_turn_atk":  # Shishilan - First turn +50% ATK
+        should_apply = False
+        if mode == "bonus":
+            should_apply = (turn == 1 and flags.get("buff_applied", False))
+        else:
+            should_apply = (turn == 1 and not flags.get("buff_applied", False))
+        
+        if should_apply:
+            if mode == "bonus":
+                bonuses["atk"] += 0.5
+            else:
+                attacker["atk"] = int(attacker["atk_base"] * 1.5)
+                flags["buff_applied"] = True
+    
+    # === 3-TURN BUFFS ===
+    elif ability_type == "def_boost_3turns":  # Ruri - 3 turns +50% DEF
+        if flags.get("ruri_turns", 0) > 0:
+            if mode == "bonus":
+                bonuses["def"] += 0.5
+            # For direct mode, this is applied at initialization
+    
+    elif ability_type == "spd_boost_3turns":  # Luminalia - 3 turns +50% SPD
+        if flags.get("luminalia_turns", 0) > 0:
+            if mode == "bonus":
+                bonuses["spd"] += 0.5
+            # For direct mode, this is applied at initialization
+    
+    # === FIRST-ATTACK ABILITIES ===
+    elif ability_type == "first_attack_heal":  # Mitama - First attack: Heals 50% max HP
+        if turn == 1 and not flags.get("mitama_healed"):
+            heal = int(attacker["hp_max"] * 0.5)
+            attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal)
+            flags["mitama_healed"] = True
+            if is_team_battle:
+                messages.append(f"💖 **Mitama's blessing!** Team heals {heal} HP")
+            else:
+                messages.append(f"✨ **{attacker['name']}'s divine blessing!** Heals {heal} HP")
+    
+    elif ability_type == "first_attack_spd":  # Deale - First attack: +50% SPD
+        # For boss battles: apply on turn 1 if already done (flag set during initialization)
+        # For regular battles: apply on turn 1 if not done yet
+        should_apply = False
+        show_message = False
+        if mode == "bonus":
+            should_apply = (turn == 1 and flags.get("deale_boosted", False))
+        else:
+            should_apply = (turn == 1 and not flags.get("deale_boosted", False))
+            show_message = should_apply  # Only show message in direct mode
+        
+        if should_apply:
+            if mode == "bonus":
+                bonuses["spd"] += 0.5
+            else:
+                attacker["spd"] = int(attacker["spd_base"] * 1.5)
+                flags["deale_boosted"] = True
+            if show_message:
+                messages.append(f"💨 **{attacker['name']}'s swift strike!** SPD +50%")
+    
+    elif ability_type == "heal_and_def":  # Jeanne - First attack: Heal 30% HP + 30% DEF
+        if turn == 1 and not flags.get("heal_and_def_used"):
+            heal_amount = int(attacker["hp_max"] * 0.3)
+            attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal_amount)
+            flags["heal_and_def_used"] = True
+            if is_team_battle:
+                messages.append(f"✨ **Jeanne's protection!** Team heals {heal_amount} HP, DEF +30%")
+            else:
+                messages.append(f"✨ **{attacker['name']} heals {heal_amount} HP and gains +30% DEF!**")
+        
+        # Apply DEF bonus every turn after activation (permanent)
+        if flags.get("heal_and_def_used"):
+            if mode == "bonus":
+                bonuses["def"] += 0.3
+            else:
+                if not flags.get("jeanne_def_boost"):
+                    flags["jeanne_def_boost"] = 1.3
+                attacker["def"] = int(attacker["def_base"] * flags.get("jeanne_def_boost", 1.3))
+    
+    # === TURN 3+ ACTIVATION ===
+    elif ability_type == "turn3_atk_boost":  # Kuu - After turn 3: +50% ATK
+        if turn >= 3:
+            if not flags.get("kuu_boosted"):
+                flags["kuu_boosted"] = True
+                if is_team_battle:
+                    messages.append(f"🔥 **Kuu's power awakens!** Team ATK +50%")
+                else:
+                    messages.append(f"🔥 **{attacker['name']}'s power awakens!** ATK +50%")
+            if mode == "bonus":
+                bonuses["atk"] += 0.5
+            else:
+                attacker["atk"] = int(attacker["atk_base"] * 1.5)
+    
+    elif ability_type == "turn3_heal":  # Himeyuri - Turn 3: Heal 50% HP
+        if turn == 3 and not flags.get("himeyuri_healed"):
+            heal = int(attacker["hp_max"] * 0.5)
+            attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal)
+            flags["himeyuri_healed"] = True
+            if is_team_battle:
+                messages.append(f"🌸 **Himeyuri's blessing!** Team heals {heal} HP")
+            else:
+                messages.append(f"🌸 **{attacker['name']}'s rejuvenation!** Heals {heal} HP")
+    
+    elif ability_type == "turn3_atk_def_boost":  # Kalisa - After turn 3: +20% ATK and DEF
+        if turn >= 3:
+            if not flags.get("kalisa_boosted"):
+                flags["kalisa_boosted"] = True
+                if is_team_battle:
+                    messages.append(f"✨ **Kalisa's power awakens!** Team ATK +20%, DEF +20%")
+                else:
+                    messages.append(f"✨ **{attacker['name']}'s power awakens!** ATK +20%, DEF +20%")
+            if mode == "bonus":
+                bonuses["atk"] += 0.2
+                bonuses["def"] += 0.2
+            else:
+                attacker["atk"] = int(attacker["atk_base"] * 1.2)
+                attacker["def"] = int(attacker["def_base"] * 1.2)
+    
+    # === LOW HP TRIGGERS ===
+    elif ability_type == "low_hp_def_boost":  # Emma - Low HP: +50% DEF
+        if attacker["hp"] < (attacker["hp_max"] * 0.5) and not flags.get("low_hp_def_active"):
+            if mode == "bonus":
+                bonuses["def"] += 0.5
+            else:
+                attacker["def"] = int(attacker["def_base"] * 1.5)
+            flags["low_hp_def_active"] = True
+            if is_team_battle:
+                messages.append(f"💚 **Emma's protection!** Team DEF +50%")
+            else:
+                messages.append(f"💚 **{attacker['name']}'s low HP ability activates!** DEF +50%")
+    
+    elif ability_type == "low_hp_atk_boost":  # Bahamut - Low HP: +50% ATK
+        if attacker["hp"] < (attacker["hp_max"] * 0.5) and not flags.get("bahamut_active"):
+            if mode == "bonus":
+                bonuses["atk"] += 0.5
+            else:
+                attacker["atk"] = int(attacker["atk_base"] * 1.5)
+            flags["bahamut_active"] = True
+            if is_team_battle:
+                messages.append(f"⚡ **Bahamut's fury!** Team ATK +50%")
+            else:
+                messages.append(f"⚡ **{attacker['name']}'s fury awakens!** ATK +50%")
+    
+    elif ability_type == "lifesteal":  # Yukimura - Low HP: Lifesteal activation
+        if attacker["hp"] < (attacker["hp_max"] * 0.5) and not flags.get("lifesteal_active"):
+            flags["lifesteal_active"] = True
+            if is_team_battle:
+                messages.append(f"🩸 **Yukimura's lifesteal activated!**")
+            else:
+                messages.append(f"🩸 **{attacker['name']}'s lifesteal awakens!** Heals 50% of damage dealt")
+    
+    elif ability_type == "low_hp_big_heal":  # Windy - Low HP: One-time 50% heal
+        if attacker["hp"] < (attacker["hp_max"] * 0.5) and not flags.get("windy_healed"):
+            heal = int(attacker["hp_max"] * 0.5)
+            attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal)
+            flags["windy_healed"] = True
+            if is_team_battle:
+                messages.append(f"🌬️ **Windy's emergency heal!** +{heal} HP")
+            else:
+                messages.append(f"🌬️ **{attacker['name']}'s emergency heal!** Heals {heal} HP")
+    
+    elif ability_type == "low_hp_spd_boost":  # Nobunaga - Low HP: +50% SPD
+        if attacker["hp"] < (attacker["hp_max"] * 0.5) and not flags.get("nobunaga_active"):
+            if mode == "bonus":
+                bonuses["spd"] += 0.5
+            else:
+                attacker["spd"] = int(attacker["spd_base"] * 1.5)
+            flags["nobunaga_active"] = True
+            if is_team_battle:
+                messages.append(f"⚡ **Nobunaga's speed!** Team SPD +50%")
+            else:
+                messages.append(f"⚡ **{attacker['name']}'s speed surge!** SPD +50%")
+    
+    # === SCALING ABILITIES ===
+    elif ability_type == "def_boost_and_heal":  # Kasli - DEF comparison with stacking
+        if attacker["def"] > defender["def"]:
+            flags["kasli_stacks"] = flags.get("kasli_stacks", 0) + 1
+            if mode == "bonus":
+                bonuses["def"] += 0.2 * flags["kasli_stacks"]
+            else:
+                attacker["def"] = int(attacker["def_base"] * (1 + 0.2 * flags["kasli_stacks"]))
+            heal = int(attacker["hp_max"] * 0.2)
+            attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal)
+            if is_team_battle:
+                messages.append(f"🛡️ **Kasli's dominance!** DEF +{flags['kasli_stacks'] * 20}%, heals {heal}")
+            else:
+                messages.append(f"🛡️ **{attacker['name']}'s DEF dominance!** DEF +{flags['kasli_stacks'] * 20}% and heals {heal} HP")
+    
+    elif ability_type == "atk_boost_and_heal":  # Izanagi - ATK comparison with stacking
+        if attacker["atk"] > defender["atk"]:
+            flags["izanagi_stacks"] = flags.get("izanagi_stacks", 0) + 1
+            if mode == "bonus":
+                bonuses["atk"] += 0.2 * flags["izanagi_stacks"]
+            else:
+                attacker["atk"] = int(attacker["atk_base"] * (1 + 0.2 * flags["izanagi_stacks"]))
+            heal = int(attacker["hp_max"] * 0.2)
+            attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal)
+            if is_team_battle:
+                messages.append(f"⚔️ **Izanagi's power!** ATK +{flags['izanagi_stacks'] * 20}%, heals {heal}")
+            else:
+                messages.append(f"⚔️ **{attacker['name']}'s ATK dominance!** ATK +{flags['izanagi_stacks'] * 20}% and heals {heal} HP")
+    
+    # === RAMPAGE/STACKING ABILITIES ===
+    elif ability_type == "rampage":  # Balrog - +20% ATK per turn
+        flags["balrog_stacks"] = flags.get("balrog_stacks", 0) + 1
+        if mode == "bonus":
+            bonuses["atk"] += 0.2 * flags["balrog_stacks"]
+        else:
+            attacker["atk"] = int(attacker["atk_base"] * (1 + 0.2 * flags["balrog_stacks"]))
+        if is_team_battle:
+            messages.append(f"🔥 **Balrog's rage!** Team ATK +{flags['balrog_stacks'] * 20}%")
+        else:
+            if flags["balrog_stacks"] == 1:
+                messages.append(f"🔥 **{attacker['name']}'s rage grows!** ATK +20% (Total: +{flags['balrog_stacks'] * 20}%)")
+            else:
+                messages.append(f"🔥 **{attacker['name']}'s rage intensifies!** ATK +20% (Total: +{flags['balrog_stacks'] * 20}%)")
+    
+    elif ability_type == "spd_rampage":  # Trixi - +20% SPD per turn
+        flags["trixi_stacks"] = flags.get("trixi_stacks", 0) + 1
+        if mode == "bonus":
+            bonuses["spd"] += 0.2 * flags["trixi_stacks"]
+        else:
+            attacker["spd"] = int(attacker["spd_base"] * (1 + 0.2 * flags["trixi_stacks"]))
+        if is_team_battle:
+            messages.append(f"💨 **Trixi's speed surge!** Team SPD +{flags['trixi_stacks'] * 20}%")
+        else:
+            messages.append(f"💨 **{attacker['name']}'s speed increases!** SPD +{flags['trixi_stacks'] * 20}%")
+    
+    # === SPECIAL DAMAGE/PASSIVE ABILITIES ===
+    # These are handled separately in damage calculation, but we track activation
+    elif ability_type == "turn3_bonus_damage":  # Sidmi - After turn 3: +50% bonus damage
+        if turn >= 3 and not flags.get("sidmi_active"):
+            flags["sidmi_active"] = True
+            messages.append(f"💥 **{attacker['name']}'s true power unleashed!** +50% bonus damage")
+    
+    # Note: speed_bonus, survive, and paralyze are handled in their respective sections
+    # (damage calculation, defender death, first attack) and don't need stat modifications here
+    
+    return {"messages": messages, "bonuses": bonuses}
+
 async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user, is_pvp=False, floor=None, message=None):
     """
     Reusable battle function for both PvE (floor battles) and PvP (duels).
@@ -1612,7 +1902,7 @@ async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user
     
     ability_text = ""
     
-    # Apply passive and first-turn abilities for player 1
+    # Apply passive and first-turn abilities for player 1 (initialization)
     if p1["ability_type"] == "def_boost_3turns":  # Ruri
         p1_flags["ruri_turns"] = 3
         p1["def"] = int(p1["def_base"] * 1.5)
@@ -1804,128 +2094,17 @@ async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user
                 round_log.append(f"⚡ **{attacker['name']} is paralyzed! Cannot attack.** ({attacker_flags['paralyze_turns']} turns left)")
                 continue
             
-            # Low HP abilities (Emma, Bahamut, Yukimura) - only activate for players with abilities
+            # Apply abilities - only for players with abilities (not enemies in PvE)
             if (not is_enemy or is_pvp):
-                if attacker["ability_type"] == "low_hp_def_boost" and not attacker_flags["low_hp_def_active"]:
-                    if attacker["hp"] < (attacker["hp_max"] * 0.5):
-                        attacker["def"] = int(attacker["def_base"] * 1.5)
-                        attacker_flags["low_hp_def_active"] = True
-                        round_log.append(f"💚 **{attacker['name']}'s low HP ability activates!** DEF +50%")
-                
-                if attacker["ability_type"] == "low_hp_atk_boost" and not attacker_flags["bahamut_active"]:
-                    if attacker["hp"] < (attacker["hp_max"] * 0.5):
-                        attacker["atk"] = int(attacker["atk_base"] * 1.5)
-                        attacker_flags["bahamut_active"] = True
-                        round_log.append(f"⚡ **{attacker['name']}'s fury awakens!** ATK +50%")
-                
-                if attacker["ability_type"] == "lifesteal" and not attacker_flags["lifesteal_active"]:
-                    if attacker["hp"] < (attacker["hp_max"] * 0.5):
-                        attacker_flags["lifesteal_active"] = True
-                        round_log.append(f"🩸 **{attacker['name']}'s lifesteal awakens!** Heals 50% of damage dealt")
-                
-                # Balrog's rampage
-                if attacker["ability_type"] == "rampage":
-                    attacker_flags["balrog_stacks"] += 1
-                    attacker["atk"] = int(attacker["atk_base"] * (1 + 0.2 * attacker_flags["balrog_stacks"]))
-                    if attacker_flags["balrog_stacks"] == 1:
-                        round_log.append(f"🔥 **{attacker['name']}'s rage grows!** ATK +20% (Total: +{attacker_flags['balrog_stacks'] * 20}%)")
-                    else:
-                        round_log.append(f"🔥 **{attacker['name']}'s rage intensifies!** ATK +20% (Total: +{attacker_flags['balrog_stacks'] * 20}%)")
-                
-                # Jeanne's heal and def boost (first attack only)
-                if attacker["ability_type"] == "heal_and_def" and not attacker_flags["heal_and_def_used"] and current_round == 1:
-                    heal_amount = int(attacker["hp_max"] * 0.3)
-                    attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal_amount)
-                    attacker_flags["jeanne_def_boost"] = 1.3
-                    attacker["def"] = int(attacker["def_base"] * attacker_flags["jeanne_def_boost"])
-                    attacker_flags["heal_and_def_used"] = True
-                    round_log.append(f"✨ **{attacker['name']} heals {heal_amount} HP and gains +30% DEF!**")
-                
-                # Kasli's DEF boost and heal (uses base stats for linear scaling)
-                if attacker["ability_type"] == "def_boost_and_heal":
-                    if attacker["def"] > defender["def"]:
-                        # Increase DEF by 20% based on BASE stats (linear stacking)
-                        attacker_flags["kasli_stacks"] += 1
-                        attacker["def"] = int(attacker["def_base"] * (1 + 0.2 * attacker_flags["kasli_stacks"]))
-                        # Heal 20% max HP
-                        heal = int(attacker["hp_max"] * 0.2)
-                        attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal)
-                        round_log.append(f"🛡️ **{attacker['name']}'s DEF dominance!** DEF +{attacker_flags['kasli_stacks'] * 20}% and heals {heal} HP")
-                
-                # Izanagi's ATK boost and heal (uses base stats for linear scaling)
-                if attacker["ability_type"] == "atk_boost_and_heal":
-                    if attacker["atk"] > defender["atk"]:
-                        # Increase ATK by 20% based on BASE stats (linear stacking)
-                        attacker_flags["izanagi_stacks"] += 1
-                        attacker["atk"] = int(attacker["atk_base"] * (1 + 0.2 * attacker_flags["izanagi_stacks"]))
-                        # Heal 20% max HP
-                        heal = int(attacker["hp_max"] * 0.2)
-                        attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal)
-                        round_log.append(f"⚔️ **{attacker['name']}'s ATK dominance!** ATK +{attacker_flags['izanagi_stacks'] * 20}% and heals {heal} HP")
-                
-                # Windy's one-time big heal
-                if attacker["ability_type"] == "low_hp_big_heal" and not attacker_flags["windy_healed"]:
-                    if attacker["hp"] < attacker["hp_max"] * 0.5:
-                        heal = int(attacker["hp_max"] * 0.5)
-                        attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal)
-                        attacker_flags["windy_healed"] = True
-                        round_log.append(f"🌬️ **{attacker['name']}'s emergency heal!** Heals {heal} HP")
-                
-                # Nobunaga's SPD boost when HP < 50%
-                if attacker["ability_type"] == "low_hp_spd_boost" and not attacker_flags["nobunaga_active"]:
-                    if attacker["hp"] < attacker["hp_max"] * 0.5:
-                        attacker["spd"] = int(attacker["spd_base"] * 1.5)
-                        attacker_flags["nobunaga_active"] = True
-                        round_log.append(f"⚡ **{attacker['name']}'s speed surge!** SPD +50%")
-                
-                # Mitama's first attack heal
-                if attacker["ability_type"] == "first_attack_heal" and not attacker_flags["mitama_healed"] and current_round == 1:
-                    heal = int(attacker["hp_max"] * 0.5)
-                    attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal)
-                    attacker_flags["mitama_healed"] = True
-                    round_log.append(f"✨ **{attacker['name']}'s divine blessing!** Heals {heal} HP")
-                
-                # Deale's first attack SPD boost
-                if attacker["ability_type"] == "first_attack_spd" and not attacker_flags["deale_boosted"] and current_round == 1:
-                    attacker["spd"] = int(attacker["spd_base"] * 1.5)
-                    attacker_flags["deale_boosted"] = True
-                    round_log.append(f"💨 **{attacker['name']}'s swift strike!** SPD +50%")
-                
-                # Kuu's ATK boost after 3 turns
-                if attacker["ability_type"] == "turn3_atk_boost" and not attacker_flags["kuu_boosted"] and current_round >= 3:
-                    attacker["atk"] = int(attacker["atk_base"] * 1.5)
-                    attacker_flags["kuu_boosted"] = True
-                    round_log.append(f"🔥 **{attacker['name']}'s power awakens!** ATK +50%")
-                
-                # Himeyuri's heal after 3 turns
-                if attacker["ability_type"] == "turn3_heal" and not attacker_flags["himeyuri_healed"] and current_round >= 3:
-                    heal = int(attacker["hp_max"] * 0.5)
-                    attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal)
-                    attacker_flags["himeyuri_healed"] = True
-                    round_log.append(f"🌸 **{attacker['name']}'s rejuvenation!** Heals {heal} HP")
-                
-                # Kalisa - After 3 turns: +20% ATK and +20% DEF (permanent)
-                if attacker["ability_type"] == "turn3_atk_def_boost":
-                    if current_round >= 3:
-                        if not attacker_flags.get("kalisa_boosted", False):
-                            attacker_flags["kalisa_boosted"] = True
-                            round_log.append(f"✨ **{attacker['name']}'s power awakens!** ATK +20%, DEF +20%")
-                        # Apply the bonus every turn after activation (permanent)
-                        attacker["atk"] = int(attacker["atk_base"] * 1.2)
-                        attacker["def"] = int(attacker["def_base"] * 1.2)
-                
-                # Trixi - Every turn: +20% SPD (stacks)
-                if attacker["ability_type"] == "spd_rampage":
-                    attacker_flags["trixi_stacks"] = attacker_flags.get("trixi_stacks", 0) + 1
-                    attacker["spd"] = int(attacker["spd_base"] * (1 + 0.2 * attacker_flags["trixi_stacks"]))
-                    round_log.append(f"💨 **{attacker['name']}'s speed increases!** SPD +{attacker_flags['trixi_stacks'] * 20}%")
-                
-                # Sidmi - After 3 turns: +50% bonus damage (permanent)
-                if attacker["ability_type"] == "turn3_bonus_damage":
-                    if current_round >= 3:
-                        if not attacker_flags.get("sidmi_active", False):
-                            attacker_flags["sidmi_active"] = True
-                            round_log.append(f"💥 **{attacker['name']}'s true power unleashed!** +50% bonus damage")
+                result = apply_ability(
+                    attacker["ability_type"],
+                    attacker,
+                    defender,
+                    attacker_flags,
+                    current_round,
+                    mode="direct"
+                )
+                round_log.extend(result["messages"])
             
             # Calculate damage
             base_dmg = damage_formula(attacker["atk"], defender["def"])
@@ -2829,131 +3008,38 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
                 def_bonus = 0.0
                 spd_bonus = 0.0
                 
-                # Ruri - 3 turns +50% DEF
-                if team_flags["ruri_turns"] > 0:
-                    def_bonus += 0.5
-                
-                # Luminalia - 3 turns +50% SPD
-                if team_flags["luminalia_turns"] > 0:
-                    spd_bonus += 0.5
-                
-                # First turn buffs (Kai, Valkyrie, Shishilan)
-                if team_flags["buff_applied"] and current_round == 1:
-                    if "first_turn_def" in team_abilities:
-                        def_bonus += 1.0  # Kai +100% DEF
-                    if "first_turn_spd" in team_abilities:
-                        spd_bonus += 1.0  # Valkyrie +100% SPD
-                    if "first_turn_atk" in team_abilities:
-                        atk_bonus += 0.5  # Shishilan +50% ATK
-                
-                # Deale - First attack SPD (se non scaduto)
-                if team_flags.get("first_attack_spd_done") and current_round == 1:
-                    spd_bonus += 0.5
-                
-                # Jeanne - First attack DEF (permanente)
-                if team_flags.get("heal_and_def_done"):
-                    def_bonus += 0.3
-                
-                # Kuu - After 3 turns: +50% ATK (permanent after activation)
-                if "turn3_atk_boost" in team_abilities:
-                    if current_round >= 3:
-                        if not team_flags["turn3_atk_boost_done"]:
-                            team_flags["turn3_atk_boost_done"] = True
-                            round_log.append(f"🔥 **Kuu's power awakens!** Team ATK +50%")
-                        atk_bonus += 0.5  # Apply bonus EVERY turn after activation
-                
-                # Himeyuri - After 3 turns: Heals 50% max HP (one-time)
-                if "turn3_heal" in team_abilities and current_round == 3 and not team_flags["turn3_heal_done"]:
-                    heal = int(team["hp_max"] * 0.5)
-                    team["hp"] = min(team["hp_max"], team["hp"] + heal)
-                    team_flags["turn3_heal_done"] = True
-                    round_log.append(f"🌸 **Himeyuri's blessing!** Team heals {heal} HP")
-                
-                # Kalisa - After 3 turns: +20% ATK and +20% DEF (permanent)
-                if "turn3_atk_def_boost" in team_abilities:
-                    if current_round >= 3:
-                        if not team_flags.get("kalisa_boosted", False):
-                            team_flags["kalisa_boosted"] = True
-                            round_log.append(f"✨ **Kalisa's power awakens!** Team ATK +20%, DEF +20%")
-                        # Only add the bonus after activation (permanent)
-                        atk_bonus += 0.2
-                        def_bonus += 0.2
-                
-                # Trixi - Every turn: +20% SPD (stacks)
-                if "spd_rampage" in team_abilities:
-                    team_flags["trixi_stacks"] = team_flags.get("trixi_stacks", 0) + 1
-                    spd_bonus += 0.2 * team_flags["trixi_stacks"]
-                    round_log.append(f"💨 **Trixi's speed surge!** Team SPD +{int(team_flags['trixi_stacks'] * 20)}%")
-                
-                # Sidmi - After 3 turns: +50% bonus damage (permanent)
-                if "turn3_bonus_damage" in team_abilities:
-                    if current_round >= 3:
-                        if not team_flags.get("sidmi_active", False):
-                            team_flags["sidmi_active"] = True
-                            round_log.append(f"💥 **Sidmi's true power unleashed!** +50% bonus damage")
-                
-                # Balrog rampage (+20% ATK per turn, stacking)
-                if "rampage" in team_abilities:
-                    team_flags["balrog_stacks"] += 1
-                    balrog_bonus = 0.2 * team_flags["balrog_stacks"]
-                    atk_bonus += balrog_bonus
-                    round_log.append(f"🔥 **Balrog's rage!** Team ATK +{int(balrog_bonus * 100)}%")
-                
-                # Kasli DEF boost and heal (based on total DEF)
-                if "def_boost_and_heal" in team_abilities:
-                    # Calcola DEF corrente per il check
-                    current_def = int(team["def_base"] * (1 + def_bonus))
-                    if current_def > boss["def"]:
-                        team_flags["kasli_stacks"] += 1
-                        kasli_bonus = 0.2 * team_flags["kasli_stacks"]
-                        def_bonus += kasli_bonus
-                        heal = int(team["hp_max"] * 0.2)
-                        team["hp"] = min(team["hp_max"], team["hp"] + heal)
-                        round_log.append(f"🛡️ **Kasli's dominance!** DEF +{int(kasli_bonus * 100)}%, heals {heal}")
-                
-                # Izanagi ATK boost and heal (based on total ATK)
-                if "atk_boost_and_heal" in team_abilities:
-                    # Calcola ATK corrente per il check
-                    current_atk = int(team["atk_base"] * (1 + atk_bonus))
-                    if current_atk > boss["atk"]:
-                        team_flags["izanagi_stacks"] += 1
-                        izanagi_bonus = 0.2 * team_flags["izanagi_stacks"]
-                        atk_bonus += izanagi_bonus
-                        heal = int(team["hp_max"] * 0.2)
-                        team["hp"] = min(team["hp_max"], team["hp"] + heal)
-                        round_log.append(f"⚔️ **Izanagi's power!** ATK +{int(izanagi_bonus * 100)}%, heals {heal}")
-                
-                # Low HP abilities (based on total HP)
-                if team["hp"] < team["hp_max"] * 0.5:
-                    # Emma
-                    if "low_hp_def_boost" in team_abilities and not team_flags["low_hp_def_active"]:
-                        def_bonus += 0.5
-                        team_flags["low_hp_def_active"] = True
-                        round_log.append(f"💚 **Emma's protection!** Team DEF +50%")
+                # Apply individual abilities
+                for ability in team_abilities:
+                    if not ability:
+                        continue
                     
-                    # Bahamut
-                    if "low_hp_atk_boost" in team_abilities and not team_flags["bahamut_active"]:
-                        atk_bonus += 0.5
-                        team_flags["bahamut_active"] = True
-                        round_log.append(f"⚡ **Bahamut's fury!** Team ATK +50%")
+                    # Create a temporary team dict with current bonuses applied for stat comparisons
+                    team_with_bonuses = team.copy()
+                    team_with_bonuses["atk"] = int(team["atk_base"] * (1 + atk_bonus))
+                    team_with_bonuses["def"] = int(team["def_base"] * (1 + def_bonus))
+                    team_with_bonuses["spd"] = int(team["spd_base"] * (1 + spd_bonus))
+                    team_with_bonuses["name"] = "Team"
                     
-                    # Yukimura lifesteal
-                    if "lifesteal" in team_abilities and not team_flags["lifesteal_active"]:
-                        team_flags["lifesteal_active"] = True
-                        round_log.append(f"🩸 **Yukimura's lifesteal activated!**")
+                    result = apply_ability(
+                        ability,
+                        team_with_bonuses,
+                        boss,
+                        team_flags,
+                        current_round,
+                        mode="bonus",
+                        is_team_battle=True
+                    )
                     
-                    # Windy big heal
-                    if "low_hp_big_heal" in team_abilities and not team_flags["windy_healed"]:
-                        heal = int(team["hp_max"] * 0.5)
-                        team["hp"] = min(team["hp_max"], team["hp"] + heal)
-                        team_flags["windy_healed"] = True
-                        round_log.append(f"🌬️ **Windy's emergency heal!** +{heal} HP")
+                    # Accumulate bonuses
+                    atk_bonus += result["bonuses"]["atk"]
+                    def_bonus += result["bonuses"]["def"]
+                    spd_bonus += result["bonuses"]["spd"]
                     
-                    # Nobunaga SPD
-                    if "low_hp_spd_boost" in team_abilities and not team_flags["nobunaga_active"]:
-                        spd_bonus += 0.5
-                        team_flags["nobunaga_active"] = True
-                        round_log.append(f"⚡ **Nobunaga's speed!** Team SPD +50%")
+                    # Add messages to log
+                    round_log.extend(result["messages"])
+                    
+                    # Update team HP if healed
+                    team["hp"] = team_with_bonuses["hp"]
                 
                 # ===== APPLICA TUTTI I BUFF ALLE STATS =====
                 team["atk"] = int(team["atk_base"] * (1 + atk_bonus))
