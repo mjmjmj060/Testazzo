@@ -322,7 +322,7 @@ RARITY_MAX_LEVEL = {
     "Legendary": 60,
 }
 RARITIES = ["Common", "Rare", "Epic", "Legendary"]
-RARITY_WEIGHTS = [60, 25, 10, 5]  # weights for random drops
+RARITY_WEIGHTS = [70, 25, 5, 0]  # weights for random drops (Common 70%, Rare 25%, Epic 5%, Legendary 0%)
 
 # rating rank for sorting inventory
 RARITY_RANK = {"Common": 1, "Rare": 2, "Epic": 3, "Legendary": 4}
@@ -338,6 +338,14 @@ RARITY_UPGRADE = {
     "Common": "Rare",
     "Rare": "Epic",
     "Epic": "Legendary",
+}
+
+# Sell prices per rarity
+SELL_PRICES = {
+    "Common": 100,
+    "Rare": 1000,
+    "Epic": 10000,
+    "Legendary": 100000,
 }
 
 # Character lookup dictionary for O(1) access
@@ -848,7 +856,8 @@ class HelpView(View):
                 value=(
                     f"`{PREFIX}gold` (`{PREFIX}g`) - Check your gold\n"
                     f"`{PREFIX}stamina` (`{PREFIX}stam`) - Check stamina\n"
-                    f"`{PREFIX}hourly` - Claim hourly reward"
+                    f"`{PREFIX}hourly` - Claim hourly reward\n"
+                    f"`{PREFIX}sell <n>` - Sell cards for gold"
                 ),
                 inline=False
             )
@@ -1495,6 +1504,166 @@ async def fuse_cmd(ctx, card1_idx: int, card2_idx: int):
         f"2x {card1.get('name')} ({rarity}) → **{new_card['name']} ({new_rarity}) Lv1**\n"
         f"💰 Cost: {cost} gold\n"
         f"New card ID: `{new_card['instance_id']}`"
+    )
+
+class SellConfirmView(View):
+    """Confirmation view for selling Epic/Legendary cards."""
+    def __init__(self, ctx, cards_to_sell, total_gold):
+        super().__init__(timeout=60)
+        self.ctx = ctx
+        self.cards_to_sell = cards_to_sell
+        self.total_gold = total_gold
+        self.confirmed = False
+        self.cancelled = False
+    
+    @discord.ui.button(label="✅ Confirm Sell", style=discord.ButtonStyle.green)
+    async def confirm_button(self, interaction: discord.Interaction, button: Button):
+        if interaction.user.id != self.ctx.author.id:
+            await interaction.response.send_message("❌ This is not your sale!", ephemeral=True)
+            return
+        self.confirmed = True
+        self.stop()
+    
+    @discord.ui.button(label="❌ Cancel", style=discord.ButtonStyle.red)
+    async def cancel_button(self, interaction: discord.Interaction, button: Button):
+        if interaction.user.id != self.ctx.author.id:
+            await interaction.response.send_message("❌ This is not your sale!", ephemeral=True)
+            return
+        self.cancelled = True
+        self.stop()
+
+@bot.command(name="sell")
+async def sell_cmd(ctx, *args):
+    """Sell cards for gold. Usage: -sell <index> OR -sell -n <name> -r <rarity>
+    Prices: Common=100, Rare=1000, Epic=10000, Legendary=100000.
+    Epic/Legendary cards require confirmation."""
+    user = ensure_user(ctx.author.id)
+    inv = user["inventory"]
+    
+    if not inv:
+        await ctx.send("🎴 Your inventory is empty.")
+        return
+    
+    sorted_inv = sort_inventory(inv)
+    cards_to_sell = []
+    
+    # Parse arguments
+    if not args:
+        await ctx.send("❌ Usage: `-sell <index>` OR `-sell -n <name>` OR `-sell -r <rarity>`")
+        return
+    
+    # Check if first arg is a number (single card sell)
+    if args[0].isdigit():
+        idx = int(args[0]) - 1
+        if idx < 0 or idx >= len(sorted_inv):
+            await ctx.send(f"❌ Invalid index (1-{len(sorted_inv)}).")
+            return
+        cards_to_sell = [sorted_inv[idx]]
+    else:
+        # Parse filters
+        filter_name = None
+        filter_rarity = None
+        
+        i = 0
+        while i < len(args):
+            arg = args[i]
+            if arg == "-n" and i + 1 < len(args):
+                values = []
+                j = i + 1
+                while j < len(args) and not args[j].startswith('-'):
+                    values.append(args[j])
+                    j += 1
+                filter_name = ' '.join(values).lower()
+                i = j
+            elif arg == "-r" and i + 1 < len(args):
+                values = []
+                j = i + 1
+                while j < len(args) and not args[j].startswith('-'):
+                    values.append(args[j])
+                    j += 1
+                filter_rarity = ' '.join(values).capitalize()
+                i = j
+            else:
+                i += 1
+        
+        if not filter_name and not filter_rarity:
+            await ctx.send("❌ Please specify at least one filter: `-n <name>` or `-r <rarity>`")
+            return
+        
+        # Apply filters
+        for card in sorted_inv:
+            match = True
+            if filter_name and filter_name not in card.get("name", "").lower():
+                match = False
+            if filter_rarity and card.get("rarity", "") != filter_rarity:
+                match = False
+            if match:
+                cards_to_sell.append(card)
+    
+    if not cards_to_sell:
+        await ctx.send("❌ No cards match your criteria.")
+        return
+    
+    # Calculate total gold and check for valuable cards
+    total_gold = 0
+    has_valuable = False
+    card_summary = []
+    
+    for card in cards_to_sell:
+        rarity = card.get("rarity", "Common")
+        price = SELL_PRICES.get(rarity, 100)
+        total_gold += price
+        if rarity in ["Epic", "Legendary"]:
+            has_valuable = True
+        card_summary.append(f"• {card['name']} ({rarity}) Lv{card.get('level', 1)} → 💰 {price}")
+    
+    # Limit display to first 15 cards
+    display_summary = card_summary[:15]
+    if len(card_summary) > 15:
+        display_summary.append(f"... and {len(card_summary) - 15} more cards")
+    
+    summary_text = "\n".join(display_summary)
+    
+    # If valuable cards, ask for confirmation
+    if has_valuable:
+        embed = discord.Embed(
+            title="⚠️ Sell Confirmation Required",
+            description=f"You are about to sell **{len(cards_to_sell)}** card(s) including **Epic/Legendary** cards!\n\n{summary_text}\n\n**Total: 💰 {total_gold} gold**",
+            color=discord.Color.orange()
+        )
+        
+        view = SellConfirmView(ctx, cards_to_sell, total_gold)
+        msg = await ctx.send(embed=embed, view=view)
+        
+        await view.wait()
+        
+        if view.cancelled or not view.confirmed:
+            await msg.edit(content="❌ Sale cancelled.", embed=None, view=None)
+            return
+        
+        await msg.edit(view=None)
+    
+    # Execute the sale
+    for card in cards_to_sell:
+        # Remove from inventory
+        if card in inv:
+            inv.remove(card)
+        # Clear selection if sold
+        if user.get("selected") == card.get("instance_id"):
+            user["selected"] = None
+        # Clear from team if sold
+        if card.get("instance_id") in user.get("team", []):
+            team = user.get("team", [])
+            team_idx = team.index(card.get("instance_id"))
+            team[team_idx] = None
+    
+    user["gold"] = user.get("gold", 0) + total_gold
+    await save_data()
+    
+    await ctx.send(
+        f"💰 **Cards sold!**\n"
+        f"Sold **{len(cards_to_sell)}** card(s) for **{total_gold}** gold!\n"
+        f"Current gold: **{user['gold']}**"
     )
 
 @bot.command(name="level")
