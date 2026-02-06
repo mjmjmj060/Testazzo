@@ -218,6 +218,54 @@ CHARACTERS = [
         "ability_type": "turn3_bonus_damage",
         "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1468709244382744675/IMG_6314.webp?ex=69850193&is=6983b013&hm=53dc82cd67097cff821246e70e179f79e583554e2455556f8c7cb09feda29ef7&"
     },
+    {
+        "id": "terun",
+        "name": "Terun",
+        "base": {"hp": 65, "atk": 76, "def": 65, "spd": 78},
+        "ability": "After 3 turns: +100% SPD",
+        "ability_type": "turn3_spd_boost",
+        "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1468979518445326447/IMG_6319.webp?ex=6986a609&is=69855489&hm=1bc744bea0288509452390fbca7d626bbe20de1e98bd2e9c3a601cc96425dcec&"
+    },
+    {
+        "id": "black_cat",
+        "name": "Black Cat",
+        "base": {"hp": 70, "atk": 75, "def": 72, "spd": 72},
+        "ability": "First turn: +20% ATK and DEF",
+        "ability_type": "first_turn_atk_def",
+        "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1468980961201881270/IMG_6320.webp?ex=6986a761&is=698555e1&hm=1b73213a52a39d92591748a3403d7ae3fce92ed16aff116b75658f02abd36c73&"
+    },
+    {
+        "id": "aphrodite",
+        "name": "Aphrodite",
+        "base": {"hp": 83, "atk": 90, "def": 70, "spd": 68},
+        "ability": "Every turn: if ATK > enemy ATK, heals 30% max HP",
+        "ability_type": "atk_heal",
+        "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1468991000881139834/IMG_6321.webp?ex=6986b0bb&is=69855f3b&hm=c967711d603cdd4b590f95b4b256c17af2816fedd567b38c7b8b1325be4b2eee&"
+    },
+    {
+        "id": "goddess",
+        "name": "Goddess",
+        "base": {"hp": 85, "atk": 60, "def": 87, "spd": 77},
+        "ability": "Every turn: if DEF > enemy DEF, heals 30% max HP",
+        "ability_type": "def_heal",
+        "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1468991402066051267/IMG_6322.webp?ex=6986b11a&is=69855f9a&hm=55e3727a4fdf22bca7c08e91fa008fd1f62fde71bfc4a6b8abccef5dc170a8c2&"
+    },
+    {
+        "id": "rei",
+        "name": "Rei",
+        "base": {"hp": 80, "atk": 80, "def": 80, "spd": 75},
+        "ability": "Every turn: if HP < 50%, +30% DEF (stacks)",
+        "ability_type": "low_hp_def_stack",
+        "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1469313733011443865/IMG_6328.webp?ex=6987348c&is=6985e30c&hm=db0122f497eb2e1a00c559d2fa1389911e24a47390b1569f183ffc0ddc6af199&"
+    },
+    {
+        "id": "paipai",
+        "name": "Paipai",
+        "base": {"hp": 85, "atk": 80, "def": 78, "spd": 63},
+        "ability": "Every turn: if HP < 50%, +30% ATK (stacks)",
+        "ability_type": "low_hp_atk_stack",
+        "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1469314130140725278/IMG_6329.webp?ex=698734eb&is=6985e36b&hm=04bd85484b1232e770e0c8ad09c6b7ae282744c3f83ae340b5179b713385fd89&"
+    },
 ]
 
 # Catbox URLs for composite battle images (permanent hosting, used only for create_battle_image)
@@ -246,6 +294,12 @@ CATBOX_IMAGES = {
     "Kalisa": "https://files.catbox.moe/7p18b6.jpeg",
     "Trixi": "https://files.catbox.moe/w845px.jpeg",
     "Sidmi": "https://files.catbox.moe/j1m90q.jpeg",
+    "Terun": "https://files.catbox.moe/en1z0c.jpeg",
+    "Black Cat": "https://files.catbox.moe/m9xg8e.jpeg",
+    "Aphrodite": "https://files.catbox.moe/fbn4km.jpeg",
+    "Goddess": "https://files.catbox.moe/qhi79d.jpeg",
+    "Rei": "https://files.catbox.moe/mo52cd.jpeg",
+    "Paipai": "https://files.catbox.moe/cfglkx.jpeg",
 }
 
 # Boss images on Catbox (permanent hosting for composite battle images)
@@ -1566,6 +1620,22 @@ def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", 
                 attacker["atk"] = int(attacker["atk_base"] * 1.5)
                 flags["buff_applied"] = True
     
+    elif ability_type == "first_turn_atk_def":  # Black Cat - First turn: +20% ATK and DEF
+        should_apply = False
+        if mode == "bonus":
+            should_apply = (turn == 1 and flags.get("black_cat_buffed", False))
+        else:
+            should_apply = (turn == 1 and not flags.get("black_cat_buffed", False))
+        
+        if should_apply:
+            if mode == "bonus":
+                bonuses["atk"] += 0.2
+                bonuses["def"] += 0.2
+            else:
+                attacker["atk"] = int(attacker["atk_base"] * 1.2)
+                attacker["def"] = int(attacker["def_base"] * 1.2)
+                flags["black_cat_buffed"] = True
+    
     # === 3-TURN BUFFS ===
     elif ability_type == "def_boost_3turns":  # Ruri - 3 turns +50% DEF
         if flags.get("ruri_turns", 0) > 0:
@@ -1668,6 +1738,19 @@ def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", 
                 attacker["atk"] = int(attacker["atk_base"] * 1.2)
                 attacker["def"] = int(attacker["def_base"] * 1.2)
     
+    elif ability_type == "turn3_spd_boost":  # Terun - After turn 3: +100% SPD
+        if turn >= 3:
+            if not flags.get("terun_boosted"):
+                flags["terun_boosted"] = True
+                if is_team_battle:
+                    messages.append(f"💨 **Terun's speed unleashed!** Team SPD +100%")
+                else:
+                    messages.append(f"💨 **{attacker['name']}'s speed unleashed!** SPD +100%")
+            if mode == "bonus":
+                bonuses["spd"] += 1.0
+            else:
+                attacker["spd"] = int(attacker["spd_base"] * 2.0)
+    
     # === LOW HP TRIGGERS ===
     elif ability_type == "low_hp_def_boost":  # Emma - Low HP: +50% DEF
         # Check if we need to activate the ability (only if HP < 50% and not yet activated)
@@ -1735,6 +1818,30 @@ def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", 
             else:
                 attacker["spd"] = int(attacker["spd_base"] * 1.5)
     
+    elif ability_type == "low_hp_def_stack":  # Rei - Every turn if HP < 50%: +30% DEF (stacks)
+        if attacker["hp"] < (attacker["hp_max"] * 0.5):
+            flags["rei_stacks"] = flags.get("rei_stacks", 0) + 1
+            if mode == "bonus":
+                bonuses["def"] += 0.3 * flags["rei_stacks"]
+            else:
+                attacker["def"] = int(attacker["def_base"] * (1 + 0.3 * flags["rei_stacks"]))
+            if is_team_battle:
+                messages.append(f"🛡️ **Rei's resolve!** Team DEF +{flags['rei_stacks'] * 30}%")
+            else:
+                messages.append(f"🛡️ **{attacker['name']}'s resolve strengthens!** DEF +{flags['rei_stacks'] * 30}%")
+    
+    elif ability_type == "low_hp_atk_stack":  # Paipai - Every turn if HP < 50%: +30% ATK (stacks)
+        if attacker["hp"] < (attacker["hp_max"] * 0.5):
+            flags["paipai_stacks"] = flags.get("paipai_stacks", 0) + 1
+            if mode == "bonus":
+                bonuses["atk"] += 0.3 * flags["paipai_stacks"]
+            else:
+                attacker["atk"] = int(attacker["atk_base"] * (1 + 0.3 * flags["paipai_stacks"]))
+            if is_team_battle:
+                messages.append(f"⚔️ **Paipai's fury!** Team ATK +{flags['paipai_stacks'] * 30}%")
+            else:
+                messages.append(f"⚔️ **{attacker['name']}'s fury grows!** ATK +{flags['paipai_stacks'] * 30}%")
+    
     # === SCALING ABILITIES ===
     elif ability_type == "def_boost_and_heal":  # Kasli - DEF comparison with stacking
         if attacker["def"] > defender["def"]:
@@ -1763,6 +1870,24 @@ def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", 
                 messages.append(f"⚔️ **Izanagi's power!** ATK +{flags['izanagi_stacks'] * 20}%, heals {heal}")
             else:
                 messages.append(f"⚔️ **{attacker['name']}'s ATK dominance!** ATK +{flags['izanagi_stacks'] * 20}% and heals {heal} HP")
+    
+    elif ability_type == "atk_heal":  # Aphrodite - If ATK > enemy ATK, heal 30%
+        if attacker["atk"] > defender["atk"]:
+            heal = int(attacker["hp_max"] * 0.3)
+            attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal)
+            if is_team_battle:
+                messages.append(f"💖 **Aphrodite's blessing!** Team heals {heal} HP")
+            else:
+                messages.append(f"💖 **{attacker['name']}'s ATK dominance!** Heals {heal} HP")
+    
+    elif ability_type == "def_heal":  # Goddess - If DEF > enemy DEF, heal 30%
+        if attacker["def"] > defender["def"]:
+            heal = int(attacker["hp_max"] * 0.3)
+            attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal)
+            if is_team_battle:
+                messages.append(f"💖 **Goddess's blessing!** Team heals {heal} HP")
+            else:
+                messages.append(f"💖 **{attacker['name']}'s DEF dominance!** Heals {heal} HP")
     
     # === RAMPAGE/STACKING ABILITIES ===
     elif ability_type == "rampage":  # Balrog - +20% ATK per turn
@@ -1909,6 +2034,18 @@ async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user
                 p["ability_type"] = "spd_rampage"
             elif char_id == "sidmi":
                 p["ability_type"] = "turn3_bonus_damage"
+            elif char_id == "terun":
+                p["ability_type"] = "turn3_spd_boost"
+            elif char_id == "black_cat":
+                p["ability_type"] = "first_turn_atk_def"
+            elif char_id == "aphrodite":
+                p["ability_type"] = "atk_heal"
+            elif char_id == "goddess":
+                p["ability_type"] = "def_heal"
+            elif char_id == "rei":
+                p["ability_type"] = "low_hp_def_stack"
+            elif char_id == "paipai":
+                p["ability_type"] = "low_hp_atk_stack"
     
     # Initialize ability flags for player 1
     p1_flags = {
@@ -1935,6 +2072,10 @@ async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user
         "kalisa_boosted": False,
         "trixi_stacks": 0,
         "sidmi_active": False,
+        "terun_boosted": False,
+        "black_cat_buffed": False,
+        "rei_stacks": 0,
+        "paipai_stacks": 0,
     }
     
     # Initialize ability flags for player 2
@@ -1962,6 +2103,10 @@ async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user
         "kalisa_boosted": False,
         "trixi_stacks": 0,
         "sidmi_active": False,
+        "terun_boosted": False,
+        "black_cat_buffed": False,
+        "rei_stacks": 0,
+        "paipai_stacks": 0,
     }
     
     ability_text = ""
@@ -1990,6 +2135,11 @@ async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user
     elif p1["ability_type"] == "first_turn_atk":  # Shishilan
         p1["atk"] = int(p1["atk_base"] * 1.5)
         p1_flags["buff_applied"] = True
+        ability_text = f"✨ {p1['name']}'s ability activates!\n**{p1.get('ability', '')}**"
+    elif p1["ability_type"] == "first_turn_atk_def":  # Black Cat
+        p1["atk"] = int(p1["atk_base"] * 1.2)
+        p1["def"] = int(p1["def_base"] * 1.2)
+        p1_flags["black_cat_buffed"] = True
         ability_text = f"✨ {p1['name']}'s ability activates!\n**{p1.get('ability', '')}**"
     
     # Apply passive and first-turn abilities for player 2 (only in PvP)
@@ -2035,6 +2185,14 @@ async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user
         elif p2["ability_type"] == "first_turn_atk":  # Shishilan
             p2["atk"] = int(p2["atk_base"] * 1.5)
             p2_flags["buff_applied"] = True
+            if ability_text:
+                ability_text += f"\n✨ {p2['name']}'s ability activates!\n**{p2.get('ability', '')}**"
+            else:
+                ability_text = f"✨ {p2['name']}'s ability activates!\n**{p2.get('ability', '')}**"
+        elif p2["ability_type"] == "first_turn_atk_def":  # Black Cat
+            p2["atk"] = int(p2["atk_base"] * 1.2)
+            p2["def"] = int(p2["def_base"] * 1.2)
+            p2_flags["black_cat_buffed"] = True
             if ability_text:
                 ability_text += f"\n✨ {p2['name']}'s ability activates!\n**{p2.get('ability', '')}**"
             else:
@@ -2924,6 +3082,10 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
         "kalisa_boosted": False,          # Kalisa
         "trixi_stacks": 0,                # Trixi
         "sidmi_active": False,            # Sidmi
+        "terun_boosted": False,           # Terun
+        "black_cat_buffed": False,        # Black Cat
+        "rei_stacks": 0,                  # Rei
+        "paipai_stacks": 0,               # Paipai
     }
     
     # Get all ability types from team
@@ -2988,6 +3150,13 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
         initial_def_bonus += 0.3
         team_flags["heal_and_def_done"] = True
         ability_text += f"✨ **Jeanne's protection!** Team heals {heal} HP, DEF +30%\n"
+    
+    # Black Cat - First turn +20% ATK and DEF
+    if "first_turn_atk_def" in team_abilities:
+        initial_atk_bonus += 0.2
+        initial_def_bonus += 0.2
+        team_flags["black_cat_buffed"] = True
+        ability_text += "✨ **Black Cat's ability!** Team ATK +20%, DEF +20%\n"
     
     # Applica i buff iniziali
     team["atk"] = int(team["atk_base"] * (1 + initial_atk_bonus))
