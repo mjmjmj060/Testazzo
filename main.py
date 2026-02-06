@@ -2505,13 +2505,14 @@ async def battle_cmd(ctx):
             await ctx.send("❌ Your selected character was not found. Use `-select <n>` again.")
             return
 
+        # Deduct stamina atomically within the lock
+        user["stamina"] -= 5
+        await save_data()
+        
         # Set the lock
         active_battles[user_id] = True
     
     try:
-        # remove stamina and save immediately
-        user["stamina"] -= 5
-        await save_data()
 
         # battle logic
         floor = user.get("floor", 1)
@@ -3484,14 +3485,14 @@ async def boss_cmd(ctx, boss_number: int = None):
         
         boss_data = BOSSES[boss_number - 1]
         
+        # Deduct stamina atomically within the lock
+        user["stamina"] -= 15
+        await save_data()
+        
         # Set the lock
         active_boss_battles[user_id] = True
     
     try:
-        # Deduct stamina
-        user["stamina"] -= 15
-        await save_data()
-        
         # Run the battle
         result = await run_boss_battle(ctx, team_cards, boss_data, user)
         
