@@ -11,6 +11,7 @@ from datetime import datetime
 import io
 import aiohttp
 from PIL import Image
+from collections import defaultdict
 
 # ------------------------
 # CONFIG
@@ -441,6 +442,11 @@ BOSSES_BY_ID = {b["id"]: b for b in BOSSES}
 # ------------------------
 data_lock = asyncio.Lock()
 data = {"users": {}}
+
+# Dictionaries to track active battles (per user)
+active_battles = {}       # {user_id: True} - for floor battles
+active_boss_battles = {}  # {user_id: True} - for boss battles
+battle_locks = defaultdict(asyncio.Lock)  # {user_id: asyncio.Lock} - locks for atomic operations
 
 def _load_data_from_disk():
     try:
@@ -2471,120 +2477,136 @@ async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user
 @commands.cooldown(1, 3, commands.BucketType.user)
 async def battle_cmd(ctx):
     """Start a battle on your current floor with your selected character."""
-    user = ensure_user(ctx.author.id)
-    if user.get("stamina", 0) < 5:
-        await ctx.send("❌ Not enough stamina. You need 5 to battle.")
-        return
-    if not user.get("selected"):
-        await ctx.send("❌ No character selected. Use `-select <n>` first.")
-        return
+    user_id = ctx.author.id
+    
+    # Acquire the lock to prevent race conditions
+    async with battle_locks[user_id]:
+        # Check if the user already has a battle in progress
+        if active_battles.get(user_id):
+            await ctx.send("⚠️ You already have a battle in progress! Wait for it to finish.")
+            return
+        
+        user = ensure_user(user_id)
+        if user.get("stamina", 0) < 5:
+            await ctx.send("❌ Not enough stamina. You need 5 to battle.")
+            return
+        if not user.get("selected"):
+            await ctx.send("❌ No character selected. Use `-select <n>` first.")
+            return
 
-    # find the selected card
-    selected_id = user["selected"]
-    chosen = None
-    for c in user["inventory"]:
-        if c.get("instance_id") == selected_id:
-            chosen = c
-            break
-    if not chosen:
-        await ctx.send("❌ Your selected character was not found. Use `-select <n>` again.")
-        return
-
-    # remove stamina and save immediately
-    user["stamina"] -= 5
-    await save_data()
-
-    # battle logic
-    floor = user.get("floor", 1)
-    enemy = make_enemy_for_floor(floor)
-    
-    # Run the battle using the shared battle logic
-    result = await run_battle(ctx, chosen, enemy, ctx.author, None, is_pvp=False, floor=floor)
-    
-    # Display final result
-    p1 = result["p1"]
-    p2 = result["p2"]
-    message = result["message"]
-    
-    if result["winner"] == 1:
-        # Player wins
-        result_text = "🎉 VICTORY! 🎉"
-        color = discord.Color.gold()
-        result_desc = f"You defeated the enemy in {result['rounds']} rounds!"
-    elif result["winner"] == 2:
-        # Player loses
-        result_text = "💀 DEFEAT 💀"
-        color = discord.Color.dark_red()
-        result_desc = f"You were defeated in {result['rounds']} rounds."
-    else:
-        # Draw
-        result_text = "⚖️ DRAW ⚖️"
-        color = discord.Color.orange()
-        result_desc = f"Battle ended in a draw after {result['rounds']} rounds."
-    
-    embed = discord.Embed(
-        title=f"⚔️ Battle — Floor {floor} ⚔️",
-        description=f"**{result_text}**\n{result_desc}",
-        color=color
-    )
-    
-    # Final HP display
-    player_stats = (
-        f"**{ctx.author.display_name}'s {p1['name']}** `{p1['rarity']}` Level `{p1['level']}`\n"
-        f"{create_hp_bar(p1['hp'], p1['hp_max'])} `{p1['hp']}/{p1['hp_max']}`"
-    )
-    embed.add_field(name="🛡️ Your Fighter", value=player_stats, inline=False)
-    
-    enemy_stats = (
-        f"**Enemy's {p2['name']}** `{p2['rarity']}` Level `{p2['level']}`\n"
-        f"{create_hp_bar(p2['hp'], p2['hp_max'])} `{p2['hp']}/{p2['hp_max']}`"
-    )
-    embed.add_field(name="⚡ Enemy", value=enemy_stats, inline=False)
-    
-    if chosen.get("image"):
-        embed.set_thumbnail(url=chosen.get("image"))
-    if enemy.get("image"):
-        embed.set_image(url=enemy.get("image"))
-    
-    await message.edit(embed=embed)
-
-    # apply rewards/penalties and progression
-    if result["winner"] == 1:
-        gold_gain = 50 + floor * 10
-        exp_gain_user = 30 + floor * 5
-        exp_gain_card = 40 + floor * 10
-        user["gold"] = user.get("gold", 0) + gold_gain
-        user["exp"] = user.get("exp", 0) + exp_gain_user
-        # add exp to chosen instance
-        chosen["exp"] = chosen.get("exp", 0) + exp_gain_card
-
-        lvl_msgs = maybe_level_up_user(user)
-        # level up card
-        while chosen.get("level", 1) < chosen.get("max_level", 30):
-            need = 100 * chosen.get("level", 1)
-            if chosen.get("exp", 0) >= need:
-                chosen["exp"] -= need
-                chosen["level"] += 1
-            else:
+        # find the selected card
+        selected_id = user["selected"]
+        chosen = None
+        for c in user["inventory"]:
+            if c.get("instance_id") == selected_id:
+                chosen = c
                 break
+        if not chosen:
+            await ctx.send("❌ Your selected character was not found. Use `-select <n>` again.")
+            return
 
-        # unlock next floor
-        if user.get("floor_unlocked", 1) < floor + 1:
-            user["floor_unlocked"] = floor + 1
-
+        # Deduct stamina atomically within the lock
+        user["stamina"] -= 5
         await save_data()
         
-        reward_msg = f"💰 **Rewards:**\n+{gold_gain} gold | +{exp_gain_user} EXP (user) | +{exp_gain_card} EXP ({chosen['name']})"
-        if user.get("floor_unlocked", 1) > floor:
-            reward_msg += f"\n🔓 Floor {user.get('floor_unlocked')} unlocked!"
-        if lvl_msgs:
-            reward_msg = "\n".join(lvl_msgs) + "\n" + reward_msg
-        await ctx.send(reward_msg)
-    else:
-        # loss penalty
-        user["stamina"] = max(0, user.get("stamina", 0) - 3)
-        await save_data()
-        await ctx.send("💀 You lost the battle. **-3 stamina**")
+        # Set the lock
+        active_battles[user_id] = True
+    
+    try:
+        # battle logic
+        floor = user.get("floor", 1)
+        enemy = make_enemy_for_floor(floor)
+        
+        # Run the battle using the shared battle logic
+        result = await run_battle(ctx, chosen, enemy, ctx.author, None, is_pvp=False, floor=floor)
+        
+        # Display final result
+        p1 = result["p1"]
+        p2 = result["p2"]
+        message = result["message"]
+        
+        if result["winner"] == 1:
+            # Player wins
+            result_text = "🎉 VICTORY! 🎉"
+            color = discord.Color.gold()
+            result_desc = f"You defeated the enemy in {result['rounds']} rounds!"
+        elif result["winner"] == 2:
+            # Player loses
+            result_text = "💀 DEFEAT 💀"
+            color = discord.Color.dark_red()
+            result_desc = f"You were defeated in {result['rounds']} rounds."
+        else:
+            # Draw
+            result_text = "⚖️ DRAW ⚖️"
+            color = discord.Color.orange()
+            result_desc = f"Battle ended in a draw after {result['rounds']} rounds."
+        
+        embed = discord.Embed(
+            title=f"⚔️ Battle — Floor {floor} ⚔️",
+            description=f"**{result_text}**\n{result_desc}",
+            color=color
+        )
+        
+        # Final HP display
+        player_stats = (
+            f"**{ctx.author.display_name}'s {p1['name']}** `{p1['rarity']}` Level `{p1['level']}`\n"
+            f"{create_hp_bar(p1['hp'], p1['hp_max'])} `{p1['hp']}/{p1['hp_max']}`"
+        )
+        embed.add_field(name="🛡️ Your Fighter", value=player_stats, inline=False)
+        
+        enemy_stats = (
+            f"**Enemy's {p2['name']}** `{p2['rarity']}` Level `{p2['level']}`\n"
+            f"{create_hp_bar(p2['hp'], p2['hp_max'])} `{p2['hp']}/{p2['hp_max']}`"
+        )
+        embed.add_field(name="⚡ Enemy", value=enemy_stats, inline=False)
+        
+        if chosen.get("image"):
+            embed.set_thumbnail(url=chosen.get("image"))
+        if enemy.get("image"):
+            embed.set_image(url=enemy.get("image"))
+        
+        await message.edit(embed=embed)
+
+        # apply rewards/penalties and progression
+        if result["winner"] == 1:
+            gold_gain = 50 + floor * 10
+            exp_gain_user = 30 + floor * 5
+            exp_gain_card = 40 + floor * 10
+            user["gold"] = user.get("gold", 0) + gold_gain
+            user["exp"] = user.get("exp", 0) + exp_gain_user
+            # add exp to chosen instance
+            chosen["exp"] = chosen.get("exp", 0) + exp_gain_card
+
+            lvl_msgs = maybe_level_up_user(user)
+            # level up card
+            while chosen.get("level", 1) < chosen.get("max_level", 30):
+                need = 100 * chosen.get("level", 1)
+                if chosen.get("exp", 0) >= need:
+                    chosen["exp"] -= need
+                    chosen["level"] += 1
+                else:
+                    break
+
+            # unlock next floor
+            if user.get("floor_unlocked", 1) < floor + 1:
+                user["floor_unlocked"] = floor + 1
+
+            await save_data()
+            
+            reward_msg = f"💰 **Rewards:**\n+{gold_gain} gold | +{exp_gain_user} EXP (user) | +{exp_gain_card} EXP ({chosen['name']})"
+            if user.get("floor_unlocked", 1) > floor:
+                reward_msg += f"\n🔓 Floor {user.get('floor_unlocked')} unlocked!"
+            if lvl_msgs:
+                reward_msg = "\n".join(lvl_msgs) + "\n" + reward_msg
+            await ctx.send(reward_msg)
+        else:
+            # loss penalty
+            user["stamina"] = max(0, user.get("stamina", 0) - 3)
+            await save_data()
+            await ctx.send("💀 You lost the battle. **-3 stamina**")
+    finally:
+        # Remove the lock
+        active_battles.pop(user_id, None)
 
 # Updated floor command: show info and restrict next to unlocked floors
 @bot.command(name="floor", aliases=["fl"])
@@ -3395,146 +3417,162 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
 @commands.cooldown(1, 5, commands.BucketType.user)
 async def boss_cmd(ctx, boss_number: int = None):
     """Start a boss battle with your team. Usage: -boss [number]"""
-    user = ensure_user(ctx.author.id)
+    user_id = ctx.author.id
     
-    # Check stamina
-    if user.get("stamina", 0) < 15:
-        await ctx.send("❌ Not enough stamina. You need **15** stamina for boss battles.")
-        return
-    
-    # Check if team is set
-    team_ids = user.get("team", [])
-    if len(team_ids) != 3:
-        await ctx.send("❌ You need to set a team of 3 cards first! Use `-team set <card1> <card2> <card3>`")
-        return
-    
-    # Check if all positions are filled (no None values)
-    if any(id is None for id in team_ids):
-        await ctx.send("❌ Your team has empty slots! Use `-team set` to fill all 3 positions before fighting bosses.")
-        return
-    
-    # Get team cards
-    team_cards = []
-    for instance_id in team_ids:
-        for c in user["inventory"]:
-            if c.get("instance_id") == instance_id:
-                team_cards.append(c)
-                break
-    
-    if len(team_cards) != 3:
-        await ctx.send("❌ Some cards in your team are missing. Please set a new team with `-team`.")
-        return
-    
-    # If no boss specified, show available bosses
-    if boss_number is None:
-        unlocked = user.get("boss_unlocked", 1)
-        boss_list = []
-        for i, boss in enumerate(BOSSES, 1):
-            status = "🔓" if i <= unlocked else "🔒"
-            phase1 = boss["phases"][0]
-            boss_list.append(f"{status} `{i}.` **{boss['name']}** — HP: {phase1['hp']} | ATK: {phase1['atk']} | Reward: {boss['rewards']['guaranteed_rarity']} card")
+    # Acquire the lock to prevent race conditions
+    async with battle_locks[user_id]:
+        # Check if the user already has a boss battle in progress
+        if active_boss_battles.get(user_id):
+            await ctx.send("⚠️ You already have a boss battle in progress! Wait for it to finish.")
+            return
         
-        await ctx.send(
-            f"👹 **Available Bosses** (Unlocked: {unlocked}/{len(BOSSES)})\n\n" +
-            "\n".join(boss_list) +
-            f"\n\nUse `-boss <number>` to fight!"
-        )
-        return
-    
-    # Validate boss number
-    if boss_number < 1 or boss_number > len(BOSSES):
-        await ctx.send(f"❌ Invalid boss number. Valid range: 1-{len(BOSSES)}")
-        return
-    
-    unlocked = user.get("boss_unlocked", 1)
-    if boss_number > unlocked:
-        await ctx.send(f"❌ Boss {boss_number} is locked! You need to defeat Boss {unlocked} first.")
-        return
-    
-    boss_data = BOSSES[boss_number - 1]
-    
-    # Deduct stamina
-    user["stamina"] -= 15
-    await save_data()
-    
-    # Run the battle
-    result = await run_boss_battle(ctx, team_cards, boss_data, user)
-    
-    # Handle result
-    message = result["message"]
-    
-    if result["winner"] == "team":
-        # Victory!
-        rewards = boss_data["rewards"]
-        gold_gain = rewards["gold"]
-        exp_gain = rewards["exp"]
-        guaranteed_rarity = rewards["guaranteed_rarity"]
+        user = ensure_user(user_id)
         
-        # Give rewards
-        user["gold"] = user.get("gold", 0) + gold_gain
-        user["exp"] = user.get("exp", 0) + exp_gain
+        # Check stamina
+        if user.get("stamina", 0) < 15:
+            await ctx.send("❌ Not enough stamina. You need **15** stamina for boss battles.")
+            return
         
-        # Give guaranteed card
-        random_char = random.choice(CHARACTERS)
-        new_card = create_card_instance(random_char, guaranteed_rarity)
-        user["inventory"].append(new_card)
+        # Check if team is set
+        team_ids = user.get("team", [])
+        if len(team_ids) != 3:
+            await ctx.send("❌ You need to set a team of 3 cards first! Use `-team set <card1> <card2> <card3>`")
+            return
         
-        # Give EXP to team cards
-        for card in team_cards:
-            card["exp"] = card.get("exp", 0) + exp_gain
-            # Level up card if possible
-            while card.get("level", 1) < card.get("max_level", 30):
-                need = 100 * card.get("level", 1)
-                if card.get("exp", 0) >= need:
-                    card["exp"] -= need
-                    card["level"] += 1
-                else:
+        # Check if all positions are filled (no None values)
+        if any(id is None for id in team_ids):
+            await ctx.send("❌ Your team has empty slots! Use `-team set` to fill all 3 positions before fighting bosses.")
+            return
+        
+        # Get team cards
+        team_cards = []
+        for instance_id in team_ids:
+            for c in user["inventory"]:
+                if c.get("instance_id") == instance_id:
+                    team_cards.append(c)
                     break
         
-        # Unlock next boss
-        if boss_number == unlocked and unlocked < len(BOSSES):
-            user["boss_unlocked"] = unlocked + 1
+        if len(team_cards) != 3:
+            await ctx.send("❌ Some cards in your team are missing. Please set a new team with `-team`.")
+            return
         
-        lvl_msgs = maybe_level_up_user(user)
+        # If no boss specified, show available bosses
+        if boss_number is None:
+            unlocked = user.get("boss_unlocked", 1)
+            boss_list = []
+            for i, boss in enumerate(BOSSES, 1):
+                status = "🔓" if i <= unlocked else "🔒"
+                phase1 = boss["phases"][0]
+                boss_list.append(f"{status} `{i}.` **{boss['name']}** — HP: {phase1['hp']} | ATK: {phase1['atk']} | Reward: {boss['rewards']['guaranteed_rarity']} card")
+            
+            await ctx.send(
+                f"👹 **Available Bosses** (Unlocked: {unlocked}/{len(BOSSES)})\n\n" +
+                "\n".join(boss_list) +
+                f"\n\nUse `-boss <number>` to fight!"
+            )
+            return
+        
+        # Validate boss number
+        if boss_number < 1 or boss_number > len(BOSSES):
+            await ctx.send(f"❌ Invalid boss number. Valid range: 1-{len(BOSSES)}")
+            return
+        
+        unlocked = user.get("boss_unlocked", 1)
+        if boss_number > unlocked:
+            await ctx.send(f"❌ Boss {boss_number} is locked! You need to defeat Boss {unlocked} first.")
+            return
+        
+        boss_data = BOSSES[boss_number - 1]
+        
+        # Deduct stamina atomically within the lock
+        user["stamina"] -= 15
         await save_data()
         
-        embed = discord.Embed(
-            title=f"👹 BOSS BATTLE — {boss_data['name']} 👹",
-            description=f"**🎉 VICTORY! 🎉**\nYou defeated {boss_data['name']} in {result['rounds']} rounds!",
-            color=discord.Color.gold()
-        )
-        
-        reward_text = f"💰 +{gold_gain} Gold\n⭐ +{exp_gain} EXP\n🎴 **{new_card['name']}** ({guaranteed_rarity})"
-        if boss_number == unlocked and unlocked < len(BOSSES):
-            reward_text += f"\n🔓 **Boss {unlocked + 1} unlocked!**"
-        if lvl_msgs:
-            reward_text = "\n".join(lvl_msgs) + "\n" + reward_text
-        
-        embed.add_field(name="🎁 Rewards", value=reward_text, inline=False)
-        embed.set_image(url=boss_data["phases"][-1]["image"])
-        
-        await message.edit(embed=embed)
+        # Set the lock
+        active_boss_battles[user_id] = True
     
-    elif result["winner"] == "boss":
-        # Defeat
-        embed = discord.Embed(
-            title=f"👹 BOSS BATTLE — {boss_data['name']} 👹",
-            description=f"**💀 DEFEAT 💀**\nYour team was defeated in {result['rounds']} rounds.",
-            color=discord.Color.dark_red()
-        )
-        embed.set_image(url=boss_data["phases"][0]["image"])
+    try:
+        # Run the battle
+        result = await run_boss_battle(ctx, team_cards, boss_data, user)
         
-        await message.edit(embed=embed)
-        await ctx.send("💀 You lost the boss battle. Try leveling up your team!")
-    
-    else:
-        # Draw
-        embed = discord.Embed(
-            title=f"👹 BOSS BATTLE — {boss_data['name']} 👹",
-            description=f"**⚖️ DRAW ⚖️**\nBattle ended in a draw after {result['rounds']} rounds.",
-            color=discord.Color.orange()
-        )
-        await message.edit(embed=embed)
+        # Handle result
+        message = result["message"]
+        
+        if result["winner"] == "team":
+            # Victory!
+            rewards = boss_data["rewards"]
+            gold_gain = rewards["gold"]
+            exp_gain = rewards["exp"]
+            guaranteed_rarity = rewards["guaranteed_rarity"]
+            
+            # Give rewards
+            user["gold"] = user.get("gold", 0) + gold_gain
+            user["exp"] = user.get("exp", 0) + exp_gain
+            
+            # Give guaranteed card
+            random_char = random.choice(CHARACTERS)
+            new_card = create_card_instance(random_char, guaranteed_rarity)
+            user["inventory"].append(new_card)
+            
+            # Give EXP to team cards
+            for card in team_cards:
+                card["exp"] = card.get("exp", 0) + exp_gain
+                # Level up card if possible
+                while card.get("level", 1) < card.get("max_level", 30):
+                    need = 100 * card.get("level", 1)
+                    if card.get("exp", 0) >= need:
+                        card["exp"] -= need
+                        card["level"] += 1
+                    else:
+                        break
+            
+            # Unlock next boss
+            if boss_number == unlocked and unlocked < len(BOSSES):
+                user["boss_unlocked"] = unlocked + 1
+            
+            lvl_msgs = maybe_level_up_user(user)
+            await save_data()
+            
+            embed = discord.Embed(
+                title=f"👹 BOSS BATTLE — {boss_data['name']} 👹",
+                description=f"**🎉 VICTORY! 🎉**\nYou defeated {boss_data['name']} in {result['rounds']} rounds!",
+                color=discord.Color.gold()
+            )
+            
+            reward_text = f"💰 +{gold_gain} Gold\n⭐ +{exp_gain} EXP\n🎴 **{new_card['name']}** ({guaranteed_rarity})"
+            if boss_number == unlocked and unlocked < len(BOSSES):
+                reward_text += f"\n🔓 **Boss {unlocked + 1} unlocked!**"
+            if lvl_msgs:
+                reward_text = "\n".join(lvl_msgs) + "\n" + reward_text
+            
+            embed.add_field(name="🎁 Rewards", value=reward_text, inline=False)
+            embed.set_image(url=boss_data["phases"][-1]["image"])
+            
+            await message.edit(embed=embed)
+        
+        elif result["winner"] == "boss":
+            # Defeat
+            embed = discord.Embed(
+                title=f"👹 BOSS BATTLE — {boss_data['name']} 👹",
+                description=f"**💀 DEFEAT 💀**\nYour team was defeated in {result['rounds']} rounds.",
+                color=discord.Color.dark_red()
+            )
+            embed.set_image(url=boss_data["phases"][0]["image"])
+            
+            await message.edit(embed=embed)
+            await ctx.send("💀 You lost the boss battle. Try leveling up your team!")
+        
+        else:
+            # Draw
+            embed = discord.Embed(
+                title=f"👹 BOSS BATTLE — {boss_data['name']} 👹",
+                description=f"**⚖️ DRAW ⚖️**\nBattle ended in a draw after {result['rounds']} rounds.",
+                color=discord.Color.orange()
+            )
+            await message.edit(embed=embed)
+    finally:
+        # Remove the lock
+        active_boss_battles.pop(user_id, None)
 
 @bot.command(name="give")
 async def give_cmd(ctx, member: discord.Member, amount: int):
