@@ -445,6 +445,7 @@ data = {"users": {}}
 # Dictionaries to track active battles (per user)
 active_battles = {}       # {user_id: True} - for floor battles
 active_boss_battles = {}  # {user_id: True} - for boss battles
+battle_locks = {}         # {user_id: asyncio.Lock} - locks for atomic operations
 
 def _load_data_from_disk():
     try:
@@ -2477,32 +2478,38 @@ async def battle_cmd(ctx):
     """Start a battle on your current floor with your selected character."""
     user_id = ctx.author.id
     
-    # Check if the user already has a battle in progress
-    if active_battles.get(user_id):
-        await ctx.send("⚠️ You already have a battle in progress! Wait for it to finish.")
-        return
+    # Get or create a lock for this user
+    if user_id not in battle_locks:
+        battle_locks[user_id] = asyncio.Lock()
     
-    user = ensure_user(user_id)
-    if user.get("stamina", 0) < 5:
-        await ctx.send("❌ Not enough stamina. You need 5 to battle.")
-        return
-    if not user.get("selected"):
-        await ctx.send("❌ No character selected. Use `-select <n>` first.")
-        return
+    # Acquire the lock to prevent race conditions
+    async with battle_locks[user_id]:
+        # Check if the user already has a battle in progress
+        if active_battles.get(user_id):
+            await ctx.send("⚠️ You already have a battle in progress! Wait for it to finish.")
+            return
+        
+        user = ensure_user(user_id)
+        if user.get("stamina", 0) < 5:
+            await ctx.send("❌ Not enough stamina. You need 5 to battle.")
+            return
+        if not user.get("selected"):
+            await ctx.send("❌ No character selected. Use `-select <n>` first.")
+            return
 
-    # find the selected card
-    selected_id = user["selected"]
-    chosen = None
-    for c in user["inventory"]:
-        if c.get("instance_id") == selected_id:
-            chosen = c
-            break
-    if not chosen:
-        await ctx.send("❌ Your selected character was not found. Use `-select <n>` again.")
-        return
+        # find the selected card
+        selected_id = user["selected"]
+        chosen = None
+        for c in user["inventory"]:
+            if c.get("instance_id") == selected_id:
+                chosen = c
+                break
+        if not chosen:
+            await ctx.send("❌ Your selected character was not found. Use `-select <n>` again.")
+            return
 
-    # Set the lock
-    active_battles[user_id] = True
+        # Set the lock
+        active_battles[user_id] = True
     
     try:
         # remove stamina and save immediately
@@ -3415,71 +3422,77 @@ async def boss_cmd(ctx, boss_number: int = None):
     """Start a boss battle with your team. Usage: -boss [number]"""
     user_id = ctx.author.id
     
-    # Check if the user already has a boss battle in progress
-    if active_boss_battles.get(user_id):
-        await ctx.send("⚠️ You already have a boss battle in progress! Wait for it to finish.")
-        return
+    # Get or create a lock for this user
+    if user_id not in battle_locks:
+        battle_locks[user_id] = asyncio.Lock()
     
-    user = ensure_user(user_id)
-    
-    # Check stamina
-    if user.get("stamina", 0) < 15:
-        await ctx.send("❌ Not enough stamina. You need **15** stamina for boss battles.")
-        return
-    
-    # Check if team is set
-    team_ids = user.get("team", [])
-    if len(team_ids) != 3:
-        await ctx.send("❌ You need to set a team of 3 cards first! Use `-team set <card1> <card2> <card3>`")
-        return
-    
-    # Check if all positions are filled (no None values)
-    if any(id is None for id in team_ids):
-        await ctx.send("❌ Your team has empty slots! Use `-team set` to fill all 3 positions before fighting bosses.")
-        return
-    
-    # Get team cards
-    team_cards = []
-    for instance_id in team_ids:
-        for c in user["inventory"]:
-            if c.get("instance_id") == instance_id:
-                team_cards.append(c)
-                break
-    
-    if len(team_cards) != 3:
-        await ctx.send("❌ Some cards in your team are missing. Please set a new team with `-team`.")
-        return
-    
-    # If no boss specified, show available bosses
-    if boss_number is None:
-        unlocked = user.get("boss_unlocked", 1)
-        boss_list = []
-        for i, boss in enumerate(BOSSES, 1):
-            status = "🔓" if i <= unlocked else "🔒"
-            phase1 = boss["phases"][0]
-            boss_list.append(f"{status} `{i}.` **{boss['name']}** — HP: {phase1['hp']} | ATK: {phase1['atk']} | Reward: {boss['rewards']['guaranteed_rarity']} card")
+    # Acquire the lock to prevent race conditions
+    async with battle_locks[user_id]:
+        # Check if the user already has a boss battle in progress
+        if active_boss_battles.get(user_id):
+            await ctx.send("⚠️ You already have a boss battle in progress! Wait for it to finish.")
+            return
         
-        await ctx.send(
-            f"👹 **Available Bosses** (Unlocked: {unlocked}/{len(BOSSES)})\n\n" +
-            "\n".join(boss_list) +
-            f"\n\nUse `-boss <number>` to fight!"
-        )
-        return
-    
-    # Validate boss number
-    if boss_number < 1 or boss_number > len(BOSSES):
-        await ctx.send(f"❌ Invalid boss number. Valid range: 1-{len(BOSSES)}")
-        return
-    
-    unlocked = user.get("boss_unlocked", 1)
-    if boss_number > unlocked:
-        await ctx.send(f"❌ Boss {boss_number} is locked! You need to defeat Boss {unlocked} first.")
-        return
-    
-    boss_data = BOSSES[boss_number - 1]
-    
-    # Set the lock
-    active_boss_battles[user_id] = True
+        user = ensure_user(user_id)
+        
+        # Check stamina
+        if user.get("stamina", 0) < 15:
+            await ctx.send("❌ Not enough stamina. You need **15** stamina for boss battles.")
+            return
+        
+        # Check if team is set
+        team_ids = user.get("team", [])
+        if len(team_ids) != 3:
+            await ctx.send("❌ You need to set a team of 3 cards first! Use `-team set <card1> <card2> <card3>`")
+            return
+        
+        # Check if all positions are filled (no None values)
+        if any(id is None for id in team_ids):
+            await ctx.send("❌ Your team has empty slots! Use `-team set` to fill all 3 positions before fighting bosses.")
+            return
+        
+        # Get team cards
+        team_cards = []
+        for instance_id in team_ids:
+            for c in user["inventory"]:
+                if c.get("instance_id") == instance_id:
+                    team_cards.append(c)
+                    break
+        
+        if len(team_cards) != 3:
+            await ctx.send("❌ Some cards in your team are missing. Please set a new team with `-team`.")
+            return
+        
+        # If no boss specified, show available bosses
+        if boss_number is None:
+            unlocked = user.get("boss_unlocked", 1)
+            boss_list = []
+            for i, boss in enumerate(BOSSES, 1):
+                status = "🔓" if i <= unlocked else "🔒"
+                phase1 = boss["phases"][0]
+                boss_list.append(f"{status} `{i}.` **{boss['name']}** — HP: {phase1['hp']} | ATK: {phase1['atk']} | Reward: {boss['rewards']['guaranteed_rarity']} card")
+            
+            await ctx.send(
+                f"👹 **Available Bosses** (Unlocked: {unlocked}/{len(BOSSES)})\n\n" +
+                "\n".join(boss_list) +
+                f"\n\nUse `-boss <number>` to fight!"
+            )
+            return
+        
+        # Validate boss number
+        if boss_number < 1 or boss_number > len(BOSSES):
+            await ctx.send(f"❌ Invalid boss number. Valid range: 1-{len(BOSSES)}")
+            return
+        
+        unlocked = user.get("boss_unlocked", 1)
+        if boss_number > unlocked:
+            await ctx.send(f"❌ Boss {boss_number} is locked! You need to defeat Boss {unlocked} first.")
+            return
+        
+        boss_data = BOSSES[boss_number - 1]
+        
+        # Set the lock
+        active_boss_battles[user_id] = True
     
     try:
         # Deduct stamina
