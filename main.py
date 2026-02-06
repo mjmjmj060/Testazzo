@@ -2513,7 +2513,6 @@ async def battle_cmd(ctx):
         active_battles[user_id] = True
     
     try:
-
         # battle logic
         floor = user.get("floor", 1)
         enemy = make_enemy_for_floor(floor)
