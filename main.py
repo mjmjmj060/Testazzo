@@ -4050,9 +4050,6 @@ async def on_command_error(ctx, error):
 # ------------------------
 # RUN
 # ------------------------
+
 if __name__ == "__main__":
-    token = os.getenv("DISCORD_TOKEN")
-    if not token:
-        print("ERROR: set the DISCORD_TOKEN environment variable.")
-    else:
-        bot.run(token)
+    bot.run("MTM4Nzg2MTkwNDMwMjY2OTg3Ng.GVrI-7.ghJVPvmjmrNKOJFHnI2roeQvxu3TEK7ds8RYpQ")
