@@ -11,6 +11,7 @@ from datetime import datetime
 import io
 import aiohttp
 from PIL import Image
+from collections import defaultdict
 
 # ------------------------
 # CONFIG
@@ -445,7 +446,7 @@ data = {"users": {}}
 # Dictionaries to track active battles (per user)
 active_battles = {}       # {user_id: True} - for floor battles
 active_boss_battles = {}  # {user_id: True} - for boss battles
-battle_locks = {}         # {user_id: asyncio.Lock} - locks for atomic operations
+battle_locks = defaultdict(asyncio.Lock)  # {user_id: asyncio.Lock} - locks for atomic operations
 
 def _load_data_from_disk():
     try:
@@ -2478,10 +2479,6 @@ async def battle_cmd(ctx):
     """Start a battle on your current floor with your selected character."""
     user_id = ctx.author.id
     
-    # Get or create a lock for this user
-    if user_id not in battle_locks:
-        battle_locks[user_id] = asyncio.Lock()
-    
     # Acquire the lock to prevent race conditions
     async with battle_locks[user_id]:
         # Check if the user already has a battle in progress
@@ -3421,10 +3418,6 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
 async def boss_cmd(ctx, boss_number: int = None):
     """Start a boss battle with your team. Usage: -boss [number]"""
     user_id = ctx.author.id
-    
-    # Get or create a lock for this user
-    if user_id not in battle_locks:
-        battle_locks[user_id] = asyncio.Lock()
     
     # Acquire the lock to prevent race conditions
     async with battle_locks[user_id]:
