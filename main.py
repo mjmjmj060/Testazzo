@@ -1746,10 +1746,10 @@ FLOOR_IMAGES = [
     "https://cdn.discordapp.com/attachments/815650716730654743/1469793440056348795/IMG_6389.webp?ex=6988f34f&is=6987a1cf&hm=566b4588cd8806c27ea8849a665f5a6b8ab15e4e50a701d89446a62b1ff9cebc&",  # Floor 63
 ]
 
-# Location 1 (Loc 1): 27 floors balanced for Legendary Lv60 cards
+# Location 1 (Loc 1): 63 floors balanced for Legendary Lv60 cards
 # Future: Additional locations will be added with their own floor systems
 def make_enemy_for_floor(floor: int) -> dict:
-    """Return an enemy dict with stats scaled by floor (1-27 for Loc 1)."""
+    """Return an enemy dict with stats scaled by floor (1-63 for Loc 1)."""
     base_hp = 120 + (floor - 1) * 40
     base_atk = 25 + int((floor - 1) * 5)
     base_def = 10 + int((floor - 1) * 4)
@@ -2833,8 +2833,8 @@ async def floor_cmd(ctx, action: str = None):
     if action.lower() in ["next", "n"]:
         current = user.get("floor", 1)
         unlocked = user.get("floor_unlocked", 1)
-        if current >= 27:
-            await ctx.send("You are already at the maximum floor (27).")
+        if current >= 63:
+            await ctx.send("You are already at the maximum floor (63).")
             return
         if unlocked < current + 1:
             await ctx.send("Next floor is locked. Complete the current floor to unlock the next one.")
