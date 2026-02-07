@@ -322,8 +322,7 @@ RARITY_MAX_LEVEL = {
     "Legendary": 60,
 }
 RARITIES = ["Common", "Rare", "Epic", "Legendary"]
-RARITY_WEIGHTS = [70, 25, 5, 0]  # weights for random drops (Common 70%, Rare 25%, Epic 5%, Legendary 0%)
-
+RARITY_WEIGHTS = [75, 24, 1, 0]  # weights for random drops
 # rating rank for sorting inventory
 RARITY_RANK = {"Common": 1, "Rare": 2, "Epic": 3, "Legendary": 4}
 
