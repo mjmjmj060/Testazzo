@@ -456,15 +456,15 @@ BOSSES = [
         "phases": [
             {
                 "hp": 2500,
-                "atk": 500,
+                "atk": 750,
                 "def": 500,
                 "spd": 999,
                 "image": "https://cdn.discordapp.com/attachments/815650716730654743/1469810392212443278/IMG_6390.webp?ex=69890319&is=6987b199&hm=7108fff73d948e0c5b69af2a0656e3f1fe916e0321ce2e0a5569f94097d36fc1&"
             },
             {
                 "hp": 2500,
-                "atk": 600,
-                "def": 600,
+                "atk": 750,
+                "def": 750,
                 "spd": 999,
                 "image": "https://cdn.discordapp.com/attachments/815650716730654743/1469810392481005669/IMG_6391.webp?ex=69890319&is=6987b199&hm=45083c9e83b49f46aeb9e64c7681a0670bb6b5d2fc41537d59e8a7d166849fbb&"
             }
@@ -485,8 +485,8 @@ BOSSES = [
             },
             {
                 "hp": 4000,
-                "atk": 600,
-                "def": 600,
+                "atk": 800,
+                "def": 800,
                 "spd": 800,
                 "image": "https://cdn.discordapp.com/attachments/815650716730654743/1469810489109254440/IMG_6393.webp?ex=69890330&is=6987b1b0&hm=a742a3b37a75c8ba80c54633f1a5620d97dad4e208615aae4f1f31c4b59a522e&"
             }
@@ -508,7 +508,7 @@ BOSSES = [
             {
                 "hp": 5000,
                 "atk": 500,
-                "def": 750,
+                "def": 900,
                 "spd": 500,
                 "image": "https://cdn.discordapp.com/attachments/815650716730654743/1469810805896777861/IMG_6395.webp?ex=6989037b&is=6987b1fb&hm=1b7646776b55cfd88d70f508014f54b753291ee6828359f33180edf36f7ac000&"
             }
@@ -529,7 +529,7 @@ BOSSES = [
             },
             {
                 "hp": 5000,
-                "atk": 750,
+                "atk": 900,
                 "def": 500,
                 "spd": 500,
                 "image": "https://cdn.discordapp.com/attachments/815650716730654743/1469810912633421916/IMG_6397.webp?ex=69890395&is=6987b215&hm=e2561369b74805f0675f8572fe155ea3cfc53a8e520ed16c67b7533385580813&"
@@ -544,9 +544,9 @@ BOSSES = [
         "phases": [
             {
                 "hp": 9999,
-                "atk": 500,
-                "def": 500,
-                "spd": 500,
+                "atk": 750,
+                "def": 750,
+                "spd": 750,
                 "image": "https://cdn.discordapp.com/attachments/815650716730654743/1469811131391545587/IMG_6398.webp?ex=698903c9&is=6987b249&hm=627df7bdf0ece5c09ccafa88dd4e995946f3a3243d41d6ded4baf25f9e4249ad&"
             },
             {
