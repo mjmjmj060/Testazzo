@@ -313,6 +313,16 @@ BOSS_CATBOX_IMAGES = {
     "crazed_axe_phase2": "https://files.catbox.moe/i9dusb.webp",
     "crazed_legs_phase1": "https://files.catbox.moe/9u3ona.webp",
     "crazed_legs_phase2": "https://files.catbox.moe/shwre4.webp",
+    "crazed_cow_phase1": "https://files.catbox.moe/wwvh80.webp",
+    "crazed_cow_phase2": "https://files.catbox.moe/9pl3kh.webp",
+    "crazed_bird_phase1": "https://files.catbox.moe/zdwcm0.webp",
+    "crazed_bird_phase2": "https://files.catbox.moe/qtwuu6.webp",
+    "crazed_fish_phase1": "https://files.catbox.moe/mh5waw.webp",
+    "crazed_fish_phase2": "https://files.catbox.moe/lgnavl.webp",
+    "crazed_lizard_phase1": "https://files.catbox.moe/sn4h1m.webp",
+    "crazed_lizard_phase2": "https://files.catbox.moe/foydnf.webp",
+    "crazed_titan_phase1": "https://files.catbox.moe/lyaa4h.webp",
+    "crazed_titan_phase2": "https://files.catbox.moe/zp1sri.webp",
 }
 
 RARITY_MAX_LEVEL = {
@@ -438,6 +448,116 @@ BOSSES = [
             }
         ],
         "rewards": {"gold": 2500, "exp": 1000, "guaranteed_rarity": "Legendary"}
+    },
+    {
+        "id": "crazed_cow",
+        "name": "Crazed Cow",
+        "ability_type": None,  # No ability
+        "phases": [
+            {
+                "hp": 2500,
+                "atk": 500,
+                "def": 500,
+                "spd": 999,
+                "image": "https://cdn.discordapp.com/attachments/815650716730654743/1469810392212443278/IMG_6390.webp?ex=69890319&is=6987b199&hm=7108fff73d948e0c5b69af2a0656e3f1fe916e0321ce2e0a5569f94097d36fc1&"
+            },
+            {
+                "hp": 2500,
+                "atk": 600,
+                "def": 600,
+                "spd": 999,
+                "image": "https://cdn.discordapp.com/attachments/815650716730654743/1469810392481005669/IMG_6391.webp?ex=69890319&is=6987b199&hm=45083c9e83b49f46aeb9e64c7681a0670bb6b5d2fc41537d59e8a7d166849fbb&"
+            }
+        ],
+        "rewards": {"gold": 3000, "exp": 1200, "guaranteed_rarity": "Epic"}
+    },
+    {
+        "id": "crazed_bird",
+        "name": "Crazed Bird",
+        "ability_type": "boss_speed_bonus",  # If SPD > enemy SPD, deals 100% bonus damage
+        "phases": [
+            {
+                "hp": 4000,
+                "atk": 400,
+                "def": 400,
+                "spd": 400,
+                "image": "https://cdn.discordapp.com/attachments/815650716730654743/1469810488840814713/IMG_6392.webp?ex=69890330&is=6987b1b0&hm=7a5591b7270d92eea8f0c0ee9894b39d2ee9c1e4bb1408d1c19ea5c3de25fe35&"
+            },
+            {
+                "hp": 4000,
+                "atk": 600,
+                "def": 600,
+                "spd": 800,
+                "image": "https://cdn.discordapp.com/attachments/815650716730654743/1469810489109254440/IMG_6393.webp?ex=69890330&is=6987b1b0&hm=a742a3b37a75c8ba80c54633f1a5620d97dad4e208615aae4f1f31c4b59a522e&"
+            }
+        ],
+        "rewards": {"gold": 3500, "exp": 1400, "guaranteed_rarity": "Epic"}
+    },
+    {
+        "id": "crazed_fish",
+        "name": "Crazed Fish",
+        "ability_type": "boss_def_heal",  # If DEF > enemy DEF, heals 30% max HP
+        "phases": [
+            {
+                "hp": 5000,
+                "atk": 500,
+                "def": 500,
+                "spd": 500,
+                "image": "https://cdn.discordapp.com/attachments/815650716730654743/1469810805531738218/IMG_6394.webp?ex=6989037b&is=6987b1fb&hm=df9af1fa4638e82f781b5814362fb87d91250a1bcf31a8c54fc73b84380c49ae&"
+            },
+            {
+                "hp": 5000,
+                "atk": 500,
+                "def": 750,
+                "spd": 500,
+                "image": "https://cdn.discordapp.com/attachments/815650716730654743/1469810805896777861/IMG_6395.webp?ex=6989037b&is=6987b1fb&hm=1b7646776b55cfd88d70f508014f54b753291ee6828359f33180edf36f7ac000&"
+            }
+        ],
+        "rewards": {"gold": 4000, "exp": 1600, "guaranteed_rarity": "Legendary"}
+    },
+    {
+        "id": "crazed_lizard",
+        "name": "Crazed Lizard",
+        "ability_type": "boss_atk_heal",  # If ATK > enemy ATK, heals 30% max HP
+        "phases": [
+            {
+                "hp": 5000,
+                "atk": 500,
+                "def": 500,
+                "spd": 500,
+                "image": "https://cdn.discordapp.com/attachments/815650716730654743/1469810912381767820/IMG_6396.webp?ex=69890395&is=6987b215&hm=dfee9d26a2b27169d0f03f94422d21b7ab7b970e651069d0f03f94422d21b7ab&"
+            },
+            {
+                "hp": 5000,
+                "atk": 750,
+                "def": 500,
+                "spd": 500,
+                "image": "https://cdn.discordapp.com/attachments/815650716730654743/1469810912633421916/IMG_6397.webp?ex=69890395&is=6987b215&hm=e2561369b74805f0675f8572fe155ea3cfc53a8e520ed16c67b7533385580813&"
+            }
+        ],
+        "rewards": {"gold": 4000, "exp": 1600, "guaranteed_rarity": "Legendary"}
+    },
+    {
+        "id": "crazed_titan",
+        "name": "Crazed Titan",
+        "ability_type": "boss_paralyze",  # First attack paralyzes enemy for 2 turns
+        "phases": [
+            {
+                "hp": 9999,
+                "atk": 500,
+                "def": 500,
+                "spd": 500,
+                "image": "https://cdn.discordapp.com/attachments/815650716730654743/1469811131391545587/IMG_6398.webp?ex=698903c9&is=6987b249&hm=627df7bdf0ece5c09ccafa88dd4e995946f3a3243d41d6ded4baf25f9e4249ad&"
+            },
+            {
+                "hp": 9999,
+                "atk": 999,
+                "def": 999,
+                "spd": 999,
+                "image": "https://cdn.discordapp.com/attachments/815650716730654743/1469811131710439486/IMG_6399.webp?ex=698903c9&is=6987b249&hm=1937cb38bcba5704690d6dcb7d8ec4a0af3e4249ad&"
+            }
+        ],
+        "rewards": {"gold": 5000, "exp": 2000, "guaranteed_rarity": "Legendary"}
     }
 ]
 
@@ -3457,10 +3577,10 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
                 break
             
             if actor == "team":
-                # Check if paralyzed
-                if team_flags.get("team_paralyzed", 0) > 0:
-                    team_flags["team_paralyzed"] -= 1
-                    round_log.append(f"⚡ **Team is stunned!** Cannot attack.")
+                # Check if paralyzed (by boss abilities like Crazed Titan)
+                if team_flags.get("team_paralyzed_turns", 0) > 0:
+                    team_flags["team_paralyzed_turns"] -= 1
+                    round_log.append(f"⚡ **Team is paralyzed!** Cannot attack. ({team_flags['team_paralyzed_turns']} turns left)")
                     continue
                 
                 # ===== SISTEMA BUFF ADDITIVO =====
@@ -3548,17 +3668,44 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
                 if boss["hp"] <= 0:
                     continue
                 
-                # Check if boss is paralyzed
+                # Check if boss is paralyzed (by team abilities like Thundia)
                 if team_flags["paralyze_turns"] > 0:
                     team_flags["paralyze_turns"] -= 1
                     round_log.append(f"⚡ **{boss_data['name']} is paralyzed!** Cannot attack. ({team_flags['paralyze_turns']} turns left)")
                     continue
                 
+                # Get boss ability type
+                boss_ability = boss_data.get("ability_type", None)
+                
+                # Boss ability: Speed bonus damage (Crazed Bird)
+                boss_dmg_bonus = 0
+                if boss_ability == "boss_speed_bonus" and boss["spd"] > team["spd"]:
+                    boss_dmg_bonus = int(boss["atk"] * 1.0)  # 100% bonus damage
+                    round_log.append(f"💨 **{boss_data['name']}'s speed superiority!** Bonus damage incoming!")
+                
                 # Boss attacks
-                dmg = max(1, int(boss["atk"] - team["def"] * 0.5))
+                dmg = max(1, int(boss["atk"] - team["def"] * 0.5)) + boss_dmg_bonus
                 team["hp"] -= dmg
                 team["hp"] = max(0, team["hp"])
                 round_log.append(f"👹 **{boss_data['name']} attacks!** Deals `{dmg}` damage")
+                
+                # Boss ability: DEF-based heal (Crazed Fish)
+                if boss_ability == "boss_def_heal" and boss["def"] > team["def"]:
+                    heal = int(boss["hp_max"] * 0.3)
+                    boss["hp"] = min(boss["hp_max"], boss["hp"] + heal)
+                    round_log.append(f"💚 **{boss_data['name']}'s defensive regeneration!** +{heal} HP")
+                
+                # Boss ability: ATK-based heal (Crazed Lizard)
+                if boss_ability == "boss_atk_heal" and boss["atk"] > team["atk"]:
+                    heal = int(boss["hp_max"] * 0.3)
+                    boss["hp"] = min(boss["hp_max"], boss["hp"] + heal)
+                    round_log.append(f"💚 **{boss_data['name']}'s offensive regeneration!** +{heal} HP")
+                
+                # Boss ability: Paralyze team (Crazed Titan - first attack in phase 1 only)
+                if boss_ability == "boss_paralyze" and current_phase == 0 and not team_flags.get("titan_paralyzed", False):
+                    team_flags["team_paralyzed_turns"] = 2
+                    team_flags["titan_paralyzed"] = True
+                    round_log.append(f"⚡ **{boss_data['name']} paralyzes your team for 2 turns!**")
                 
                 # Verbena survive
                 if team["hp"] <= 0 and "survive" in team_abilities and not team_flags["verbena_survived"]:
