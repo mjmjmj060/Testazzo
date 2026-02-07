@@ -374,7 +374,7 @@ BOSSES = [
                 "image": "https://cdn.discordapp.com/attachments/815650716730654743/1467647917400784926/IMG_6298.webp?ex=6981cde3&is=69807c63&hm=a4d3098a6f923479d627295d5f929d99301b4b974d1da10b7d62e1eea37205d2&"
             }
         ],
-        "rewards": {"gold": 1000, "exp": 500, "guaranteed_rarity": "Epic"}
+        "rewards": {"gold": 1000, "exp": 500, "guaranteed_rarity": "Rare"}
     },
     {
         "id": "crazed_tank",
@@ -395,7 +395,7 @@ BOSSES = [
                 "image": "https://cdn.discordapp.com/attachments/815650716730654743/1467919227527888999/IMG_6303.webp?ex=698221d0&is=6980d050&hm=571ad25ae8bbccf3a501a1958a392751baf32d66fa35cfd3160c4b89869cc34f&"
             }
         ],
-        "rewards": {"gold": 2500, "exp": 1000, "guaranteed_rarity": "Legendary"}
+        "rewards": {"gold": 2500, "exp": 1000, "guaranteed_rarity": "Epic"}
     },
     {
         "id": "crazed_axe",
@@ -416,7 +416,7 @@ BOSSES = [
                 "image": "https://cdn.discordapp.com/attachments/815650716730654743/1468969510307627301/IMG_6332.webp?ex=6985f3f7&is=6984a277&hm=3be5cdcf40db67af2942e28f3a3824659a323a26796ed60dc31028b0e095c3a1&"
             }
         ],
-        "rewards": {"gold": 2500, "exp": 1000, "guaranteed_rarity": "Legendary"}
+        "rewards": {"gold": 2500, "exp": 1000, "guaranteed_rarity": "Epic"}
     },
     {
         "id": "crazed_legs",
@@ -554,6 +554,8 @@ def ensure_user(user_id: int):
         user["team"] = []
     if "boss_unlocked" not in user:
         user["boss_unlocked"] = 1
+    if "bosses_cleared" not in user:
+        user["bosses_cleared"] = []  # List of boss IDs cleared for first time card reward
     
     return user
 
@@ -3677,10 +3679,18 @@ async def boss_cmd(ctx, boss_number: int = None):
             user["gold"] = user.get("gold", 0) + gold_gain
             user["exp"] = user.get("exp", 0) + exp_gain
             
-            # Give guaranteed card
-            random_char = random.choice(CHARACTERS)
-            new_card = create_card_instance(random_char, guaranteed_rarity)
-            user["inventory"].append(new_card)
+            # Give guaranteed card ONLY on first clear
+            is_first_clear = boss_data["id"] not in user.get("bosses_cleared", [])
+            new_card = None
+            
+            if is_first_clear:
+                random_char = random.choice(CHARACTERS)
+                new_card = create_card_instance(random_char, guaranteed_rarity)
+                user["inventory"].append(new_card)
+                # Mark boss as cleared
+                if "bosses_cleared" not in user:
+                    user["bosses_cleared"] = []
+                user["bosses_cleared"].append(boss_data["id"])
             
             # Give EXP to team cards
             for card in team_cards:
@@ -3707,7 +3717,9 @@ async def boss_cmd(ctx, boss_number: int = None):
                 color=discord.Color.gold()
             )
             
-            reward_text = f"💰 +{gold_gain} Gold\n⭐ +{exp_gain} EXP\n🎴 **{new_card['name']}** ({guaranteed_rarity})"
+            reward_text = f"💰 +{gold_gain} Gold\n⭐ +{exp_gain} EXP"
+            if new_card:
+                reward_text += f"\n🎴 **{new_card['name']}** ({guaranteed_rarity}) *(First Clear Bonus!)*"
             if boss_number == unlocked and unlocked < len(BOSSES):
                 reward_text += f"\n🔓 **Boss {unlocked + 1} unlocked!**"
             if lvl_msgs:
