@@ -342,10 +342,10 @@ RARITY_UPGRADE = {
 
 # Sell prices per rarity
 SELL_PRICES = {
-    "Common": 100,
-    "Rare": 1000,
-    "Epic": 10000,
-    "Legendary": 100000,
+    "Common": 50,
+    "Rare": 500,
+    "Epic": 5000,
+    "Legendary": 50000,
 }
 
 # Character lookup dictionary for O(1) access
@@ -1148,7 +1148,7 @@ async def farm_cmd(ctx):
     await ctx.send(f"⛏️ You gained **{amount}** gold!")
 
 @bot.command(name="drop", aliases=["d"])
-@commands.cooldown(1, 5, commands.BucketType.user)
+@commands.cooldown(1, 60, commands.BucketType.user)
 async def drop_cmd(ctx):
     """Get a random card (15-minute cooldown), does not consume stamina."""
     user = ensure_user(ctx.author.id)
@@ -1345,7 +1345,7 @@ async def info_cmd(ctx, index: int):
     
     await ctx.send(embed=embed)
 
-@bot.command(name="enhance")
+@bot.command(name="enhance", aliases=["enh"])
 async def enhance_cmd(ctx, target: str, *args):
     """Enhance a card's level using gold. Usage: -enhance <index> [-l <target_level>]
     Cost: 100 gold per level. If -l is omitted, enhances to max level."""
