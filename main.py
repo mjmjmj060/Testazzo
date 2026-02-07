@@ -1715,9 +1715,9 @@ FLOOR_IMAGES = [
 def make_enemy_for_floor(floor: int) -> dict:
     """Return an enemy dict with stats scaled by floor (1-27 for Loc 1)."""
     base_hp = 120 + (floor - 1) * 72
-    base_atk = 25 + int((floor - 1) * 8.7)
-    base_def = 10 + int((floor - 1) * 5.4)
-    base_spd = 20 + int((floor - 1) * 3.1)
+    base_atk = 25 + int((floor - 1) * 6)
+    base_def = 10 + int((floor - 1) * 5)
+    base_spd = 20 + int((floor - 1) * 3)
     
     # Get floor-specific image (index 0 = floor 1)
     image_index = min(floor - 1, len(FLOOR_IMAGES) - 1)
