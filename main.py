@@ -1708,16 +1708,52 @@ FLOOR_IMAGES = [
     "https://cdn.discordapp.com/attachments/815650716730654743/1467540001184153744/IMG_6278.webp?ex=6980c0a1&is=697f6f21&hm=183b1ce0a67bc4a527e2e9a4be5ea1e0210e4bfef301bc2c2f207c5e4a56de4b&",  # Floor 25
     "https://cdn.discordapp.com/attachments/815650716730654743/1467540001452462242/IMG_6279.webp?ex=6980c0a1&is=697f6f21&hm=6ea6e5c66432cddfc97a2b081347e834a053bdc953be410d84af50cbe0f45387&",  # Floor 26
     "https://cdn.discordapp.com/attachments/815650716730654743/1467540001666502737/IMG_6280.webp?ex=6980c0a1&is=697f6f21&hm=e8c664f9f2b9b50997bca2cb833a903fe5e4f76ee6bce3691169f098a7f03270&",  # Floor 27
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793228479008861/IMG_6354.webp?ex=6988f31d&is=6987a19d&hm=8236b818dca30585d3b0fc16d968d00ace90b49d4579cba7d00162dc2b11ad2e&",  # Floor 28
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793229057691770/IMG_6355.webp?ex=6988f31d&is=6987a19d&hm=b1bf59deff1a94256cbaeab5b1748165ae0631d5a921138bcddccff76c60573e&",  # Floor 29
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793229410140403/IMG_6356.webp?ex=6988f31d&is=6987a19d&hm=f364f5666ab99f9c9a8a5743198a5f5c2002cb0cd34a2844785cc4bdb6cc7c85&",  # Floor 30
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793229686968452/IMG_6357.webp?ex=6988f31d&is=6987a19d&hm=40f2a630954dcb1ea1981ff4fd66dd9aa618b783b9e6ffef322d721919b211a6&",  # Floor 31
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793229988827166/IMG_6358.webp?ex=6988f31d&is=6987a19d&hm=1efa2898fa974d97e5931d377b31a5637a48e6897275c29712f2709cd26900f1&",  # Floor 32
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793230206795776/IMG_6359.webp?ex=6988f31d&is=6987a19d&hm=b8c64f06a62b0825ff0f43ab38b99f2d4a838b38f3312c9cd6861a2d0a086487&",  # Floor 33
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793230639075472/IMG_6360.webp?ex=6988f31d&is=6987a19d&hm=0a565617fbefea4d1dfec5e7226b6b8833bae1839f25d347d3f1579f37b184e9&",  # Floor 34
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793230915768432/IMG_6361.webp?ex=6988f31d&is=6987a19d&hm=82d16ea6b198c583d7ba0f813189ce4d0cab353713bd3fa439762a0e976e70d5&",  # Floor 35
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793231268221151/IMG_6362.webp?ex=6988f31d&is=6987a19d&hm=f6b79f1831d264a66006fe18983ff84c3ee7fc9bd711a98bbc416a93c001829b&",  # Floor 36
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793281222119526/IMG_6363.webp?ex=6988f329&is=6987a1a9&hm=30395c5d7e1df904820ad40068b0e57b3cc27902715605b3c4f442d2ffe6dba3&",  # Floor 37
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793281520046248/IMG_6364.webp?ex=6988f329&is=6987a1a9&hm=437aa26e70be73e5c264490097af7937f410aa4b6857345c83534a1176136e59&",  # Floor 38
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793281758986354/IMG_6365.webp?ex=6988f329&is=6987a1a9&hm=438a76e13e52bb14d452e154c9b2c440eb964f2c49cdf6eb060dd6234b07359f&",  # Floor 39
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793282048528524/IMG_6366.webp?ex=6988f329&is=6987a1a9&hm=5a39ca28e993e873f6c4ad0cd22388941c222b580c9e8d9f7190d307bd878456&",  # Floor 40
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793282417754304/IMG_6367.webp?ex=6988f329&is=6987a1a9&hm=6795b1801d2637f004150725ad21acf01acc09fedbfb574b830e2b7ffa829329&",  # Floor 41
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793282698645624/IMG_6368.webp?ex=6988f32a&is=6987a1aa&hm=716bf231b92385a85a01b17cf00d2d4c25333cf2962d541cfff8b763e8767ee7&",  # Floor 42
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793283063419011/IMG_6369.webp?ex=6988f32a&is=6987a1aa&hm=bd02e14f1592f14aa62e3d9bcb26a44c801d90c095dbf8bbf2d6f652d1fc7682&",  # Floor 43
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793283621519411/IMG_6370.webp?ex=6988f32a&is=6987a1aa&hm=cd5bea5eef827a17129e72e9a12f810e38d227de2b90608c8f08d39039c6f196&",  # Floor 44
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793289304805376/IMG_6371.webp?ex=6988f32b&is=6987a1ab&hm=b95215f6e62005e58c39bc1be859606751f19d1a82fb287fcbba6138f4b42c0f&",  # Floor 45
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793376181158090/IMG_6372.webp?ex=6988f340&is=6987a1c0&hm=36f85c6fe07ea0ce15869817e6b65197f70c94e71e3acfa062e481ba98d13154&",  # Floor 46
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793376407785647/IMG_6373.webp?ex=6988f340&is=6987a1c0&hm=c08ee0b6c80982be7b4c6e661439a66a7bf4c4d1808793f1c0d2e8e9c0c11b1b&",  # Floor 47
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793376907034735/IMG_6374.webp?ex=6988f340&is=6987a1c0&hm=e670dacc456bce79491e8386f92ca9bc87b3183bd9e6b5d33656c0f6e348f420&",  # Floor 48
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793377137459311/IMG_6375.webp?ex=6988f340&is=6987a1c0&hm=61e132494f1a0f163ef79bf7ecc6b9fcf68db4b4793f8dc4dfcbc11598c97fb2&",  # Floor 49
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793377452294195/IMG_6376.webp?ex=6988f340&is=6987a1c0&hm=c8a734dc7218020b6c22705e992e0a686132ffc5a4e9afd64deaad8b682052d8&",  # Floor 50
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793377741705236/IMG_6377.webp?ex=6988f340&is=6987a1c0&hm=4b81da3f71e568787faffda750ffb09dfaa289eb8029b513249ec19a630b2f21&",  # Floor 51
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793378014072852/IMG_6378.webp?ex=6988f340&is=6987a1c0&hm=277aed15880d1ee74aa127605020629e78221fce8e90b068a5480524302a46b7&",  # Floor 52
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793378257600512/IMG_6379.webp?ex=6988f340&is=6987a1c0&hm=970f2e1f73c35a38ef3f4ce9947e42a9bb1941018b51e8f35703b26106aefab5&",  # Floor 53
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793378500608054/IMG_6380.webp?ex=6988f340&is=6987a1c0&hm=710d086105a3b2eaab9bb220ca06e8655509e21106d2da362eaf035c4bc3c52b&",  # Floor 54
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793435300003840/IMG_6381.webp?ex=6988f34e&is=6987a1ce&hm=427deccdf9c9847444cd85f2c0a4ec51f4f1a2c68e2d08cfe01513cf8db08996&",  # Floor 55
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793435996262636/IMG_6382.webp?ex=6988f34e&is=6987a1ce&hm=fc17071b4ea62371b8c56f95ee6694dc6b1e2c7af70118edaec76601a0452d48&",  # Floor 56
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793436419883235/IMG_6383.webp?ex=6988f34e&is=6987a1ce&hm=1e748a630fdf4fc176b65fade724d9fcd57278353cd531b66ca72f8f65494e43&",  # Floor 57
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793436830928988/IMG_6384.webp?ex=6988f34e&is=6987a1ce&hm=26c2da1ca5de6af7421ffdcea3cd07eaa979b6925f3d368493f701de43da883c&",  # Floor 58
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793437648687207/IMG_6385.webp?ex=6988f34e&is=6987a1ce&hm=41bad1d4bf298de33ff9baee48baa5ac1d1f669b03109c37cfafc9bf67f0a35c&",  # Floor 59
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793438001135869/IMG_6386.webp?ex=6988f34f&is=6987a1cf&hm=4b0e942ef01ffcb04d81cadcae5a96d7ea8abf0a292a8fb6bb8c4663a433d214&",  # Floor 60
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793438324228178/IMG_6387.webp?ex=6988f34f&is=6987a1cf&hm=9c32bf7515f53ed3ec5241317479e4677f4a5ec87e88379fb4e728d80df12b72&",  # Floor 61
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793439498502195/IMG_6388.webp?ex=6988f34f&is=6987a1cf&hm=97f7433af01f236494c964366f9cebc412587cabff0c8669e4a4e520484547eb&",  # Floor 62
+    "https://cdn.discordapp.com/attachments/815650716730654743/1469793440056348795/IMG_6389.webp?ex=6988f34f&is=6987a1cf&hm=566b4588cd8806c27ea8849a665f5a6b8ab15e4e50a701d89446a62b1ff9cebc&",  # Floor 63
 ]
 
 # Location 1 (Loc 1): 27 floors balanced for Legendary Lv60 cards
 # Future: Additional locations will be added with their own floor systems
 def make_enemy_for_floor(floor: int) -> dict:
     """Return an enemy dict with stats scaled by floor (1-27 for Loc 1)."""
-    base_hp = 120 + (floor - 1) * 72
-    base_atk = 25 + int((floor - 1) * 6)
-    base_def = 10 + int((floor - 1) * 5)
-    base_spd = 20 + int((floor - 1) * 3)
+    base_hp = 120 + (floor - 1) * 40
+    base_atk = 25 + int((floor - 1) * 5)
+    base_def = 10 + int((floor - 1) * 4)
+    base_spd = 20 + int((floor - 1) * 2)
     
     # Get floor-specific image (index 0 = floor 1)
     image_index = min(floor - 1, len(FLOOR_IMAGES) - 1)
