@@ -2151,57 +2151,97 @@ def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", 
                 attacker["spd"] = int(attacker["spd_base"] * 1.5)
     
     elif ability_type == "low_hp_def_stack":  # Rei - Every turn if HP < 50%: +30% DEF (stacks)
+        # SEMPRE applica i buff già accumulati
+        current_stacks = flags.get("rei_stacks", 0)
+        if mode == "bonus":
+            bonuses["def"] += 0.3 * current_stacks
+        else:
+            attacker["def"] = int(attacker["def_base"] * (1 + 0.3 * current_stacks))
+        
+        # SE HP < 50%, incrementa stack
         if attacker["hp"] < (attacker["hp_max"] * 0.5):
-            flags["rei_stacks"] = flags.get("rei_stacks", 0) + 1
-            if mode == "bonus":
-                bonuses["def"] += 0.3 * flags["rei_stacks"]
-            else:
-                attacker["def"] = int(attacker["def_base"] * (1 + 0.3 * flags["rei_stacks"]))
+            flags["rei_stacks"] = current_stacks + 1
             if is_team_battle:
                 messages.append(f"🛡️ **Rei's resolve!** Team DEF +{flags['rei_stacks'] * 30}%")
             else:
                 messages.append(f"🛡️ **{attacker['name']}'s resolve strengthens!** DEF +{flags['rei_stacks'] * 30}%")
+        elif current_stacks > 0:
+            # HP > 50% ma mantiene i buff accumulati
+            if is_team_battle:
+                messages.append(f"🛡️ **Rei maintains resolve** DEF +{current_stacks * 30}%")
+            else:
+                messages.append(f"🛡️ **{attacker['name']} maintains defense** DEF +{current_stacks * 30}%")
     
     elif ability_type == "low_hp_atk_stack":  # Paipai - Every turn if HP < 50%: +30% ATK (stacks)
+        # SEMPRE applica i buff già accumulati
+        current_stacks = flags.get("paipai_stacks", 0)
+        if mode == "bonus":
+            bonuses["atk"] += 0.3 * current_stacks
+        else:
+            attacker["atk"] = int(attacker["atk_base"] * (1 + 0.3 * current_stacks))
+        
+        # SE HP < 50%, incrementa stack
         if attacker["hp"] < (attacker["hp_max"] * 0.5):
-            flags["paipai_stacks"] = flags.get("paipai_stacks", 0) + 1
-            if mode == "bonus":
-                bonuses["atk"] += 0.3 * flags["paipai_stacks"]
-            else:
-                attacker["atk"] = int(attacker["atk_base"] * (1 + 0.3 * flags["paipai_stacks"]))
+            flags["paipai_stacks"] = current_stacks + 1
             if is_team_battle:
                 messages.append(f"⚔️ **Paipai's fury!** Team ATK +{flags['paipai_stacks'] * 30}%")
             else:
                 messages.append(f"⚔️ **{attacker['name']}'s fury grows!** ATK +{flags['paipai_stacks'] * 30}%")
+        elif current_stacks > 0:
+            # HP > 50% ma mantiene i buff accumulati
+            if is_team_battle:
+                messages.append(f"⚔️ **Paipai maintains fury** ATK +{current_stacks * 30}%")
+            else:
+                messages.append(f"⚔️ **{attacker['name']} maintains rage** ATK +{current_stacks * 30}%")
     
     # === SCALING ABILITIES ===
     elif ability_type == "def_boost_and_heal":  # Kasli - DEF comparison with stacking
+        # SEMPRE applica i buff già accumulati
+        current_stacks = flags.get("kasli_stacks", 0)
+        if mode == "bonus":
+            bonuses["def"] += 0.2 * current_stacks
+        else:
+            attacker["def"] = int(attacker["def_base"] * (1 + 0.2 * current_stacks))
+        
+        # SE condizione vera, incrementa stack e heala
         if attacker["def"] > defender["def"]:
-            flags["kasli_stacks"] = flags.get("kasli_stacks", 0) + 1
-            if mode == "bonus":
-                bonuses["def"] += 0.2 * flags["kasli_stacks"]
-            else:
-                attacker["def"] = int(attacker["def_base"] * (1 + 0.2 * flags["kasli_stacks"]))
+            flags["kasli_stacks"] = current_stacks + 1
             heal = int(attacker["hp_max"] * 0.2)
             attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal)
             if is_team_battle:
                 messages.append(f"🛡️ **Kasli's dominance!** DEF +{flags['kasli_stacks'] * 20}%, heals {heal}")
             else:
                 messages.append(f"🛡️ **{attacker['name']}'s DEF dominance!** DEF +{flags['kasli_stacks'] * 20}% and heals {heal} HP")
+        elif current_stacks > 0:
+            # Condizione falsa ma mantiene buff accumulati
+            if is_team_battle:
+                messages.append(f"🛡️ **Kasli maintains power** DEF +{current_stacks * 20}%")
+            else:
+                messages.append(f"🛡️ **{attacker['name']} maintains DEF boost** +{current_stacks * 20}%")
     
     elif ability_type == "atk_boost_and_heal":  # Izanagi - ATK comparison with stacking
+        # SEMPRE applica i buff già accumulati
+        current_stacks = flags.get("izanagi_stacks", 0)
+        if mode == "bonus":
+            bonuses["atk"] += 0.2 * current_stacks
+        else:
+            attacker["atk"] = int(attacker["atk_base"] * (1 + 0.2 * current_stacks))
+        
+        # SE condizione vera, incrementa stack e heala
         if attacker["atk"] > defender["atk"]:
-            flags["izanagi_stacks"] = flags.get("izanagi_stacks", 0) + 1
-            if mode == "bonus":
-                bonuses["atk"] += 0.2 * flags["izanagi_stacks"]
-            else:
-                attacker["atk"] = int(attacker["atk_base"] * (1 + 0.2 * flags["izanagi_stacks"]))
+            flags["izanagi_stacks"] = current_stacks + 1
             heal = int(attacker["hp_max"] * 0.2)
             attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal)
             if is_team_battle:
                 messages.append(f"⚔️ **Izanagi's power!** ATK +{flags['izanagi_stacks'] * 20}%, heals {heal}")
             else:
                 messages.append(f"⚔️ **{attacker['name']}'s ATK dominance!** ATK +{flags['izanagi_stacks'] * 20}% and heals {heal} HP")
+        elif current_stacks > 0:
+            # Condizione falsa ma mantiene buff accumulati
+            if is_team_battle:
+                messages.append(f"⚔️ **Izanagi maintains power** ATK +{current_stacks * 20}%")
+            else:
+                messages.append(f"⚔️ **{attacker['name']} maintains ATK boost** +{current_stacks * 20}%")
     
     elif ability_type == "atk_heal":  # Aphrodite - If ATK > enemy ATK, heal 30%
         if attacker["atk"] > defender["atk"]:
