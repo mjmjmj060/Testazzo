@@ -628,6 +628,9 @@ def ensure_user(user_id: int):
             # Boss battle team (3 cards):
             "team": [],
             "boss_unlocked": 1,
+            # Gacha system:
+            "tickets": 0,
+            "last_daily": 0.0,
         }
     # Normalize existing inventory entries if missing fields (basic migration)
     user = data["users"][uid]
@@ -1036,6 +1039,7 @@ async def profile(ctx):
         f"👤 **Profile — {ctx.author.name}**\n"
         f"{stamina_info}\n"
         f"💰 Gold: {user['gold']}\n"
+        f"🎫 Tickets: {user.get('tickets', 0)}\n"
         f"🎴 Cards owned: {len(user['inventory'])}\n"
         f"⭐ Level: {user.get('level',1)} | EXP: {user.get('exp',0)}/{exp_to_next(user.get('level',1))}\n"
         f"🗼 Floor: {user.get('floor',1)} (unlocked: {user.get('floor_unlocked',1)})"
@@ -1258,6 +1262,27 @@ async def hourly_cmd(ctx):
     await save_data()
     await ctx.send(f"🎁 Hourly claimed! +{amount} stamina.")
 
+@bot.command(name="daily")
+async def daily_cmd(ctx):
+    """Claim 1 free gacha ticket every 12 hours."""
+    user = ensure_user(ctx.author.id)
+    now = time.time()
+    elapsed = now - user.get("last_daily", 0.0)
+    cooldown = 43200  # 12 hours
+    
+    if elapsed < cooldown:
+        remaining_seconds = int(cooldown - elapsed)
+        hours = remaining_seconds // 3600
+        minutes = (remaining_seconds % 3600) // 60
+        seconds = remaining_seconds % 60
+        await ctx.send(f"⏳ Daily ticket not ready. Try again in **{hours}h {minutes}m {seconds}s**.")
+        return
+    
+    user["last_daily"] = now
+    user["tickets"] = user.get("tickets", 0) + 1
+    await save_data()
+    await ctx.send(f"🎁 Daily claimed! You received **1 Gacha Ticket**! 🎫\nTotal tickets: **{user['tickets']}**")
+
 @bot.command(name="farm")
 @commands.cooldown(1, 900, commands.BucketType.user)
 async def farm_cmd(ctx):
@@ -1267,6 +1292,170 @@ async def farm_cmd(ctx):
     user["gold"] = user.get("gold", 0) + amount
     await save_data()
     await ctx.send(f"⛏️ You gained **{amount}** gold!")
+
+# ========================
+# GACHA SYSTEM
+# ========================
+
+class GachaView(View):
+    """Interactive view for gacha pulls"""
+    def __init__(self, ctx, user):
+        super().__init__(timeout=60)
+        self.ctx = ctx
+        self.user = user
+        self.user_id = str(ctx.author.id)
+    
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.ctx.author.id:
+            await interaction.response.send_message("❌ This is not your gacha menu!", ephemeral=True)
+            return False
+        return True
+    
+    @discord.ui.button(label="🎫 Use 1 Ticket", style=discord.ButtonStyle.green)
+    async def pull_one(self, interaction: discord.Interaction, button: Button):
+        user = data["users"][self.user_id]
+        
+        if user.get("tickets", 0) < 1:
+            await interaction.response.send_message("❌ You don't have enough tickets! Use `-daily` to get 1 free ticket.", ephemeral=True)
+            return
+        
+        user["tickets"] -= 1
+        
+        # Roll gacha
+        roll = random.random()
+        if roll < 0.01:
+            rarity = "Legendary"
+        elif roll < 0.15:
+            rarity = "Epic"
+        elif roll < 0.40:
+            rarity = "Rare"
+        else:
+            rarity = "Common"
+        
+        random_char = random.choice(CHARACTERS)
+        new_card = create_card_instance(random_char, rarity)
+        user["inventory"].append(new_card)
+        
+        await save_data()
+        
+        # Result embed
+        rarity_emoji = {"Common": "⚪", "Rare": "🔵", "Epic": "🟣", "Legendary": "🟡"}
+        rarity_color = {"Common": 0x808080, "Rare": 0x0080ff, "Epic": 0x8000ff, "Legendary": 0xffd700}
+        
+        embed = discord.Embed(
+            title=f"🎊 Gacha Result!",
+            description=f"You pulled: **{new_card['name']}**",
+            color=rarity_color.get(rarity, 0x808080)
+        )
+        embed.add_field(name="Rarity", value=f"{rarity_emoji[rarity]} **{rarity}**", inline=True)
+        embed.add_field(name="Level", value=f"⭐ {new_card['level']}/{new_card['max_level']}", inline=True)
+        embed.add_field(name="Tickets Left", value=f"🎫 **{user['tickets']}**", inline=True)
+        embed.set_thumbnail(url=random_char.get("image", ""))
+        embed.set_footer(text=f"Card added to inventory! • Total cards: {len(user['inventory'])}")
+        
+        self.disable_all_items()
+        await interaction.response.edit_message(view=self)
+        await interaction.followup.send(embed=embed)
+    
+    @discord.ui.button(label="🎫 Use 10 Tickets", style=discord.ButtonStyle.blurple)
+    async def pull_ten(self, interaction: discord.Interaction, button: Button):
+        user = data["users"][self.user_id]
+        
+        if user.get("tickets", 0) < 10:
+            await interaction.response.send_message(f"❌ You need 10 tickets! You have: **{user.get('tickets', 0)}** 🎫", ephemeral=True)
+            return
+        
+        user["tickets"] -= 10
+        
+        results = {"Common": 0, "Rare": 0, "Epic": 0, "Legendary": 0}
+        pulled_cards = []
+        
+        for _ in range(10):
+            roll = random.random()
+            if roll < 0.01:
+                rarity = "Legendary"
+            elif roll < 0.15:
+                rarity = "Epic"
+            elif roll < 0.40:
+                rarity = "Rare"
+            else:
+                rarity = "Common"
+            
+            random_char = random.choice(CHARACTERS)
+            new_card = create_card_instance(random_char, rarity)
+            user["inventory"].append(new_card)
+            
+            results[rarity] += 1
+            pulled_cards.append(f"{rarity[0]} {new_card['name']}")
+        
+        await save_data()
+        
+        embed = discord.Embed(
+            title="🎊 10x Gacha Results!",
+            description="You pulled 10 cards!",
+            color=0x00ff00
+        )
+        
+        summary = []
+        if results["Legendary"] > 0:
+            summary.append(f"🟡 **Legendary**: {results['Legendary']}")
+        if results["Epic"] > 0:
+            summary.append(f"🟣 **Epic**: {results['Epic']}")
+        if results["Rare"] > 0:
+            summary.append(f"🔵 **Rare**: {results['Rare']}")
+        if results["Common"] > 0:
+            summary.append(f"⚪ **Common**: {results['Common']}")
+        
+        embed.add_field(name="📊 Summary", value="\n".join(summary), inline=False)
+        
+        cards_text = "\n".join(pulled_cards[:10])
+        embed.add_field(name="🎴 Cards Obtained", value=cards_text, inline=False)
+        
+        embed.add_field(name="Tickets Left", value=f"🎫 **{user['tickets']}**", inline=True)
+        embed.set_footer(text=f"All cards added to inventory! • Total cards: {len(user['inventory'])}")
+        
+        self.disable_all_items()
+        await interaction.response.edit_message(view=self)
+        await interaction.followup.send(embed=embed)
+
+@bot.command(name="gacha")
+async def gacha_cmd(ctx):
+    """Open the gacha menu to pull cards with tickets"""
+    user = ensure_user(ctx.author.id)
+    
+    embed = discord.Embed(
+        title="🎰 Gacha Menu",
+        description="Use your tickets to pull random cards!",
+        color=0xff69b4
+    )
+    
+    embed.add_field(
+        name="Your Tickets",
+        value=f"🎫 **{user.get('tickets', 0)}** tickets",
+        inline=False
+    )
+    
+    embed.add_field(
+        name="📊 Drop Rates",
+        value=(
+            "⚪ **Common**: 60%\n"
+            "🔵 **Rare**: 25%\n"
+            "🟣 **Epic**: 14%\n"
+            "🟡 **Legendary**: 1%"
+        ),
+        inline=True
+    )
+    
+    embed.add_field(
+        name="ℹ️ How to Get Tickets",
+        value="• Use `-daily` (every 12 hours)\n• More sources coming soon!",
+        inline=True
+    )
+    
+    embed.set_footer(text="Click a button below to pull!")
+    
+    view = GachaView(ctx, user)
+    await ctx.send(embed=embed, view=view)
 
 @bot.command(name="drop", aliases=["d"])
 @commands.cooldown(1, 60, commands.BucketType.user)
