@@ -6,6 +6,7 @@ import time
 import os
 import json
 import asyncio
+from backup import auto_backup
 from copy import deepcopy
 from datetime import datetime
 import io
@@ -869,6 +870,7 @@ async def on_ready():
     await load_data()
     print(f"Logged in as {bot.user} (id: {bot.user.id})")
     print(f"Data file: {os.path.abspath(DATA_FILE)}")
+    bot.loop.create_task(auto_backup(bot))
 
 # ------------------------
 # COMMANDS
