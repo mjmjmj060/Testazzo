@@ -1307,6 +1307,11 @@ class GachaView(View):
         self.user = user
         self.user_id = str(ctx.author.id)
     
+    def disable_all_items(self):
+        """Disable all buttons in this view"""
+        for item in self.children:
+            item.disabled = True
+    
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.ctx.author.id:
             await interaction.response.send_message("❌ This is not your gacha menu!", ephemeral=True)
