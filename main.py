@@ -1246,7 +1246,7 @@ async def select_cmd(ctx, index: int):
 
 @bot.command(name="hourly")
 async def hourly_cmd(ctx):
-    """Claim a random stamina reward every hour (5,10,15)."""
+    """Claim a random stamina reward every hour (15,20,25)."""
     user = ensure_user(ctx.author.id)
     now = time.time()
     elapsed = now - user.get("last_hourly", 0.0)
@@ -1258,7 +1258,7 @@ async def hourly_cmd(ctx):
         seconds = remaining_secs - minutes * 60
         await ctx.send(f"⏳ Hourly not ready. Try again in {minutes} minutes and {seconds} seconds.")
         return
-    amount = random.choice([5, 10, 15])
+    amount = random.choice([15, 20, 25])
     user["last_hourly"] = now
     user["stamina"] = user.get("stamina", 0) + amount
     await save_data()
