@@ -1282,8 +1282,9 @@ async def daily_cmd(ctx):
     
     user["last_daily"] = now
     user["tickets"] = user.get("tickets", 0) + 1
+    user["stamina"] = user.get("stamina", 0) + 100
     await save_data()
-    await ctx.send(f"🎁 Daily claimed! You received **1 Gacha Ticket**! 🎫\nTotal tickets: **{user['tickets']}**")
+    await ctx.send(f"🎁 Daily claimed! You received **1 Gacha Ticket** 🎫 and **100 Stamina** ⚡\nTotal tickets: **{user['tickets']}** | Stamina: **{user['stamina']}**")
 
 @bot.command(name="farm")
 @commands.cooldown(1, 900, commands.BucketType.user)
@@ -2346,29 +2347,37 @@ def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", 
             else:
                 attacker["spd"] = int(attacker["spd_base"] * 1.5)
     
-    elif ability_type == "low_hp_def_stack":  # Rei - Every turn if HP < 50%: +30% DEF (stacks)
+    elif ability_type == "low_hp_def_stack":  # Rei - Every turn if HP < 50%: +30% DEF (stacks, permanent)
+        # Stack when HP < 50% (new stack each turn below threshold)
         if attacker["hp"] < (attacker["hp_max"] * 0.5):
             flags["rei_stacks"] = flags.get("rei_stacks", 0) + 1
-            if mode == "bonus":
-                bonuses["def"] += 0.3 * flags["rei_stacks"]
-            else:
-                attacker["def"] = int(attacker["def_base"] * (1 + 0.3 * flags["rei_stacks"]))
             if is_team_battle:
                 messages.append(f"🛡️ **Rei's resolve!** Team DEF +{flags['rei_stacks'] * 30}%")
             else:
                 messages.append(f"🛡️ **{attacker['name']}'s resolve strengthens!** DEF +{flags['rei_stacks'] * 30}%")
+        
+        # Apply bonus ALWAYS if stacks exist (permanent, like Bahamut)
+        if flags.get("rei_stacks", 0) > 0:
+            if mode == "bonus":
+                bonuses["def"] += 0.3 * flags["rei_stacks"]
+            else:
+                attacker["def"] = int(attacker["def_base"] * (1 + 0.3 * flags["rei_stacks"]))
     
-    elif ability_type == "low_hp_atk_stack":  # Paipai - Every turn if HP < 50%: +30% ATK (stacks)
+    elif ability_type == "low_hp_atk_stack":  # Paipai - Every turn if HP < 50%: +30% ATK (stacks, permanent)
+        # Stack when HP < 50% (new stack each turn below threshold)
         if attacker["hp"] < (attacker["hp_max"] * 0.5):
             flags["paipai_stacks"] = flags.get("paipai_stacks", 0) + 1
-            if mode == "bonus":
-                bonuses["atk"] += 0.3 * flags["paipai_stacks"]
-            else:
-                attacker["atk"] = int(attacker["atk_base"] * (1 + 0.3 * flags["paipai_stacks"]))
             if is_team_battle:
                 messages.append(f"⚔️ **Paipai's fury!** Team ATK +{flags['paipai_stacks'] * 30}%")
             else:
                 messages.append(f"⚔️ **{attacker['name']}'s fury grows!** ATK +{flags['paipai_stacks'] * 30}%")
+        
+        # Apply bonus ALWAYS if stacks exist (permanent, like Bahamut)
+        if flags.get("paipai_stacks", 0) > 0:
+            if mode == "bonus":
+                bonuses["atk"] += 0.3 * flags["paipai_stacks"]
+            else:
+                attacker["atk"] = int(attacker["atk_base"] * (1 + 0.3 * flags["paipai_stacks"]))
     
     # === SCALING ABILITIES ===
     elif ability_type == "def_boost_and_heal":  # Kasli - DEF comparison with stacking
