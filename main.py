@@ -160,9 +160,9 @@ CHARACTERS = [
         "id": "luminalia",
         "name": "Luminalia",
         "base": {"hp": 89, "atk": 60, "def": 79, "spd": 80},
-        "ability": "For 3 turns, increases SPD by 50%",
-        "ability_type": "spd_boost_3turns",
-        "image": "https://media.discordapp.net/attachments/1467048963415871621/1467585963424219228/IMG_6282.png?ex=6980eb70&is=697f99f0&hm=4e2038a7aa30f07ba00efba04f9bf4b9ffeabf464adc6f1b52c500a639bb94d0&=&format=webp&quality=lossless&width=691&height=968"
+        "ability": "If enemy's type is ALIEN, increases DEF by 50% and SPD by 50%",
+        "ability_type": "alien_def_spd_boost",
+        "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1471104555621023896/IMG_6282.png?ex=698db861&is=698c66e1&hm=80429c51aa60d72758cf3c341c2995cf4fce079a578978774482faa1a58b2ce4&"
     },
     {
         "id": "mitama",
@@ -268,6 +268,30 @@ CHARACTERS = [
         "ability_type": "low_hp_atk_stack",
         "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1469314130140725278/IMG_6329.webp?ex=698734eb&is=6985e36b&hm=04bd85484b1232e770e0c8ad09c6b7ae282744c3f83ae340b5179b713385fd89&"
     },
+    {
+        "id": "lilin",
+        "name": "Lilin",
+        "base": {"hp": 87, "atk": 87, "def": 87, "spd": 78},
+        "ability": "If enemy's type is ALIEN, increases ATK by 50% and DEF by 50%",
+        "ability_type": "alien_atk_def_boost",
+        "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1470906407456080159/IMG_6409.webp?ex=698da897&is=698c5717&hm=f84ebd35ccc35474a47de919250223fbc2d2ac8080725a4582b8130e47a8c85f&"
+    },
+    {
+        "id": "sakura",
+        "name": "Sakura",
+        "base": {"hp": 65, "atk": 89, "def": 81, "spd": 80},
+        "ability": "For 3 turns, increases SPD by 50%",
+        "ability_type": "spd_boost_3turns",
+        "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1470908566713008181/IMG_6406.webp?ex=698daa9a&is=698c591a&hm=7f6b0fc256c77ad053e8c564bc072947fa4efedaba4743f2662081bb2f1c2252&"
+    },
+    {
+        "id": "jack",
+        "name": "Jack",
+        "base": {"hp": 70, "atk": 85, "def": 85, "spd": 88},
+        "ability": "If enemy's type is ALIEN, increases SPD by 100%",
+        "ability_type": "alien_spd_boost",
+        "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1471111968202166333/IMG_6411.webp?ex=698dbf49&is=698c6dc9&hm=1b5cef4b7cbab7cefbdd00d4c18fb9a357d279cd896424d62d5b80e6bac554e0&"
+    },
 ]
 
 # Catbox URLs for composite battle images (permanent hosting, used only for create_battle_image)
@@ -302,6 +326,9 @@ CATBOX_IMAGES = {
     "Goddess": "https://files.catbox.moe/qhi79d.jpeg",
     "Rei": "https://files.catbox.moe/mo52cd.jpeg",
     "Paipai": "https://files.catbox.moe/cfglkx.jpeg",
+    "Lilin": "https://files.catbox.moe/w6ovkb.jpeg",
+    "Sakura": "https://files.catbox.moe/w62qdy.jpeg",
+    "Jack": "https://files.catbox.moe/u0md1o.jpeg",
 }
 
 # Boss images on Catbox (permanent hosting for composite battle images)
@@ -324,6 +351,8 @@ BOSS_CATBOX_IMAGES = {
     "crazed_lizard_phase2": "https://files.catbox.moe/foydnf.webp",
     "crazed_titan_phase1": "https://files.catbox.moe/lyaa4h.webp",
     "crazed_titan_phase2": "https://files.catbox.moe/zp1sri.webp",
+    "cli_one_phase1": "https://files.catbox.moe/svag2w.webp",
+    "corrupted_valkyrie_phase1": "https://files.catbox.moe/mzkwla.jpeg",
 }
 
 RARITY_MAX_LEVEL = {
@@ -559,6 +588,38 @@ BOSSES = [
             }
         ],
         "rewards": {"gold": 5000, "exp": 2000, "guaranteed_rarity": "Legendary"}
+    },
+    {
+        "id": "cli_one",
+        "name": "Cli-One",
+        "type": "ALIEN",
+        "ability_type": None,
+        "phases": [
+            {
+                "hp": 5000,
+                "atk": 800,
+                "def": 800,
+                "spd": 800,
+                "image": "https://cdn.discordapp.com/attachments/815650716730654743/1471116186803769459/Immagine_WebP.webp?ex=698dc336&is=698c71b6&hm=c5bcaa1c1230c905db3c63753d543be23192d55d25b1b6f9890821b490cc76ed&"
+            }
+        ],
+        "rewards": {"gold": 6000, "exp": 2500, "tickets": 50}
+    },
+    {
+        "id": "corrupted_valkyrie",
+        "name": "Corrupted Valkyrie",
+        "type": "ALIEN",
+        "ability_type": "lifesteal",
+        "phases": [
+            {
+                "hp": 4000,
+                "atk": 850,
+                "def": 850,
+                "spd": 850,
+                "image": "https://cdn.discordapp.com/attachments/815650716730654743/1471116187239841853/Immagine_WebP.webp?ex=698dc337&is=698c71b7&hm=020ab1068e13eba55ba73940c2c9d0bb7253a595290c79a1382ba35b75a3e5f2&"
+            }
+        ],
+        "rewards": {"gold": 7000, "exp": 3000, "tickets": 50}
     }
 ]
 
@@ -2465,6 +2526,53 @@ def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", 
             else:
                 messages.append(f"💥 **{attacker['name']}'s true power!** +50% bonus damage")
     
+    # === ANTI-ALIEN ABILITIES ===
+    elif ability_type == "alien_def_spd_boost":  # Luminalia - If enemy is ALIEN: +50% DEF and SPD
+        enemy_type = defender.get("type", None)
+        if enemy_type == "ALIEN":
+            if not flags.get("luminalia_alien_boost"):
+                flags["luminalia_alien_boost"] = True
+                if is_team_battle:
+                    messages.append(f"👽 **Luminalia's ALIEN hunter instinct!** Team DEF +50%, SPD +50%")
+                else:
+                    messages.append(f"👽 **{attacker['name']}'s ALIEN hunter instinct!** DEF +50%, SPD +50%")
+            if mode == "bonus":
+                bonuses["def"] += 0.5
+                bonuses["spd"] += 0.5
+            else:
+                attacker["def"] = int(attacker["def_base"] * 1.5)
+                attacker["spd"] = int(attacker["spd_base"] * 1.5)
+    
+    elif ability_type == "alien_atk_def_boost":  # Lilin - If enemy is ALIEN: +50% ATK and DEF
+        enemy_type = defender.get("type", None)
+        if enemy_type == "ALIEN":
+            if not flags.get("lilin_alien_boost"):
+                flags["lilin_alien_boost"] = True
+                if is_team_battle:
+                    messages.append(f"👽 **Lilin's ALIEN slayer power!** Team ATK +50%, DEF +50%")
+                else:
+                    messages.append(f"👽 **{attacker['name']}'s ALIEN slayer power!** ATK +50%, DEF +50%")
+            if mode == "bonus":
+                bonuses["atk"] += 0.5
+                bonuses["def"] += 0.5
+            else:
+                attacker["atk"] = int(attacker["atk_base"] * 1.5)
+                attacker["def"] = int(attacker["def_base"] * 1.5)
+    
+    elif ability_type == "alien_spd_boost":  # Jack - If enemy is ALIEN: +100% SPD
+        enemy_type = defender.get("type", None)
+        if enemy_type == "ALIEN":
+            if not flags.get("jack_alien_boost"):
+                flags["jack_alien_boost"] = True
+                if is_team_battle:
+                    messages.append(f"👽 **Jack's ALIEN hunter speed!** Team SPD +100%")
+                else:
+                    messages.append(f"👽 **{attacker['name']}'s ALIEN hunter speed!** SPD +100%")
+            if mode == "bonus":
+                bonuses["spd"] += 1.0
+            else:
+                attacker["spd"] = int(attacker["spd_base"] * 2.0)
+    
     # Note: speed_bonus, survive, and paralyze are handled in their respective sections
     # (damage calculation, defender death, first attack) and don't need stat modifications here
     
@@ -2613,6 +2721,9 @@ async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user
         "black_cat_buffed": False,
         "rei_stacks": 0,
         "paipai_stacks": 0,
+        "luminalia_alien_boost": False,
+        "lilin_alien_boost": False,
+        "jack_alien_boost": False,
     }
     
     # Initialize ability flags for player 2
@@ -2644,6 +2755,9 @@ async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user
         "black_cat_buffed": False,
         "rei_stacks": 0,
         "paipai_stacks": 0,
+        "luminalia_alien_boost": False,
+        "lilin_alien_boost": False,
+        "jack_alien_boost": False,
     }
     
     ability_text = ""
@@ -3606,7 +3720,8 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
             "def": phase["def"],
             "spd_base": phase["spd"],
             "spd": phase["spd"],
-            "image": phase["image"]
+            "image": phase["image"],
+            "type": boss_data.get("type", None)  # ALIEN or None
         }
     
     boss = get_boss_stats(current_phase)
@@ -3639,6 +3754,9 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
         "black_cat_buffed": False,        # Black Cat
         "rei_stacks": 0,                  # Rei
         "paipai_stacks": 0,               # Paipai
+        "luminalia_alien_boost": False,   # Luminalia
+        "lilin_alien_boost": False,       # Lilin
+        "jack_alien_boost": False,        # Jack
     }
     
     # Get all ability types from team
@@ -4038,7 +4156,17 @@ async def boss_cmd(ctx, boss_number: int = None):
             for i, boss in enumerate(BOSSES, 1):
                 status = "🔓" if i <= unlocked else "🔒"
                 phase1 = boss["phases"][0]
-                boss_list.append(f"{status} `{i}.` **{boss['name']}** — HP: {phase1['hp']} | ATK: {phase1['atk']} | Reward: {boss['rewards']['guaranteed_rarity']} card")
+                
+                # Determine reward text
+                rewards = boss["rewards"]
+                if "guaranteed_rarity" in rewards:
+                    reward_text = f"Reward: {rewards['guaranteed_rarity']} card"
+                elif "tickets" in rewards:
+                    reward_text = f"Reward: {rewards['tickets']} tickets 🎫"
+                else:
+                    reward_text = "Reward: Gold & EXP"
+                
+                boss_list.append(f"{status} `{i}.` **{boss['name']}** — HP: {phase1['hp']} | ATK: {phase1['atk']} | {reward_text}")
             
             await ctx.send(
                 f"👹 **Available Bosses** (Unlocked: {unlocked}/{len(BOSSES)})\n\n" +
@@ -4078,17 +4206,24 @@ async def boss_cmd(ctx, boss_number: int = None):
             rewards = boss_data["rewards"]
             gold_gain = rewards["gold"]
             exp_gain = rewards["exp"]
-            guaranteed_rarity = rewards["guaranteed_rarity"]
             
             # Give rewards
             user["gold"] = user.get("gold", 0) + gold_gain
             user["exp"] = user.get("exp", 0) + exp_gain
             
-            # Give guaranteed card ONLY on first clear
+            # Check if boss gives card or tickets
+            guaranteed_rarity = rewards.get("guaranteed_rarity", None)
+            tickets_reward = rewards.get("tickets", 0)
+            
+            # Give tickets if present
+            if tickets_reward > 0:
+                user["tickets"] = user.get("tickets", 0) + tickets_reward
+            
+            # Give guaranteed card ONLY on first clear (if boss has guaranteed_rarity)
             is_first_clear = boss_data["id"] not in user.get("bosses_cleared", [])
             new_card = None
             
-            if is_first_clear:
+            if is_first_clear and guaranteed_rarity:
                 random_char = random.choice(CHARACTERS)
                 new_card = create_card_instance(random_char, guaranteed_rarity)
                 user["inventory"].append(new_card)
@@ -4123,6 +4258,8 @@ async def boss_cmd(ctx, boss_number: int = None):
             )
             
             reward_text = f"💰 +{gold_gain} Gold\n⭐ +{exp_gain} EXP"
+            if tickets_reward > 0:
+                reward_text += f"\n🎫 +{tickets_reward} Gacha Tickets"
             if new_card:
                 reward_text += f"\n🎴 **{new_card['name']}** ({guaranteed_rarity}) *(First Clear Bonus!)*"
             if boss_number == unlocked and unlocked < len(BOSSES):
