@@ -603,7 +603,7 @@ BOSSES = [
                 "image": "https://cdn.discordapp.com/attachments/815650716730654743/1471116186803769459/Immagine_WebP.webp?ex=698dc336&is=698c71b6&hm=c5bcaa1c1230c905db3c63753d543be23192d55d25b1b6f9890821b490cc76ed&"
             }
         ],
-        "rewards": {"gold": 6000, "exp": 2500, "tickets": 50}
+        "rewards": {"gold": 6000, "exp": 2500, "tickets": 1}
     },
     {
         "id": "corrupted_valkyrie",
@@ -619,7 +619,7 @@ BOSSES = [
                 "image": "https://cdn.discordapp.com/attachments/815650716730654743/1471116187239841853/Immagine_WebP.webp?ex=698dc337&is=698c71b7&hm=020ab1068e13eba55ba73940c2c9d0bb7253a595290c79a1382ba35b75a3e5f2&"
             }
         ],
-        "rewards": {"gold": 7000, "exp": 3000, "tickets": 50}
+        "rewards": {"gold": 7000, "exp": 3000, "tickets": 1}
     }
 ]
 
