@@ -4251,19 +4251,23 @@ async def boss_cmd(ctx, boss_number: int = None):
             guaranteed_rarity = rewards.get("guaranteed_rarity", None)
             tickets_reward = rewards.get("tickets", 0)
             
-            # Give tickets if present
-            if tickets_reward > 0:
+            # Check if this is the first clear
+            is_first_clear = boss_data["id"] not in user.get("bosses_cleared", [])
+            
+            # Give tickets ONLY on first clear (like guaranteed cards)
+            if is_first_clear and tickets_reward > 0:
                 user["tickets"] = user.get("tickets", 0) + tickets_reward
             
             # Give guaranteed card ONLY on first clear (if boss has guaranteed_rarity)
-            is_first_clear = boss_data["id"] not in user.get("bosses_cleared", [])
             new_card = None
             
             if is_first_clear and guaranteed_rarity:
                 random_char = random.choice(CHARACTERS)
                 new_card = create_card_instance(random_char, guaranteed_rarity)
                 user["inventory"].append(new_card)
-                # Mark boss as cleared
+            
+            # Mark boss as cleared (if first clear)
+            if is_first_clear:
                 if "bosses_cleared" not in user:
                     user["bosses_cleared"] = []
                 user["bosses_cleared"].append(boss_data["id"])
@@ -4294,8 +4298,8 @@ async def boss_cmd(ctx, boss_number: int = None):
             )
             
             reward_text = f"💰 +{gold_gain} Gold\n⭐ +{exp_gain} EXP"
-            if tickets_reward > 0:
-                reward_text += f"\n🎫 +{tickets_reward} Gacha Tickets"
+            if is_first_clear and tickets_reward > 0:
+                reward_text += f"\n🎫 +{tickets_reward} Gacha Tickets *(First Clear Bonus!)*"
             if new_card:
                 reward_text += f"\n🎴 **{new_card['name']}** ({guaranteed_rarity}) *(First Clear Bonus!)*"
             if boss_number == unlocked and unlocked < len(BOSSES):
