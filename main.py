@@ -353,6 +353,7 @@ BOSS_CATBOX_IMAGES = {
     "crazed_titan_phase2": "https://files.catbox.moe/zp1sri.webp",
     "cli_one_phase1": "https://files.catbox.moe/svag2w.webp",
     "corrupted_valkyrie_phase1": "https://files.catbox.moe/mzkwla.jpeg",
+    "raging_bahamut_phase1": "https://files.catbox.moe/ei42oo.jpeg",
 }
 
 RARITY_MAX_LEVEL = {
@@ -603,7 +604,7 @@ BOSSES = [
                 "image": "https://cdn.discordapp.com/attachments/815650716730654743/1471116186803769459/Immagine_WebP.webp?ex=698dc336&is=698c71b6&hm=c5bcaa1c1230c905db3c63753d543be23192d55d25b1b6f9890821b490cc76ed&"
             }
         ],
-        "rewards": {"gold": 6000, "exp": 2500, "tickets": 1}
+        "rewards": {"gold": 6000, "exp": 2500, "tickets": 50}
     },
     {
         "id": "corrupted_valkyrie",
@@ -619,7 +620,23 @@ BOSSES = [
                 "image": "https://cdn.discordapp.com/attachments/815650716730654743/1471116187239841853/Immagine_WebP.webp?ex=698dc337&is=698c71b7&hm=020ab1068e13eba55ba73940c2c9d0bb7253a595290c79a1382ba35b75a3e5f2&"
             }
         ],
-        "rewards": {"gold": 7000, "exp": 3000, "tickets": 1}
+        "rewards": {"gold": 7000, "exp": 3000, "tickets": 50}
+    },
+    {
+        "id": "raging_bahamut",
+        "name": "Raging Bahamut",
+        "type": "ALIEN",
+        "ability_type": "boss_bahamut_rage",
+        "phases": [
+            {
+                "hp": 5000,
+                "atk": 900,
+                "def": 700,
+                "spd": 700,
+                "image": "https://cdn.discordapp.com/attachments/815650716730654743/1471555470786302105/Immagine_WebP.webp?ex=698f5c54&is=698e0ad4&hm=822013317e4c3e1927bfb6a660eaef3aa81bf3befa73b03f94eab34b75bffa02&"
+            }
+        ],
+        "rewards": {"gold": 8000, "exp": 3500, "tickets": 50}
     }
 ]
 
@@ -4022,6 +4039,25 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
                 if boss_ability == "boss_speed_bonus" and boss["spd"] > team["spd"]:
                     boss_dmg_bonus = int(boss["atk"] * 1.0)  # 100% bonus damage
                     round_log.append(f"💨 **{boss_data['name']}'s speed superiority!** Bonus damage incoming!")
+                
+                # Boss ability: Raging Bahamut - ATK boost if no anti-ALIEN or SPD superiority
+                if boss_ability == "boss_bahamut_rage":
+                    # Check if team has at least one anti-ALIEN character
+                    has_anti_alien = False
+                    anti_alien_types = ["alien_def_spd_boost", "alien_atk_def_boost", "alien_spd_boost"]
+                    for ability in team_abilities:
+                        if ability in anti_alien_types:
+                            has_anti_alien = True
+                            break
+                    
+                    # Activate rage if: no anti-ALIEN OR speed superiority
+                    if not has_anti_alien or boss["spd"] > team["spd"]:
+                        boss_dmg_bonus = int(boss["atk"] * 1.0)  # 100% bonus damage
+                        if not has_anti_alien:
+                            round_log.append(f"😈 **{boss_data['name']}'s RAGE!** No anti-ALIEN detected! ATK doubled!")
+                        else:
+                            round_log.append(f"😈 **{boss_data['name']}'s RAGE!** Speed superiority! ATK doubled!")
+                
                 
                 # Boss attacks
                 dmg = max(1, int(boss["atk"] - team["def"] * 0.5)) + boss_dmg_bonus
