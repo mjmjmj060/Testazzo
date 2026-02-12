@@ -2128,9 +2128,9 @@ FLOOR_IMAGES = [
 # Future: Additional locations will be added with their own floor systems
 def make_enemy_for_floor(floor: int) -> dict:
     """Return an enemy dict with stats scaled by floor (1-63 for Loc 1)."""
-    base_hp = 120 + (floor - 1) * 40
-    base_atk = 25 + int((floor - 1) * 5)
-    base_def = 10 + int((floor - 1) * 4)
+    base_hp = 120 + (floor - 1) * 30
+    base_atk = 25 + int((floor - 1) * 4)
+    base_def = 10 + int((floor - 1) * 3)
     base_spd = 20 + int((floor - 1) * 2)
     
     # Get floor-specific image (index 0 = floor 1)
