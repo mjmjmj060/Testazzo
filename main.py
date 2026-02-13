@@ -2544,9 +2544,30 @@ def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", 
                 messages.append(f"💥 **{attacker['name']}'s true power!** +50% bonus damage")
     
     # === ANTI-ALIEN ABILITIES ===
-    # NOTE: These are now handled at battle initialization (like Ruri)
-    # They activate immediately at the start if the enemy is ALIEN
-    # No longer processed in the ability loop
+    # These are activated at initialization AND reapplied every turn in the loop
+    # to ensure buffs are always active
+    elif ability_type == "alien_def_spd_boost":  # Luminalia - If enemy is ALIEN: +50% DEF and SPD
+        enemy_type = defender.get("type", None)
+        if enemy_type == "ALIEN":
+            if mode == "bonus":
+                bonuses["def"] += 0.5
+                bonuses["spd"] += 0.5
+            # Message shown only once at initialization
+    
+    elif ability_type == "alien_atk_def_boost":  # Lilin - If enemy is ALIEN: +50% ATK and DEF
+        enemy_type = defender.get("type", None)
+        if enemy_type == "ALIEN":
+            if mode == "bonus":
+                bonuses["atk"] += 0.5
+                bonuses["def"] += 0.5
+            # Message shown only once at initialization
+    
+    elif ability_type == "alien_spd_boost":  # Jack - If enemy is ALIEN: +100% SPD
+        enemy_type = defender.get("type", None)
+        if enemy_type == "ALIEN":
+            if mode == "bonus":
+                bonuses["spd"] += 1.0
+            # Message shown only once at initialization
     
     # Note: speed_bonus, survive, and paralyze are handled in their respective sections
     # (damage calculation, defender death, first attack) and don't need stat modifications here
