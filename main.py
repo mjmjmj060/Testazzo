@@ -2250,8 +2250,8 @@ def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", 
                 bonuses["def"] += 0.5
             # For direct mode, this is applied at initialization
     
-    elif ability_type == "spd_boost_3turns":  # Luminalia - 3 turns +50% SPD
-        if flags.get("luminalia_turns", 0) > 0:
+    elif ability_type == "spd_boost_3turns":  # Sakura - 3 turns +50% SPD
+        if flags.get("sakura_turns", 0) > 0:
             if mode == "bonus":
                 bonuses["spd"] += 0.5
             # For direct mode, this is applied at initialization
@@ -2544,51 +2544,9 @@ def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", 
                 messages.append(f"💥 **{attacker['name']}'s true power!** +50% bonus damage")
     
     # === ANTI-ALIEN ABILITIES ===
-    elif ability_type == "alien_def_spd_boost":  # Luminalia - If enemy is ALIEN: +50% DEF and SPD
-        enemy_type = defender.get("type", None)
-        if enemy_type == "ALIEN":
-            if not flags.get("luminalia_alien_boost"):
-                flags["luminalia_alien_boost"] = True
-                if is_team_battle:
-                    messages.append(f"👽 **Luminalia's ALIEN hunter instinct!** Team DEF +50%, SPD +50%")
-                else:
-                    messages.append(f"👽 **{attacker['name']}'s ALIEN hunter instinct!** DEF +50%, SPD +50%")
-            if mode == "bonus":
-                bonuses["def"] += 0.5
-                bonuses["spd"] += 0.5
-            else:
-                attacker["def"] = int(attacker["def_base"] * 1.5)
-                attacker["spd"] = int(attacker["spd_base"] * 1.5)
-    
-    elif ability_type == "alien_atk_def_boost":  # Lilin - If enemy is ALIEN: +50% ATK and DEF
-        enemy_type = defender.get("type", None)
-        if enemy_type == "ALIEN":
-            if not flags.get("lilin_alien_boost"):
-                flags["lilin_alien_boost"] = True
-                if is_team_battle:
-                    messages.append(f"👽 **Lilin's ALIEN slayer power!** Team ATK +50%, DEF +50%")
-                else:
-                    messages.append(f"👽 **{attacker['name']}'s ALIEN slayer power!** ATK +50%, DEF +50%")
-            if mode == "bonus":
-                bonuses["atk"] += 0.5
-                bonuses["def"] += 0.5
-            else:
-                attacker["atk"] = int(attacker["atk_base"] * 1.5)
-                attacker["def"] = int(attacker["def_base"] * 1.5)
-    
-    elif ability_type == "alien_spd_boost":  # Jack - If enemy is ALIEN: +100% SPD
-        enemy_type = defender.get("type", None)
-        if enemy_type == "ALIEN":
-            if not flags.get("jack_alien_boost"):
-                flags["jack_alien_boost"] = True
-                if is_team_battle:
-                    messages.append(f"👽 **Jack's ALIEN hunter speed!** Team SPD +100%")
-                else:
-                    messages.append(f"👽 **{attacker['name']}'s ALIEN hunter speed!** SPD +100%")
-            if mode == "bonus":
-                bonuses["spd"] += 1.0
-            else:
-                attacker["spd"] = int(attacker["spd_base"] * 2.0)
+    # NOTE: These are now handled at battle initialization (like Ruri)
+    # They activate immediately at the start if the enemy is ALIEN
+    # No longer processed in the ability loop
     
     # Note: speed_bonus, survive, and paralyze are handled in their respective sections
     # (damage calculation, defender death, first attack) and don't need stat modifications here
@@ -2724,7 +2682,7 @@ async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user
         "ruri_turns": 0,
         "windy_healed": False,
         "nobunaga_active": False,
-        "luminalia_turns": 0,
+        "sakura_turns": 0,
         "mitama_healed": False,
         "deale_boosted": False,
         "kuu_boosted": False,
@@ -2758,7 +2716,7 @@ async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user
         "ruri_turns": 0,
         "windy_healed": False,
         "nobunaga_active": False,
-        "luminalia_turns": 0,
+        "sakura_turns": 0,
         "mitama_healed": False,
         "deale_boosted": False,
         "kuu_boosted": False,
@@ -2785,7 +2743,7 @@ async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user
         p1["def"] = int(p1["def_base"] * 1.5)
         ability_text = f"✨ {p1['name']}'s ability activates!\n**{p1.get('ability', '')}**"
     elif p1["ability_type"] == "spd_boost_3turns":  # Luminalia
-        p1_flags["luminalia_turns"] = 3
+        p1_flags["sakura_turns"] = 3
         p1["spd"] = int(p1["spd_base"] * 1.5)
         ability_text = f"✨ {p1['name']}'s ability activates!\n**{p1.get('ability', '')}**"
     elif p1["ability_type"] == "speed_bonus":  # Lunacia
@@ -2820,7 +2778,7 @@ async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user
             else:
                 ability_text = f"✨ {p2['name']}'s ability activates!\n**{p2.get('ability', '')}**"
         elif p2["ability_type"] == "spd_boost_3turns":  # Luminalia
-            p2_flags["luminalia_turns"] = 3
+            p2_flags["sakura_turns"] = 3
             p2["spd"] = int(p2["spd_base"] * 1.5)
             if ability_text:
                 ability_text += f"\n✨ {p2['name']}'s ability activates!\n**{p2.get('ability', '')}**"
@@ -3112,9 +3070,9 @@ async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user
                     # Note: DEF boost expiration message will show in next round
             
             # Luminalia's SPD boost countdown
-            if (not is_enemy or is_pvp) and attacker["ability_type"] == "spd_boost_3turns" and attacker_flags["luminalia_turns"] > 0:
-                attacker_flags["luminalia_turns"] -= 1
-                if attacker_flags["luminalia_turns"] == 0:
+            if (not is_enemy or is_pvp) and attacker["ability_type"] == "spd_boost_3turns" and attacker_flags["sakura_turns"] > 0:
+                attacker_flags["sakura_turns"] -= 1
+                if attacker_flags["sakura_turns"] == 0:
                     attacker["spd"] = attacker["spd_base"]
                     round_log.append(f"💨 **{attacker['name']}'s SPD boost expired.**")
     
@@ -3755,7 +3713,7 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
         "windy_healed": False,
         "nobunaga_active": False,
         "ruri_turns": 0,
-        "luminalia_turns": 0,
+        "sakura_turns": 0,
         "verbena_survived": False,
         "paralyze_turns": 0,  # For boss
         # New ability flags
@@ -3812,32 +3770,14 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
         initial_def_bonus += 0.5
         ability_text += "🛡️ **Ruri's ability!** Team DEF +50% for 3 turns\n"
     
-    # Luminalia - 3 turns +50% SPD
+    # Sakura - 3 turns +50% SPD
     if "spd_boost_3turns" in team_abilities:
-        team_flags["luminalia_turns"] = 3
+        team_flags["sakura_turns"] = 3
         initial_spd_bonus += 0.5
-        ability_text += "💨 **Luminalia's ability!** Team SPD +50% for 3 turns\n"
+        ability_text += "💨 **Sakura's ability!** Team SPD +50% for 3 turns\n"
     
-    # Mitama - First attack: Heals 50% max HP
-    if "first_attack_heal" in team_abilities:
-        heal = int(team["hp_max"] * 0.5)
-        team["hp"] = min(team["hp_max"], team["hp"] + heal)
-        team_flags["first_attack_heal_done"] = True
-        ability_text += f"💖 **Mitama's blessing!** Team heals {heal} HP\n"
-    
-    # Deale - First attack: +50% SPD
-    if "first_attack_spd" in team_abilities:
-        initial_spd_bonus += 0.5
-        team_flags["first_attack_spd_done"] = True
-        ability_text += "⚡ **Deale's swiftness!** Team SPD +50%\n"
-    
-    # Jeanne - First attack: Heal 30% HP, +30% DEF
-    if "heal_and_def" in team_abilities:
-        heal = int(team["hp_max"] * 0.3)
-        team["hp"] = min(team["hp_max"], team["hp"] + heal)
-        initial_def_bonus += 0.3
-        team_flags["heal_and_def_done"] = True
-        ability_text += f"✨ **Jeanne's protection!** Team heals {heal} HP, DEF +30%\n"
+    # NOTE: First attack abilities (Mitama, Deale, Jeanne) are now handled
+    # in the battle loop when the team attacks for the first time (current_round == 1)
     
     # Black Cat - First turn +20% ATK and DEF
     if "first_turn_atk_def" in team_abilities:
@@ -3845,6 +3785,29 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
         initial_def_bonus += 0.2
         team_flags["black_cat_buffed"] = True
         ability_text += "✨ **Black Cat's ability!** Team ATK +20%, DEF +20%\n"
+    
+    # === ANTI-ALIEN ABILITIES (attivate se boss è ALIEN) ===
+    boss_type = boss_data.get("type", None)
+    
+    # Luminalia - If enemy is ALIEN: +50% DEF and SPD
+    if "alien_def_spd_boost" in team_abilities and boss_type == "ALIEN":
+        initial_def_bonus += 0.5
+        initial_spd_bonus += 0.5
+        team_flags["luminalia_alien_boost"] = True
+        ability_text += "👽 **Luminalia's ALIEN hunter instinct!** Team DEF +50%, SPD +50%\n"
+    
+    # Lilin - If enemy is ALIEN: +50% ATK and DEF
+    if "alien_atk_def_boost" in team_abilities and boss_type == "ALIEN":
+        initial_atk_bonus += 0.5
+        initial_def_bonus += 0.5
+        team_flags["lilin_alien_boost"] = True
+        ability_text += "👽 **Lilin's ALIEN slayer power!** Team ATK +50%, DEF +50%\n"
+    
+    # Jack - If enemy is ALIEN: +100% SPD
+    if "alien_spd_boost" in team_abilities and boss_type == "ALIEN":
+        initial_spd_bonus += 1.0
+        team_flags["jack_alien_boost"] = True
+        ability_text += "👽 **Jack's ALIEN hunter speed!** Team SPD +100%\n"
     
     # Applica i buff iniziali
     team["atk"] = int(team["atk_base"] * (1 + initial_atk_bonus))
@@ -4012,6 +3975,32 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
                     team_flags["paralyze_turns"] = 2
                     round_log.append(f"⚡ **Thundia paralyzes the boss for 2 turns!**")
                 
+                # === FIRST ATTACK ABILITIES (round 1 only) ===
+                
+                # Mitama - First attack: Heals 50% max HP
+                if "first_attack_heal" in team_abilities and current_round == 1:
+                    if not team_flags.get("first_attack_heal_done"):
+                        heal = int(team["hp_max"] * 0.5)
+                        team["hp"] = min(team["hp_max"], team["hp"] + heal)
+                        team_flags["first_attack_heal_done"] = True
+                        round_log.append(f"💖 **Mitama's blessing!** Team heals {heal} HP")
+                
+                # Deale - First attack: +50% SPD
+                if "first_attack_spd" in team_abilities and current_round == 1:
+                    if not team_flags.get("first_attack_spd_done"):
+                        spd_bonus += 0.5
+                        team_flags["first_attack_spd_done"] = True
+                        round_log.append(f"⚡ **Deale's swiftness!** Team SPD +50%")
+                
+                # Jeanne - First attack: Heal 30% HP, +30% DEF
+                if "heal_and_def" in team_abilities and current_round == 1:
+                    if not team_flags.get("heal_and_def_done"):
+                        heal = int(team["hp_max"] * 0.3)
+                        team["hp"] = min(team["hp_max"], team["hp"] + heal)
+                        def_bonus += 0.3
+                        team_flags["heal_and_def_done"] = True
+                        round_log.append(f"✨ **Jeanne's protection!** Team heals {heal} HP, DEF +30%")
+                
                 # Check if boss phase changes
                 if boss["hp"] <= 0 and current_phase < len(phases) - 1:
                     current_phase += 1
@@ -4095,10 +4084,10 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
             if team_flags["ruri_turns"] == 0:
                 round_log.append("🛡️ Ruri's DEF boost expired.")
         
-        if team_flags["luminalia_turns"] > 0:
-            team_flags["luminalia_turns"] -= 1
-            if team_flags["luminalia_turns"] == 0:
-                round_log.append("💨 Luminalia's SPD boost expired.")
+        if team_flags["sakura_turns"] > 0:
+            team_flags["sakura_turns"] -= 1
+            if team_flags["sakura_turns"] == 0:
+                round_log.append("💨 Sakura's SPD boost expired.")
         
         # Update embed
         embed = discord.Embed(
