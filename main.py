@@ -1738,10 +1738,12 @@ class DexView(View):
         for i, char in enumerate(self.cards[start_idx:end_idx], start=start_idx + 1):
             stats = char["base"]
             stat_line = f"HP:{stats['hp']} ATK:{stats['atk']} DEF:{stats['def']} SPD:{stats['spd']}"
+            ability_id = char.get("ability_id", "")
+            ability_emoji = ABILITIES.get(ability_id, {}).get("emoji", "")
             target_types = char.get("target_types", [])
             type_emojis = format_target_types_emoji_only(target_types)
             embed.add_field(
-                name=f"{i}. {char['name']} {type_emojis}",
+                name=f"{i}. {char['name']} {ability_emoji} {type_emojis}",
                 value=f"`{stat_line}`",
                 inline=False
             )
