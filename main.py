@@ -25,6 +25,92 @@ DATA_FILE = "data.json"
 IMAGE_STORAGE_CHANNEL = 1468260725284802755  # Channel for storing composite battle images
 
 # ------------------------
+# ABILITIES
+# ------------------------
+ABILITIES = {
+    "buff_atk": {
+        "emoji": "<:buff_atk:1472951140131012671>",
+        "description": "Increases ATK by 50% (permanent).",
+    },
+    "buff_def": {
+        "emoji": "<:buff_def:1472954559382163477>",
+        "description": "Increases DEF by 50% (permanent).",
+    },
+    "buff_spd": {
+        "emoji": "<:buff_spd:1472951195713671168>",
+        "description": "Increases SPD by 50% (permanent).",
+    },
+    "buff_atk_def": {
+        "emoji": "<:buff_atk_def:1472950193455370331>",
+        "description": "Increases ATK by 20% and DEF by 20% (permanent).",
+    },
+    "first_turn_atk": {
+        "emoji": "<:first_turn_atk:1472953584529178768>",
+        "description": "For 1 turn (the first turn), increases ATK by 100%.",
+    },
+    "first_turn_def": {
+        "emoji": "<:first_turn_def:1472954261213024512>",
+        "description": "For 1 turn (the first turn), increases DEF by 100%.",
+    },
+    "first_turn_spd": {
+        "emoji": "<:first_turn_spd:1472954496937099344>",
+        "description": "For 1 turn (the first turn), increases SPD by 100%.",
+    },
+    "rampage_atk": {
+        "emoji": "<:rampage_atk:1472950676085805137>",
+        "description": "Every turn, increases ATK by 20%.",
+    },
+    "rampage_spd": {
+        "emoji": "<:rampage_spd:1472952310362669230>",
+        "description": "Every turn, increases SPD by 20%.",
+    },
+    "buff_atk_heal": {
+        "emoji": "<:buff_atk_heal:1472951766948511859>",
+        "description": "Every turn, if current ATK is higher than enemy's current ATK, increases ATK by 10% and heals 20% of max HP.",
+    },
+    "buff_def_heal": {
+        "emoji": "<:buff_def_heal:1472951820216176670>",
+        "description": "Every turn, if current DEF is higher than enemy's current DEF, increases DEF by 10% and heals 20% of max HP.",
+    },
+    "critical": {
+        "emoji": "<:critical:1472950908739653784>",
+        "description": "25% chance to deal CRITICAL damage (50% more damage).",
+    },
+    "dodge": {
+        "emoji": "<:dodge:1472950242755477539>",
+        "description": "For 1 turn (the first turn), dodges the attack (no damage).",
+    },
+    "lifesteal": {
+        "emoji": "<:lifesteal:1472955100619341866>",
+        "description": "If current HP is low (less than 50%), activates lifesteal permanently (heals 50% of the damage dealt).",
+    },
+    "heal": {
+        "emoji": "<:heal:1472951854265667717>",
+        "description": "Every turn, if current HP is low (less than 50%), heals 20% of max HP.",
+    },
+    "paralyze": {
+        "emoji": "<:paralyze:1472949147366854748>",
+        "description": "With the first attack, paralyzes the enemy for 3 turns.",
+    },
+    "survive": {
+        "emoji": "<:survive:1472950849969062058>",
+        "description": "If HP reaches 0, survives once with 1 HP.",
+    },
+    "shield_breaker": {
+        "emoji": "<:shield_breaker:1472951090889625732>",
+        "description": "If the enemy has a shield, breaks it.",
+    },
+    "low_hp_buff_atk": {
+        "emoji": "<:low_hp_buff_atk:1472956267445354698>",
+        "description": "Every turn, if current HP is low (less than 50%), increases ATK by 30%.",
+    },
+    "low_hp_buff_def": {
+        "emoji": "<:low_hp_buff_def:1472956442142048328>",
+        "description": "Every turn, if current HP is low (less than 50%), increases DEF by 30%.",
+    },
+}
+
+# ------------------------
 # CHARACTERS (base)
 # Each character has the same base stats across rarities; rarities only affect max_level
 CHARACTERS = [
@@ -32,264 +118,264 @@ CHARACTERS = [
         "id": "kai",
         "name": "Kai",
         "base": {"hp": 81, "atk": 79, "def": 85, "spd": 75},
-        "ability": "First turn: +100% DEF",
-        "ability_type": "first_turn_def",
+        "ability_id": "buff_def",
+        "target_types": ["NONE", "FLOATING"],
         "image": "https://media.discordapp.net/attachments/1467048963415871621/1467230569225257021/IMG_6242.webp?ex=697fa073&is=697e4ef3&hm=fcf57c98aa851d3720a077233c986ff8ca097d9f627f8f3d0015418dec20b63f&=&format=webp&width=691&height=967"
     },
     {
         "id": "valkyrie",
         "name": "Valkyrie",
         "base": {"hp": 70, "atk": 70, "def": 70, "spd": 75},
-        "ability": "First turn: +100% SPD",
-        "ability_type": "first_turn_spd",
+        "ability_id": "first_turn_spd",
+        "target_types": ["NONE"],
         "image": "https://media.discordapp.net/attachments/1467048963415871621/1467231114069541167/IMG_6243.jpg?ex=697fa0f5&is=697e4f75&hm=9ea3fc0b57e952f3ef19b47890d430953154d550c8080ed4a126d9a6cdb1315c&=&format=webp&width=692&height=968"
     },
     {
         "id": "shishilan_pasalan",
         "name": "Shishilan Pasalan",
         "base": {"hp": 75, "atk": 88, "def": 75, "spd": 50},
-        "ability": "First turn: +50% ATK",
-        "ability_type": "first_turn_atk",
+        "ability_id": "first_turn_atk",
+        "target_types": ["NONE"],
         "image": "https://media.discordapp.net/attachments/1467048963415871621/1467230025437679638/IMG_6240.webp?ex=697f9ff1&is=697e4e71&hm=12d51b8f9340d44c7fb9350c23ac32b0acd9d1dbf0724625bd6cb5c3027307b0&=&format=webp&width=691&height=967"
     },
     {
         "id": "kasli",
         "name": "Kasli",
         "base": {"hp": 92, "atk": 80, "def": 91, "spd": 80},
-        "ability": "Every turn: if DEF > enemy DEF, +20% DEF and heals 20% max HP",
-        "ability_type": "def_boost_and_heal",
+        "ability_id": "buff_def_heal",
+        "target_types": ["ALL"],
         "image": "https://media.discordapp.net/attachments/1467048963415871621/1467226612956135477/IMG_6235.webp?ex=697f9cc4&is=697e4b44&hm=009816068e835a51f08118c55ba0f89b8056998576aaed3728fe0503cbd85328&=&format=webp&width=691&height=968"
     },
     {
         "id": "emma",
         "name": "Emma",
         "base": {"hp": 90, "atk": 72, "def": 94, "spd": 70},
-        "ability": "When HP < 50%: +50% DEF",
-        "ability_type": "low_hp_def_boost",
+        "ability_id": "low_hp_buff_def",
+        "target_types": ["ALL"],
         "image": "https://media.discordapp.net/attachments/1467048963415871621/1467227714330038302/IMG_6237.webp?ex=697f9dca&is=697e4c4a&hm=228c56a9a127727b6ef49d93f076f017e74d81a74fde02c5a36a298602161f2c&=&format=webp&width=691&height=968"
     },
     {
         "id": "thundia",
         "name": "Thundia",
         "base": {"hp": 82, "atk": 85, "def": 89, "spd": 79},
-        "ability": "First attack: Paralyze enemy for 2 turns",
-        "ability_type": "paralyze",
+        "ability_id": "paralyze",
+        "target_types": ["ALL"],
         "image": "https://media.discordapp.net/attachments/1467048963415871621/1467228234142716057/IMG_6238.webp?ex=697f9e46&is=697e4cc6&hm=c818fc48e0c497096815093781fb55da02dc6b43037dc1999374f22b1ed18bed&=&format=webp&width=691&height=967"
     },
     {
         "id": "jeanne",
         "name": "Jeanne",
         "base": {"hp": 88, "atk": 69, "def": 85, "spd": 69},
-        "ability": "First attack: Heal 30% max HP, +30% DEF",
-        "ability_type": "heal_and_def",
+        "ability_id": "heal",
+        "target_types": ["ALL"],
         "image": "https://media.discordapp.net/attachments/1467048963415871621/1467229071741026486/IMG_6239.webp?ex=697f9f0e&is=697e4d8e&hm=3ced57c2b8f5be94667b84252de7ccd99720d94b36eb37e410434a64111750b0&=&format=webp&width=691&height=967"
     },
     {
         "id": "balrog",
         "name": "Balrog",
         "base": {"hp": 88, "atk": 75, "def": 80, "spd": 80},
-        "ability": "Every turn: +20% ATK (stacks)",
-        "ability_type": "rampage",
+        "ability_id": "rampage_atk",
+        "target_types": ["ALL"],
         "image": "https://media.discordapp.net/attachments/1467048963415871621/1467437264329248902/IMG_6249.webp?ex=698060f3&is=697f0f73&hm=afc7db51b57d8bff8d4668b82bffa0c089b0e812761c53632e7c023e8f74ac05&=&format=webp&width=691&height=968"
     },
     {
         "id": "verbena",
         "name": "Verbena",
         "base": {"hp": 88, "atk": 75, "def": 80, "spd": 80},
-        "ability": "Survives with 1 HP once when taking fatal damage",
-        "ability_type": "survive",
+        "ability_id": "critical",
+        "target_types": ["NONE", "METAL"],
         "image": "https://media.discordapp.net/attachments/1467048963415871621/1467287024011837731/IMG_6245.webp?ex=697fd507&is=697e8387&hm=9ac193ff03c2f6090ad9970be4809415d93e34c0f7080763d678371e187e36c3&=&format=webp&width=692&height=968"
     },
     {
         "id": "yukimura",
         "name": "Yukimura",
         "base": {"hp": 79, "atk": 92, "def": 72, "spd": 65},
-        "ability": "When HP < 50%: Lifesteal (heal 50% of damage dealt)",
-        "ability_type": "lifesteal",
+        "ability_id": "lifesteal",
+        "target_types": ["NONE", "BLACK"],
         "image": "https://media.discordapp.net/attachments/1467048963415871621/1467439641987907688/IMG_6241.webp?ex=6980632a&is=697f11aa&hm=3644ff1507591152d68d5f02da1ea81d6787cbd7dbd363a37c9b90b1793a0c1d&=&format=webp"
     },
     {
         "id": "ruri",
         "name": "Ruri",
         "base": {"hp": 93, "atk": 71, "def": 93, "spd": 69},
-        "ability": "For 3 turns: +50% DEF",
-        "ability_type": "def_boost_3turns",
+        "ability_id": "buff_def",
+        "target_types": ["NONE", "RED"],
         "image": "https://media.discordapp.net/attachments/1467048963415871621/1467441355885252791/IMG_6251.webp?ex=698064c2&is=697f1342&hm=1c1f5a11027d3c447d1f0933fea38cbeff8ceb374ac4da5f683e5c6da2dd16ff&=&format=webp&width=691&height=968"
     },
     {
         "id": "lunacia",
         "name": "Lunacia",
         "base": {"hp": 85, "atk": 80, "def": 70, "spd": 90},
-        "ability": "If SPD > enemy SPD: Deal +50% bonus damage",
-        "ability_type": "speed_bonus",
+        "ability_id": "shield_breaker",
+        "target_types": ["ALIEN"],
         "image": "https://media.discordapp.net/attachments/1467048963415871621/1467304124465807543/IMG_6246.webp?ex=697fe4f4&is=697e9374&hm=589f49e7ea6fb044cf8aba2211088db958a1d872be585be1ad801671eb1f5409&=&format=webp&width=692&height=968"
     },
     {
         "id": "bahamut",
         "name": "Bahamut",
         "base": {"hp": 66, "atk": 91, "def": 76, "spd": 91},
-        "ability": "When HP < 50%: +50% ATK",
-        "ability_type": "low_hp_atk_boost",
+        "ability_id": "low_hp_buff_atk",
+        "target_types": ["NONE"],
         "image": "https://media.discordapp.net/attachments/1467048963415871621/1467305407293948141/IMG_6247.webp?ex=697fe626&is=697e94a6&hm=b21bd82a8e152875c3964ff175a11fb0152693ab005bcca061bf7eff28c7ec86&=&format=webp"
     },
     {
         "id": "windy",
         "name": "Windy",
         "base": {"hp": 88, "atk": 70, "def": 66, "spd": 66},
-        "ability": "If HP < 50%, heals 50% of max HP (once)",
-        "ability_type": "low_hp_big_heal",
+        "ability_id": "buff_atk",
+        "target_types": ["NONE", "FLOATING"],
         "image": "https://media.discordapp.net/attachments/1467048963415871621/1467581480770207786/IMG_6281.webp?ex=6980e743&is=697f95c3&hm=cb6acdb1e97b1d8acc57a002b28650048badd08e84abd1d9c021f0445a7e1d03&=&format=webp&width=691&height=967"
     },
     {
         "id": "nobunaga",
         "name": "Nobunaga",
         "base": {"hp": 70, "atk": 80, "def": 75, "spd": 70},
-        "ability": "If HP < 50%, increases SPD by 50%",
-        "ability_type": "low_hp_spd_boost",
+        "ability_id": "buff_spd",
+        "target_types": ["NONE", "BLACK"],
         "image": "https://media.discordapp.net/attachments/1467048963415871621/1467583149960859750/IMG_6284.webp?ex=6980e8d1&is=697f9751&hm=4b89114a61ce971c96ec616278c3691b9d0429d3dce6d5f721d1b5cefb854976&=&format=webp"
     },
     {
         "id": "izanagi",
         "name": "Izanagi",
         "base": {"hp": 91, "atk": 90, "def": 70, "spd": 70},
-        "ability": "Every turn: if ATK > enemy ATK, +20% ATK and heals 20% max HP",
-        "ability_type": "atk_boost_and_heal",
+        "ability_id": "buff_atk_heal",
+        "target_types": ["ALL"],
         "image": "https://media.discordapp.net/attachments/1467048963415871621/1467584718621905068/IMG_6285.webp?ex=6980ea47&is=697f98c7&hm=fe8288fb73ba343ecea2e03d6876dedc44c84ba3b06f4dadfc4237b1a719eeb4&=&format=webp&width=692&height=968"
     },
     {
         "id": "luminalia",
         "name": "Luminalia",
         "base": {"hp": 89, "atk": 60, "def": 79, "spd": 80},
-        "ability": "If enemy's type is ALIEN, increases DEF by 50% and SPD by 50%",
-        "ability_type": "alien_def_spd_boost",
+        "ability_id": "buff_def",
+        "target_types": ["NONE", "ALIEN"],
         "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1471104555621023896/IMG_6282.png?ex=698db861&is=698c66e1&hm=80429c51aa60d72758cf3c341c2995cf4fce079a578978774482faa1a58b2ce4&"
     },
     {
         "id": "mitama",
         "name": "Mitama",
         "base": {"hp": 94, "atk": 65, "def": 78, "spd": 62},
-        "ability": "First attack: Heals 50% max HP",
-        "ability_type": "first_attack_heal",
+        "ability_id": "dodge",
+        "target_types": ["ALL"],
         "image": "https://media.discordapp.net/attachments/1467048963415871621/1467941345611091969/IMG_6305.webp?ex=69823669&is=6980e4e9&hm=5b8367041b4201d36c4bae2b2efa511ba27c9fa2e910387e1b0a8bba2e4290e8&=&format=webp&width=691&height=967"
     },
     {
         "id": "deale",
         "name": "Deale",
         "base": {"hp": 77, "atk": 76, "def": 78, "spd": 88},
-        "ability": "First attack: +50% SPD",
-        "ability_type": "first_attack_spd",
+        "ability_id": "buff_spd",
+        "target_types": ["NONE", "ALIEN"],
         "image": "https://media.discordapp.net/attachments/1467048963415871621/1467942208543129772/IMG_6304.webp?ex=69823737&is=6980e5b7&hm=251d7918dad0471308b5baaf271a47c14d296c21f7f821e829461185d5b666c8&=&format=webp&width=691&height=968"
     },
     {
         "id": "kuu",
         "name": "Kuu",
         "base": {"hp": 83, "atk": 83, "def": 75, "spd": 75},
-        "ability": "After 3 turns: +50% ATK",
-        "ability_type": "turn3_atk_boost",
+        "ability_id": "buff_atk_def",
+        "target_types": ["NONE", "RED"],
         "image": "https://media.discordapp.net/attachments/1467048963415871621/1467943692521443462/IMG_6306.webp?ex=69823899&is=6980e719&hm=09e31480ec693e1419e1385cb8f2f595ecac176acdbd3a676f44ffd818217d5d&=&format=webp&width=691&height=968"
     },
     {
         "id": "himeyuri",
         "name": "Himeyuri",
         "base": {"hp": 70, "atk": 75, "def": 79, "spd": 78},
-        "ability": "After 3 turns: Heals 50% max HP",
-        "ability_type": "turn3_heal",
+        "ability_id": "buff_def",
+        "target_types": ["NONE", "ANGEL"],
         "image": "https://media.discordapp.net/attachments/1467048963415871621/1467944233175617639/IMG_6307.webp?ex=6982391a&is=6980e79a&hm=6ea5933cbac24768162937bf8093519651aec5ecaac7134f5464fe3c284f110f&=&format=webp&width=250&height=350"
     },
     {
         "id": "kalisa",
         "name": "Kalisa",
         "base": {"hp": 75, "atk": 75, "def": 75, "spd": 79},
-        "ability": "After 3 turns: +20% ATK and +20% DEF",
-        "ability_type": "turn3_atk_def_boost",
+        "ability_id": "buff_atk",
+        "target_types": ["NONE", "ANGEL"],
         "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1468707381247475723/IMG_6316.webp?ex=6984ffd6&is=6983ae56&hm=811db3ebbd9eab0312b4a5f156a7530e1f0100022a92c7760550986ff5df18e0&"
     },
     {
         "id": "trixi",
         "name": "Trixi",
         "base": {"hp": 70, "atk": 75, "def": 70, "spd": 92},
-        "ability": "Every turn: +20% SPD (stacks)",
-        "ability_type": "spd_rampage",
+        "ability_id": "rampage_spd",
+        "target_types": ["ALL"],
         "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1468708225028325530/IMG_6315.webp?ex=698500a0&is=6983af20&hm=9a116c7c9bc971ad9d5a09914423c16e2a241a51d45eec0653de908f7ce8d13b&"
     },
     {
         "id": "sidmi",
         "name": "Sidmi",
         "base": {"hp": 85, "atk": 80, "def": 75, "spd": 65},
-        "ability": "After 3 turns: +50% bonus damage",
-        "ability_type": "turn3_bonus_damage",
+        "ability_id": "buff_atk",
+        "target_types": ["NONE", "ALIEN"],
         "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1468709244382744675/IMG_6314.webp?ex=69850193&is=6983b013&hm=53dc82cd67097cff821246e70e179f79e583554e2455556f8c7cb09feda29ef7&"
     },
     {
         "id": "terun",
         "name": "Terun",
         "base": {"hp": 65, "atk": 76, "def": 65, "spd": 78},
-        "ability": "After 3 turns: +100% SPD",
-        "ability_type": "turn3_spd_boost",
+        "ability_id": "first_turn_def",
+        "target_types": ["NONE"],
         "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1468979518445326447/IMG_6319.webp?ex=6986a609&is=69855489&hm=1bc744bea0288509452390fbca7d626bbe20de1e98bd2e9c3a601cc96425dcec&"
     },
     {
         "id": "black_cat",
         "name": "Black Cat",
         "base": {"hp": 70, "atk": 75, "def": 72, "spd": 72},
-        "ability": "First turn: +20% ATK and DEF",
-        "ability_type": "first_turn_atk_def",
+        "ability_id": "buff_atk_def",
+        "target_types": ["NONE", "BLACK"],
         "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1468980961201881270/IMG_6320.webp?ex=6986a761&is=698555e1&hm=1b73213a52a39d92591748a3403d7ae3fce92ed16aff116b75658f02abd36c73&"
     },
     {
         "id": "aphrodite",
         "name": "Aphrodite",
         "base": {"hp": 83, "atk": 90, "def": 70, "spd": 68},
-        "ability": "Every turn: if ATK > enemy ATK, heals 30% max HP",
-        "ability_type": "atk_heal",
+        "ability_id": "lifesteal",
+        "target_types": ["NONE", "ALIEN"],
         "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1468991000881139834/IMG_6321.webp?ex=6986b0bb&is=69855f3b&hm=c967711d603cdd4b590f95b4b256c17af2816fedd567b38c7b8b1325be4b2eee&"
     },
     {
         "id": "goddess",
         "name": "Goddess",
         "base": {"hp": 85, "atk": 60, "def": 87, "spd": 77},
-        "ability": "Every turn: if DEF > enemy DEF, heals 30% max HP",
-        "ability_type": "def_heal",
+        "ability_id": "lifesteal",
+        "target_types": ["NONE", "ANGEL"],
         "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1468991402066051267/IMG_6322.webp?ex=6986b11a&is=69855f9a&hm=55e3727a4fdf22bca7c08e91fa008fd1f62fde71bfc4a6b8abccef5dc170a8c2&"
     },
     {
         "id": "rei",
         "name": "Rei",
         "base": {"hp": 80, "atk": 80, "def": 80, "spd": 75},
-        "ability": "Every turn: if HP < 50%, +30% DEF (stacks)",
-        "ability_type": "low_hp_def_stack",
+        "ability_id": "lifesteal",
+        "target_types": ["NONE", "FLOATING"],
         "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1469313733011443865/IMG_6328.webp?ex=6987348c&is=6985e30c&hm=db0122f497eb2e1a00c559d2fa1389911e24a47390b1569f183ffc0ddc6af199&"
     },
     {
         "id": "paipai",
         "name": "Paipai",
         "base": {"hp": 85, "atk": 80, "def": 78, "spd": 63},
-        "ability": "Every turn: if HP < 50%, +30% ATK (stacks)",
-        "ability_type": "low_hp_atk_stack",
+        "ability_id": "low_hp_buff_atk",
+        "target_types": ["NONE", "RED"],
         "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1469314130140725278/IMG_6329.webp?ex=698734eb&is=6985e36b&hm=04bd85484b1232e770e0c8ad09c6b7ae282744c3f83ae340b5179b713385fd89&"
     },
     {
         "id": "lilin",
         "name": "Lilin",
         "base": {"hp": 87, "atk": 87, "def": 87, "spd": 78},
-        "ability": "If enemy's type is ALIEN, increases ATK by 50% and DEF by 50%",
-        "ability_type": "alien_atk_def_boost",
+        "ability_id": "buff_def",
+        "target_types": ["NONE", "AKU"],
         "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1470906407456080159/IMG_6409.webp?ex=698da897&is=698c5717&hm=f84ebd35ccc35474a47de919250223fbc2d2ac8080725a4582b8130e47a8c85f&"
     },
     {
         "id": "sakura",
         "name": "Sakura",
         "base": {"hp": 65, "atk": 89, "def": 81, "spd": 80},
-        "ability": "For 3 turns, increases SPD by 50%",
-        "ability_type": "spd_boost_3turns",
+        "ability_id": "critical",
+        "target_types": ["NONE"],
         "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1470908566713008181/IMG_6406.webp?ex=698daa9a&is=698c591a&hm=7f6b0fc256c77ad053e8c564bc072947fa4efedaba4743f2662081bb2f1c2252&"
     },
     {
         "id": "jack",
         "name": "Jack",
         "base": {"hp": 70, "atk": 85, "def": 85, "spd": 88},
-        "ability": "If enemy's type is ALIEN, increases SPD by 100%",
-        "ability_type": "alien_spd_boost",
+        "ability_id": "buff_atk_def",
+        "target_types": ["NONE", "ALIEN"],
         "image": "https://cdn.discordapp.com/attachments/1467048963415871621/1471111968202166333/IMG_6411.webp?ex=698dbf49&is=698c6dc9&hm=1b5cef4b7cbab7cefbdd00d4c18fb9a357d279cd896424d62d5b80e6bac554e0&"
     },
 ]
@@ -399,6 +485,7 @@ BOSSES = [
     {
         "id": "crazed_cat",
         "name": "Crazed Cat",
+        "enemy_type": "NONE",
         "phases": [
             {
                 "hp": 5000,
@@ -420,6 +507,7 @@ BOSSES = [
     {
         "id": "crazed_tank",
         "name": "Crazed Tank",
+        "enemy_type": "NONE",
         "phases": [
             {
                 "hp": 9999,
@@ -441,6 +529,7 @@ BOSSES = [
     {
         "id": "crazed_axe",
         "name": "Crazed Axe",
+        "enemy_type": "NONE",
         "phases": [
             {
                 "hp": 7500,
@@ -462,6 +551,7 @@ BOSSES = [
     {
         "id": "crazed_legs",
         "name": "Crazed Legs",
+        "enemy_type": "NONE",
         "phases": [
             {
                 "hp": 8000,
@@ -483,6 +573,7 @@ BOSSES = [
     {
         "id": "crazed_cow",
         "name": "Crazed Cow",
+        "enemy_type": "NONE",
         "ability_type": None,  # No ability
         "phases": [
             {
@@ -505,6 +596,7 @@ BOSSES = [
     {
         "id": "crazed_bird",
         "name": "Crazed Bird",
+        "enemy_type": "NONE",
         "ability_type": "boss_speed_bonus",  # If SPD > enemy SPD, deals 100% bonus damage
         "phases": [
             {
@@ -527,6 +619,7 @@ BOSSES = [
     {
         "id": "crazed_fish",
         "name": "Crazed Fish",
+        "enemy_type": "NONE",
         "ability_type": "boss_def_heal",  # If DEF > enemy DEF, heals 30% max HP
         "phases": [
             {
@@ -549,6 +642,7 @@ BOSSES = [
     {
         "id": "crazed_lizard",
         "name": "Crazed Lizard",
+        "enemy_type": "NONE",
         "ability_type": "boss_atk_heal",  # If ATK > enemy ATK, heals 30% max HP
         "phases": [
             {
@@ -571,6 +665,7 @@ BOSSES = [
     {
         "id": "crazed_titan",
         "name": "Crazed Titan",
+        "enemy_type": "NONE",
         "ability_type": "boss_paralyze",  # First attack paralyzes enemy for 2 turns
         "phases": [
             {
@@ -593,7 +688,7 @@ BOSSES = [
     {
         "id": "cli_one",
         "name": "Cli-One",
-        "type": "ALIEN",
+        "enemy_type": "ALIEN",
         "ability_type": None,
         "phases": [
             {
@@ -609,7 +704,7 @@ BOSSES = [
     {
         "id": "corrupted_valkyrie",
         "name": "Corrupted Valkyrie",
-        "type": "ALIEN",
+        "enemy_type": "ALIEN",
         "ability_type": "lifesteal",
         "phases": [
             {
@@ -625,7 +720,7 @@ BOSSES = [
     {
         "id": "raging_bahamut",
         "name": "Raging Bahamut",
-        "type": "ALIEN",
+        "enemy_type": "ALIEN",
         "ability_type": "boss_bahamut_rage",
         "phases": [
             {
@@ -738,18 +833,16 @@ def ensure_user(user_id: int):
             c.setdefault("exp", 0)
         if "max_level" not in c:
             c["max_level"] = RARITY_MAX_LEVEL.get(c.get("rarity", "Common"), 30)
-        if "base" not in c:
-            # try to find base by id
-            base = CHARACTERS_BY_ID.get(c.get("id"))
-            if base:
+        # Migration: get base character data once and populate missing fields
+        base = CHARACTERS_BY_ID.get(c.get("id"))
+        if base:
+            if "base" not in c:
                 c["base"] = base["base"]
-                c.setdefault("ability", base.get("ability", ""))
                 c.setdefault("image", base.get("image", ""))
-        # MIGRAZIONE: aggiungi ability_type alle carte vecchie
-        if "ability_type" not in c:
-            base = CHARACTERS_BY_ID.get(c.get("id"))
-            if base and "ability_type" in base:
-                c["ability_type"] = base["ability_type"]
+            if "ability_id" not in c:
+                c["ability_id"] = base.get("ability_id", "")
+            if "target_types" not in c:
+                c["target_types"] = base.get("target_types", [])
     
     # MIGRAZIONE: aggiungi team e boss_unlocked per utenti esistenti
     if "team" not in user:
@@ -762,12 +855,13 @@ def ensure_user(user_id: int):
     return user
 
 def exp_to_next(level: int) -> int:
-    return 100 * level
+    return 500 * level
 
 def maybe_level_up_user(user: dict) -> list:
     """Checks and performs user level ups. Returns list of level-up messages."""
     messages = []
-    while user.get("exp", 0) >= exp_to_next(user.get("level", 1)):
+    MAX_USER_LEVEL = 200
+    while user.get("exp", 0) >= exp_to_next(user.get("level", 1)) and user.get("level", 1) < MAX_USER_LEVEL:
         need = exp_to_next(user.get("level", 1))
         user["exp"] -= need
         user["level"] = user.get("level", 1) + 1
@@ -790,8 +884,9 @@ def create_card_instance(card_base: dict, rarity: str):
         "exp": 0,
         "max_level": RARITY_MAX_LEVEL[rarity],
         "base": card_base["base"],
-        "ability": card_base["ability"],
         "image": card_base.get("image", ""),
+        "ability_id": card_base.get("ability_id", ""),
+        "target_types": card_base.get("target_types", []),
     }
 
 def find_card_by_name(name: str):
@@ -1544,21 +1639,30 @@ async def gacha_cmd(ctx):
     await ctx.send(embed=embed, view=view)
 
 @bot.command(name="drop", aliases=["d"])
-@commands.cooldown(1, 60, commands.BucketType.user)
+@commands.cooldown(1, 300, commands.BucketType.user)
 async def drop_cmd(ctx):
-    """Get a random card (15-minute cooldown), does not consume stamina."""
+    """Get a random card (5-minute cooldown), does not consume stamina."""
     user = ensure_user(ctx.author.id)
     base = deepcopy(random.choice(CHARACTERS))
     rarity = random.choices(RARITIES, weights=RARITY_WEIGHTS, k=1)[0]
     card_instance = create_card_instance(base, rarity)
     user["inventory"].append(card_instance)
     await save_data()
+    
+    # Look up ability info
+    char_base = CHARACTERS_BY_ID.get(card_instance["id"])
+    ability_id = char_base.get("ability_id", "") if char_base else ""
+    ability_info = ABILITIES.get(ability_id, {})
+    ability_emoji = ability_info.get("emoji", "")
+    ability_desc = ability_info.get("description", "No ability")
+    
     await ctx.send(
         f"🎉 **New card obtained!**\n"
         f"🧙 {card_instance['name']} ({card_instance['rarity']}) Lv{card_instance['level']}\n"
         f"ID: `{card_instance['instance_id']}`\n"
-        f"✨ Ability: {card_instance['ability']}"
+        f"{ability_emoji} **Ability:** {ability_desc}"
     )
+
 
 @bot.command(name="cinfo")
 async def cinfo_cmd(ctx, *, name: str):
@@ -1568,10 +1672,20 @@ async def cinfo_cmd(ctx, *, name: str):
         await ctx.send("Card not found.")
         return
     stats = base["base"]
+    
+    # Get ability information
+    ability_id = base.get("ability_id", "")
+    ability_info = ABILITIES.get(ability_id, {})
+    ability_emoji = ability_info.get("emoji", "")
+    ability_desc = ability_info.get("description", "No ability")
+    
+    # Format target types
+    target_types = base.get("target_types", [])
+    anti_types = format_target_types(target_types)
 
     embed = discord.Embed(
         title=f"{base['name']} — Base stats (Common Lv1)",
-        description=f"Ability: {base['ability']}",
+        description=f"{ability_emoji} **Ability:** {ability_desc}\n\n**Anti:** {anti_types}",
         color=discord.Color.blue()
     )
     embed.add_field(name="HP", value=str(stats['hp']), inline=True)
@@ -1624,8 +1738,10 @@ class DexView(View):
         for i, char in enumerate(self.cards[start_idx:end_idx], start=start_idx + 1):
             stats = char["base"]
             stat_line = f"HP:{stats['hp']} ATK:{stats['atk']} DEF:{stats['def']} SPD:{stats['spd']}"
+            target_types = char.get("target_types", [])
+            type_emojis = format_target_types_emoji_only(target_types)
             embed.add_field(
-                name=f"{i}. {char['name']}",
+                name=f"{i}. {char['name']} {type_emojis}",
                 value=f"`{stat_line}`",
                 inline=False
             )
@@ -1723,9 +1839,20 @@ async def info_cmd(ctx, index: int):
     defense = int(base["def"] * mult)
     spd = int(base["spd"] * mult)
     
+    # Get ability information from CHARACTERS using card ID
+    char_base = find_card_by_name(card["name"])
+    ability_id = char_base.get("ability_id", "") if char_base else ""
+    ability_info = ABILITIES.get(ability_id, {})
+    ability_emoji = ability_info.get("emoji", "")
+    ability_desc = ability_info.get("description", "No ability")
+    
+    # Format target types
+    target_types = char_base.get("target_types", []) if char_base else []
+    anti_types = format_target_types(target_types)
+    
     embed = discord.Embed(
         title=f"{card['name']} — {card['rarity']} Lv{lvl}",
-        description=f"**Ability:** {card.get('ability', 'None')}",
+        description=f"{ability_emoji} **Ability:** {ability_desc}\n\n**Anti:** {anti_types}",
         color=discord.Color.gold()
     )
     embed.add_field(name="HP", value=str(hp), inline=True)
@@ -2154,21 +2281,77 @@ def make_enemy_for_floor(floor: int) -> dict:
     image_index = min(floor - 1, len(FLOOR_IMAGES) - 1)
     image = FLOOR_IMAGES[image_index] if FLOOR_IMAGES else ENEMY_IMAGE
     
-    return {"name": f"Floor {floor} Enemy", "hp": base_hp, "atk": base_atk, "def": base_def, "spd": base_spd, "image": image}
+    return {"name": f"Floor {floor} Enemy", "hp": base_hp, "atk": base_atk, "def": base_def, "spd": base_spd, "image": image, "enemy_type": "NONE"}
+
+TYPE_EMOJIS = {
+    "NONE":     "<:none:1473318211838808267>",
+    "ALIEN":    "<:alien:1473318248396226709>",
+    "RED":      "<:red:1473318284823756863>",
+    "FLOATING": "<:floating:1473318319313653894>",
+    "BLACK":    "<:black:1473318359541088529>",
+    "METAL":    "<:metal:1473318393422680084>",
+    "ANGEL":    "<:angel:1473318428113768602>",
+    "ZOMBIE":   "<:zombie:1473318461206954195>",
+    "RELIC":    "<:relic:1473318500624896123>",
+    "AKU":      "<:aku:1473318531364950211>",
+}
+
+def format_target_types(target_types):
+    """Returns a formatted string with emoji + name for each target type (info/cinfo)."""
+    if not target_types:
+        return f"{TYPE_EMOJIS['NONE']} NONE"
+    if "ALL" in target_types:
+        # ALL = funziona contro tutti i tipi, mostra tutte le emoji
+        return " ".join(f"{emoji} {t}" for t, emoji in TYPE_EMOJIS.items())
+    return " ".join(f"{TYPE_EMOJIS.get(t, t)} {t}" for t in target_types)
+
+def format_target_types_emoji_only(target_types):
+    """Returns only emojis (no text) for each target type (dex).
+    For ALL, uses a single globe emoji to avoid exceeding Discord's 256-char field name limit."""
+    if not target_types:
+        return TYPE_EMOJIS['NONE']
+    if "ALL" in target_types:
+        return "🌍"  # Single emoji for ALL to stay within Discord's 256-char limit
+    return " ".join(TYPE_EMOJIS.get(t, t) for t in target_types)
 
 def damage_formula(attacker_atk: int, defender_def: int) -> int:
     """Simple damage formula."""
     dmg = max(1, int(attacker_atk - defender_def * 0.5))
     return dmg
 
-def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", is_team_battle=False):
+def check_ability_active(attacker, defender):
     """
-    Apply ability effects based on ability_type.
+    Check if attacker's ability should be active based on target_types.
+    Supports both 'type' (boss dict) and 'enemy_type' (floor enemy dict) fields.
+    
+    Returns True if:
+    - target_types contains "ALL"
+    - target_types contains defender's type
+    - target_types contains "NONE" and defender has no type
+    """
+    target_types = attacker.get("target_types", [])
+    # Support both 'type' (boss) and 'enemy_type' (floor enemy / player card)
+    defender_type = defender.get("type") or defender.get("enemy_type") or None
+    
+    # If target types contains "ALL", ability always works
+    if "ALL" in target_types:
+        return True
+    
+    # If defender has a type, check if it's in target_types
+    if defender_type and defender_type != "NONE":
+        return defender_type in target_types
+    
+    # If defender has no type, check if "NONE" is in target_types
+    return "NONE" in target_types
+
+def apply_ability(ability_id, attacker, defender, flags, turn, mode="direct", is_team_battle=False):
+    """
+    Apply ability effects based on ability_id from ABILITIES dictionary.
     
     Args:
-        ability_type: The type of ability (e.g., "first_turn_def", "lifesteal", etc.)
-        attacker: Dict with attacker stats (hp, atk, def, spd, hp_max, atk_base, def_base, spd_base, name, etc.)
-        defender: Dict with defender stats
+        ability_id: The ability ID (e.g., "buff_atk", "lifesteal", etc.)
+        attacker: Dict with attacker stats (hp, atk, def, spd, hp_max, atk_base, def_base, spd_base, name, target_types, etc.)
+        defender: Dict with defender stats (including type)
         flags: Dict with ability state flags (buff_applied, lifesteal_active, etc.)
         turn: Current turn number (round number)
         mode: "direct" for run_battle (modifies stats directly), "bonus" for run_boss_battle (returns bonuses)
@@ -2182,395 +2365,328 @@ def apply_ability(ability_type, attacker, defender, flags, turn, mode="direct", 
     messages = []
     bonuses = {"atk": 0.0, "def": 0.0, "spd": 0.0}
     
-    # === FIRST-TURN ABILITIES ===
-    if ability_type == "first_turn_def":  # Kai - First turn +100% DEF
-        # For boss battles (bonus mode): apply on turn 1 if buff_applied is True
-        # For regular battles (direct mode): apply on turn 1 if buff_applied is False
-        should_apply = False
+    # If no ability or ability not recognized, return empty result
+    if not ability_id or ability_id not in ABILITIES:
+        return {"messages": messages, "bonuses": bonuses}
+    
+    # Check if ability should be active based on target_types
+    if not check_ability_active(attacker, defender):
+        return {"messages": messages, "bonuses": bonuses}
+    
+    # === ONE-TIME PERMANENT BUFFS ===
+    if ability_id == "buff_atk":
+        flag_name = "buff_atk_applied"
         if mode == "bonus":
-            should_apply = (turn == 1 and flags.get("buff_applied", False))
+            if not flags.get(flag_name, False):
+                flags[flag_name] = True
+                if is_team_battle:
+                    messages.append(f"⚔️ **{attacker['name']}'s ATK increased!** Team ATK +50%")
+                else:
+                    messages.append(f"⚔️ **{attacker['name']}'s ATK increased!** +50% ATK")
+            bonuses["atk"] += 0.5
         else:
-            should_apply = (turn == 1 and not flags.get("buff_applied", False))
-        
-        if should_apply:
+            if not flags.get(flag_name, False):
+                attacker["atk"] = int(attacker["atk_base"] * 1.5)
+                flags[flag_name] = True
+                if is_team_battle:
+                    messages.append(f"⚔️ **{attacker['name']}'s ATK increased!** Team ATK +50%")
+                else:
+                    messages.append(f"⚔️ **{attacker['name']}'s ATK increased!** +50% ATK")
+    
+    elif ability_id == "buff_def":
+        flag_name = "buff_def_applied"
+        if mode == "bonus":
+            if not flags.get(flag_name, False):
+                flags[flag_name] = True
+                if is_team_battle:
+                    messages.append(f"🛡️ **{attacker['name']}'s DEF increased!** Team DEF +50%")
+                else:
+                    messages.append(f"🛡️ **{attacker['name']}'s DEF increased!** +50% DEF")
+            bonuses["def"] += 0.5
+        else:
+            if not flags.get(flag_name, False):
+                attacker["def"] = int(attacker["def_base"] * 1.5)
+                flags[flag_name] = True
+                if is_team_battle:
+                    messages.append(f"🛡️ **{attacker['name']}'s DEF increased!** Team DEF +50%")
+                else:
+                    messages.append(f"🛡️ **{attacker['name']}'s DEF increased!** +50% DEF")
+    
+    elif ability_id == "buff_spd":
+        flag_name = "buff_spd_applied"
+        if mode == "bonus":
+            if not flags.get(flag_name, False):
+                flags[flag_name] = True
+                if is_team_battle:
+                    messages.append(f"⚡ **{attacker['name']}'s SPD increased!** Team SPD +50%")
+                else:
+                    messages.append(f"⚡ **{attacker['name']}'s SPD increased!** +50% SPD")
+            bonuses["spd"] += 0.5
+        else:
+            if not flags.get(flag_name, False):
+                attacker["spd"] = int(attacker["spd_base"] * 1.5)
+                flags[flag_name] = True
+                if is_team_battle:
+                    messages.append(f"⚡ **{attacker['name']}'s SPD increased!** Team SPD +50%")
+                else:
+                    messages.append(f"⚡ **{attacker['name']}'s SPD increased!** +50% SPD")
+    
+    elif ability_id == "buff_atk_def":
+        flag_name = "buff_atk_def_applied"
+        if mode == "bonus":
+            if not flags.get(flag_name, False):
+                flags[flag_name] = True
+                if is_team_battle:
+                    messages.append(f"⚔️🛡️ **{attacker['name']}'s power surges!** Team ATK +20%, DEF +20%")
+                else:
+                    messages.append(f"⚔️🛡️ **{attacker['name']}'s power surges!** +20% ATK/DEF")
+            bonuses["atk"] += 0.2
+            bonuses["def"] += 0.2
+        else:
+            if not flags.get(flag_name, False):
+                attacker["atk"] = int(attacker["atk_base"] * 1.2)
+                attacker["def"] = int(attacker["def_base"] * 1.2)
+                flags[flag_name] = True
+                if is_team_battle:
+                    messages.append(f"⚔️🛡️ **{attacker['name']}'s power surges!** Team ATK +20%, DEF +20%")
+                else:
+                    messages.append(f"⚔️🛡️ **{attacker['name']}'s power surges!** +20% ATK/DEF")
+    
+    # === FIRST-TURN BUFFS ===
+    elif ability_id == "first_turn_atk":
+        flag_name = "first_turn_atk_applied"
+        if turn == 1:
             if mode == "bonus":
+                if not flags.get(flag_name, False):
+                    flags[flag_name] = True
+                    messages.append(f"⚔️ **First turn boost!** {attacker['name']}'s ATK doubled!")
+                bonuses["atk"] += 1.0
+            else:
+                if not flags.get(flag_name, False):
+                    attacker["atk"] = int(attacker["atk_base"] * 2)
+                    flags[flag_name] = True
+                    messages.append(f"⚔️ **First turn boost!** {attacker['name']}'s ATK doubled!")
+        elif turn == 2 and mode == "direct":
+            # Remove buff after turn 1
+            attacker["atk"] = attacker["atk_base"]
+            messages.append(f"⚔️ **{attacker['name']}'s first turn ATK boost ended.**")
+    
+    elif ability_id == "first_turn_def":
+        flag_name = "first_turn_def_applied"
+        if turn == 1:
+            if mode == "bonus":
+                if not flags.get(flag_name, False):
+                    flags[flag_name] = True
+                    messages.append(f"🛡️ **First turn boost!** {attacker['name']}'s DEF doubled!")
                 bonuses["def"] += 1.0
             else:
-                attacker["def"] = int(attacker["def_base"] * 2)
-                flags["buff_applied"] = True
+                if not flags.get(flag_name, False):
+                    attacker["def"] = int(attacker["def_base"] * 2)
+                    flags[flag_name] = True
+                    messages.append(f"🛡️ **First turn boost!** {attacker['name']}'s DEF doubled!")
+        elif turn == 2 and mode == "direct":
+            # Remove buff after turn 1
+            attacker["def"] = attacker["def_base"]
+            messages.append(f"🛡️ **{attacker['name']}'s first turn DEF boost ended.**")
     
-    elif ability_type == "first_turn_spd":  # Valkyrie - First turn +100% SPD
-        should_apply = False
-        if mode == "bonus":
-            should_apply = (turn == 1 and flags.get("buff_applied", False))
-        else:
-            should_apply = (turn == 1 and not flags.get("buff_applied", False))
-        
-        if should_apply:
+    elif ability_id == "first_turn_spd":
+        flag_name = "first_turn_spd_applied"
+        if turn == 1:
             if mode == "bonus":
+                if not flags.get(flag_name, False):
+                    flags[flag_name] = True
+                    messages.append(f"⚡ **First turn boost!** {attacker['name']}'s SPD doubled!")
                 bonuses["spd"] += 1.0
             else:
-                attacker["spd"] = int(attacker["spd_base"] * 2)
-                flags["buff_applied"] = True
+                if not flags.get(flag_name, False):
+                    attacker["spd"] = int(attacker["spd_base"] * 2)
+                    flags[flag_name] = True
+                    messages.append(f"⚡ **First turn boost!** {attacker['name']}'s SPD doubled!")
+        elif turn == 2 and mode == "direct":
+            # Remove buff after turn 1
+            attacker["spd"] = attacker["spd_base"]
+            messages.append(f"⚡ **{attacker['name']}'s first turn SPD boost ended.**")
     
-    elif ability_type == "first_turn_atk":  # Shishilan - First turn +50% ATK
-        should_apply = False
+    # === FIRST-TURN DODGE ===
+    elif ability_id == "dodge":
+        # Dodge is handled in damage calculation, just set flag
+        if turn == 1 and not flags.get("dodge_used", False):
+            flags["dodge_active"] = True
+    
+    # === PER-TURN SCALING (RAMPAGE) ===
+    elif ability_id == "rampage_atk":
+        # Every turn: +20% of base ATK (stacks)
+        stacks = flags.get("rampage_atk_stacks", 0)
+        # Increment stacks first
+        stacks += 1
+        flags["rampage_atk_stacks"] = stacks
+        # Apply bonus based on current stacks
         if mode == "bonus":
-            should_apply = (turn == 1 and flags.get("buff_applied", False))
+            bonuses["atk"] += stacks * 0.2
         else:
-            should_apply = (turn == 1 and not flags.get("buff_applied", False))
-        
-        if should_apply:
-            if mode == "bonus":
-                bonuses["atk"] += 0.5
-            else:
-                attacker["atk"] = int(attacker["atk_base"] * 1.5)
-                flags["buff_applied"] = True
+            # In direct mode, modify attacker's ATK based on stacks
+            attacker["atk"] = int(attacker["atk_base"] * (1 + stacks * 0.2))
+        # Show message EVERY turn
+        if is_team_battle:
+            messages.append(f"🔥 **{attacker['name']}'s rage grows!** Team ATK +{stacks * 20}% (stacks: {stacks})")
+        else:
+            messages.append(f"🔥 **{attacker['name']}'s rage grows!** ATK +{stacks * 20}% (stacks: {stacks})")
     
-    elif ability_type == "first_turn_atk_def":  # Black Cat - First turn: +20% ATK and DEF
-        should_apply = False
+    elif ability_id == "rampage_spd":
+        # Every turn: +20% of base SPD (stacks)
+        stacks = flags.get("rampage_spd_stacks", 0)
+        # Increment stacks first
+        stacks += 1
+        flags["rampage_spd_stacks"] = stacks
+        # Apply bonus based on current stacks
         if mode == "bonus":
-            should_apply = (turn == 1 and flags.get("black_cat_buffed", False))
+            bonuses["spd"] += stacks * 0.2
         else:
-            should_apply = (turn == 1 and not flags.get("black_cat_buffed", False))
-        
-        if should_apply:
+            # In direct mode, modify attacker's SPD based on stacks
+            attacker["spd"] = int(attacker["spd_base"] * (1 + stacks * 0.2))
+        # Show message EVERY turn
+        if is_team_battle:
+            messages.append(f"💨 **{attacker['name']}'s speed surges!** Team SPD +{stacks * 20}% (stacks: {stacks})")
+        else:
+            messages.append(f"💨 **{attacker['name']}'s speed surges!** SPD +{stacks * 20}% (stacks: {stacks})")
+    
+    # === PER-TURN CONDITIONAL (STAT COMPARISON) ===
+    elif ability_id == "buff_atk_heal":
+        # Check current ATK vs enemy current ATK
+        if attacker["atk"] > defender["atk"]:
+            stacks = flags.get("buff_atk_heal_stacks", 0)
+            # Increment stacks first
+            stacks += 1
+            flags["buff_atk_heal_stacks"] = stacks
+            # Apply bonus based on current stacks
             if mode == "bonus":
-                bonuses["atk"] += 0.2
-                bonuses["def"] += 0.2
+                bonuses["atk"] += stacks * 0.1
             else:
-                attacker["atk"] = int(attacker["atk_base"] * 1.2)
-                attacker["def"] = int(attacker["def_base"] * 1.2)
-                flags["black_cat_buffed"] = True
-    
-    # === 3-TURN BUFFS ===
-    elif ability_type == "def_boost_3turns":  # Ruri - 3 turns +50% DEF
-        if flags.get("ruri_turns", 0) > 0:
-            if mode == "bonus":
-                bonuses["def"] += 0.5
-            # For direct mode, this is applied at initialization
-    
-    elif ability_type == "spd_boost_3turns":  # Sakura - 3 turns +50% SPD
-        if flags.get("sakura_turns", 0) > 0:
-            if mode == "bonus":
-                bonuses["spd"] += 0.5
-            # For direct mode, this is applied at initialization
-    
-    # === FIRST-ATTACK ABILITIES ===
-    elif ability_type == "first_attack_heal":  # Mitama - First attack: Heals 50% max HP
-        if turn == 1 and not flags.get("mitama_healed"):
-            heal = int(attacker["hp_max"] * 0.5)
+                # In direct mode, modify attacker's ATK based on stacks
+                attacker["atk"] = int(attacker["atk_base"] * (1 + stacks * 0.1))
+            # Heal 20% max HP
+            heal = int(attacker["hp_max"] * 0.2)
             attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal)
-            flags["mitama_healed"] = True
+            # Show message EVERY turn
             if is_team_battle:
-                messages.append(f"💖 **Mitama's blessing!** Team heals {heal} HP")
+                messages.append(f"⚔️ **{attacker['name']}'s ATK superiority!** Team ATK +{stacks * 10}%, heals {heal} HP")
             else:
-                messages.append(f"✨ **{attacker['name']}'s divine blessing!** Heals {heal} HP")
+                messages.append(f"⚔️ **{attacker['name']}'s ATK superiority!** ATK +{stacks * 10}%, heals {heal} HP")
     
-    elif ability_type == "first_attack_spd":  # Deale - First attack: +50% SPD
-        # For boss battles: apply on turn 1 if already done (flag set during initialization)
-        # For regular battles: apply on turn 1 if not done yet
-        should_apply = False
-        show_message = False
-        if mode == "bonus":
-            should_apply = (turn == 1 and flags.get("deale_boosted", False))
-        else:
-            should_apply = (turn == 1 and not flags.get("deale_boosted", False))
-            show_message = should_apply  # Only show message in direct mode
-        
-        if should_apply:
+    elif ability_id == "buff_def_heal":
+        # Check current DEF vs enemy current DEF
+        if attacker["def"] > defender["def"]:
+            stacks = flags.get("buff_def_heal_stacks", 0)
+            # Increment stacks first
+            stacks += 1
+            flags["buff_def_heal_stacks"] = stacks
+            # Apply bonus based on current stacks
             if mode == "bonus":
-                bonuses["spd"] += 0.5
+                bonuses["def"] += stacks * 0.1
             else:
-                attacker["spd"] = int(attacker["spd_base"] * 1.5)
-                flags["deale_boosted"] = True
-            if show_message:
-                messages.append(f"💨 **{attacker['name']}'s swift strike!** SPD +50%")
-    
-    elif ability_type == "heal_and_def":  # Jeanne - First attack: Heal 30% HP + 30% DEF
-        if turn == 1 and not flags.get("heal_and_def_used"):
-            heal_amount = int(attacker["hp_max"] * 0.3)
-            attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal_amount)
-            flags["heal_and_def_used"] = True
-            if is_team_battle:
-                messages.append(f"✨ **Jeanne's protection!** Team heals {heal_amount} HP, DEF +30%")
-            else:
-                messages.append(f"✨ **{attacker['name']} heals {heal_amount} HP and gains +30% DEF!**")
-        
-        # Apply DEF bonus every turn after activation (permanent)
-        if flags.get("heal_and_def_used"):
-            if mode == "bonus":
-                bonuses["def"] += 0.3
-            else:
-                if not flags.get("jeanne_def_boost"):
-                    flags["jeanne_def_boost"] = 1.3
-                attacker["def"] = int(attacker["def_base"] * flags.get("jeanne_def_boost", 1.3))
-    
-    # === TURN 3+ ACTIVATION ===
-    elif ability_type == "turn3_atk_boost":  # Kuu - After turn 3: +50% ATK
-        if turn >= 3:
-            if not flags.get("kuu_boosted"):
-                flags["kuu_boosted"] = True
-                if is_team_battle:
-                    messages.append(f"🔥 **Kuu's power awakens!** Team ATK +50%")
-                else:
-                    messages.append(f"🔥 **{attacker['name']}'s power awakens!** ATK +50%")
-            if mode == "bonus":
-                bonuses["atk"] += 0.5
-            else:
-                attacker["atk"] = int(attacker["atk_base"] * 1.5)
-    
-    elif ability_type == "turn3_heal":  # Himeyuri - Turn 3: Heal 50% HP
-        if turn == 3 and not flags.get("himeyuri_healed"):
-            heal = int(attacker["hp_max"] * 0.5)
+                # In direct mode, modify attacker's DEF based on stacks
+                attacker["def"] = int(attacker["def_base"] * (1 + stacks * 0.1))
+            # Heal 20% max HP
+            heal = int(attacker["hp_max"] * 0.2)
             attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal)
-            flags["himeyuri_healed"] = True
+            # Show message EVERY turn
             if is_team_battle:
-                messages.append(f"🌸 **Himeyuri's blessing!** Team heals {heal} HP")
+                messages.append(f"🛡️ **{attacker['name']}'s DEF superiority!** Team DEF +{stacks * 10}%, heals {heal} HP")
             else:
-                messages.append(f"🌸 **{attacker['name']}'s rejuvenation!** Heals {heal} HP")
+                messages.append(f"🛡️ **{attacker['name']}'s DEF superiority!** DEF +{stacks * 10}%, heals {heal} HP")
     
-    elif ability_type == "turn3_atk_def_boost":  # Kalisa - After turn 3: +20% ATK and DEF
-        if turn >= 3:
-            if not flags.get("kalisa_boosted"):
-                flags["kalisa_boosted"] = True
-                if is_team_battle:
-                    messages.append(f"✨ **Kalisa's power awakens!** Team ATK +20%, DEF +20%")
-                else:
-                    messages.append(f"✨ **{attacker['name']}'s power awakens!** ATK +20%, DEF +20%")
+    # === LOW HP CONDITIONAL (PER-TURN) ===
+    elif ability_id == "low_hp_buff_atk":
+        # Every turn if HP < 50%: +30% base ATK (stacks ONLY while HP < 50%)
+        if attacker["hp"] < attacker["hp_max"] * 0.5:
+            stacks = flags.get("low_hp_buff_atk_stacks", 0)
+            # Increment stacks first
+            stacks += 1
+            flags["low_hp_buff_atk_stacks"] = stacks
+            # Apply bonus based on current stacks
             if mode == "bonus":
-                bonuses["atk"] += 0.2
-                bonuses["def"] += 0.2
+                bonuses["atk"] += stacks * 0.3
             else:
-                attacker["atk"] = int(attacker["atk_base"] * 1.2)
-                attacker["def"] = int(attacker["def_base"] * 1.2)
-    
-    elif ability_type == "turn3_spd_boost":  # Terun - After turn 3: +100% SPD
-        if turn >= 3:
-            if not flags.get("terun_boosted"):
-                flags["terun_boosted"] = True
-                if is_team_battle:
-                    messages.append(f"💨 **Terun's speed unleashed!** Team SPD +100%")
-                else:
-                    messages.append(f"💨 **{attacker['name']}'s speed unleashed!** SPD +100%")
-            if mode == "bonus":
-                bonuses["spd"] += 1.0
-            else:
-                attacker["spd"] = int(attacker["spd_base"] * 2.0)
-    
-    # === LOW HP TRIGGERS ===
-    elif ability_type == "low_hp_def_boost":  # Emma - Low HP: +50% DEF
-        # Check if we need to activate the ability (only if HP < 50% and not yet activated)
-        if attacker["hp"] < (attacker["hp_max"] * 0.5) and not flags.get("low_hp_def_active"):
-            flags["low_hp_def_active"] = True
+                # In direct mode, modify attacker's ATK based on stacks
+                attacker["atk"] = int(attacker["atk_base"] * (1 + stacks * 0.3))
+            # Show message EVERY turn while active
             if is_team_battle:
-                messages.append(f"💚 **Emma's protection!** Team DEF +50%")
+                messages.append(f"⚔️ **Low HP rage!** Team ATK +{stacks * 30}% (stacks: {stacks})")
             else:
-                messages.append(f"💚 **{attacker['name']}'s low HP ability activates!** DEF +50%")
-        
-        # Apply the bonus ALWAYS if the ability is active (permanent)
-        if flags.get("low_hp_def_active"):
-            if mode == "bonus":
-                bonuses["def"] += 0.5
-            else:
-                attacker["def"] = int(attacker["def_base"] * 1.5)
+                messages.append(f"⚔️ **Low HP rage!** ATK +{stacks * 30}% (stacks: {stacks})")
+        else:
+            # HP is above 50%, reset stacks
+            if flags.get("low_hp_buff_atk_stacks", 0) > 0:
+                flags["low_hp_buff_atk_stacks"] = 0
+                if mode == "direct":
+                    attacker["atk"] = attacker["atk_base"]
+                    if is_team_battle:
+                        messages.append(f"⚔️ **{attacker['name']}'s rage subsides.** HP recovered.")
+                    else:
+                        messages.append(f"⚔️ **{attacker['name']}'s rage subsides.** HP recovered.")
     
-    elif ability_type == "low_hp_atk_boost":  # Bahamut - Low HP: +50% ATK
-        # Check if we need to activate the ability (only if HP < 50% and not yet activated)
-        if attacker["hp"] < (attacker["hp_max"] * 0.5) and not flags.get("bahamut_active"):
-            flags["bahamut_active"] = True
+    elif ability_id == "low_hp_buff_def":
+        # Every turn if HP < 50%: +30% base DEF (stacks ONLY while HP < 50%)
+        if attacker["hp"] < attacker["hp_max"] * 0.5:
+            stacks = flags.get("low_hp_buff_def_stacks", 0)
+            # Increment stacks first
+            stacks += 1
+            flags["low_hp_buff_def_stacks"] = stacks
+            # Apply bonus based on current stacks
+            if mode == "bonus":
+                bonuses["def"] += stacks * 0.3
+            else:
+                # In direct mode, modify attacker's DEF based on stacks
+                attacker["def"] = int(attacker["def_base"] * (1 + stacks * 0.3))
+            # Show message EVERY turn while active
             if is_team_battle:
-                messages.append(f"⚡ **Bahamut's fury!** Team ATK +50%")
+                messages.append(f"🛡️ **Low HP defense!** Team DEF +{stacks * 30}% (stacks: {stacks})")
             else:
-                messages.append(f"⚡ **{attacker['name']}'s fury awakens!** ATK +50%")
-        
-        # Apply the bonus ALWAYS if the ability is active (permanent)
-        if flags.get("bahamut_active"):
-            if mode == "bonus":
-                bonuses["atk"] += 0.5
-            else:
-                attacker["atk"] = int(attacker["atk_base"] * 1.5)
+                messages.append(f"🛡️ **Low HP defense!** DEF +{stacks * 30}% (stacks: {stacks})")
+        else:
+            # HP is above 50%, reset stacks
+            if flags.get("low_hp_buff_def_stacks", 0) > 0:
+                flags["low_hp_buff_def_stacks"] = 0
+                if mode == "direct":
+                    attacker["def"] = attacker["def_base"]
+                    if is_team_battle:
+                        messages.append(f"🛡️ **{attacker['name']}'s defense normalizes.** HP recovered.")
+                    else:
+                        messages.append(f"🛡️ **{attacker['name']}'s defense normalizes.** HP recovered.")
     
-    elif ability_type == "lifesteal":  # Yukimura - Low HP: Lifesteal activation
-        if attacker["hp"] < (attacker["hp_max"] * 0.5) and not flags.get("lifesteal_active"):
+    elif ability_id == "heal":
+        # Every turn if HP < 50%: heal 20% max HP
+        if attacker["hp"] < attacker["hp_max"] * 0.5:
+            heal = int(attacker["hp_max"] * 0.2)
+            attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal)
+            # Show message every time healing occurs
+            messages.append(f"💖 **Healing aura!** {attacker['name']} heals {heal} HP")
+    
+    elif ability_id == "lifesteal":
+        # Once HP drops below 50%, activate lifesteal permanently
+        if attacker["hp"] < attacker["hp_max"] * 0.5 and not flags.get("lifesteal_active", False):
             flags["lifesteal_active"] = True
-            if is_team_battle:
-                messages.append(f"🩸 **Yukimura's lifesteal activated!**")
-            else:
-                messages.append(f"🩸 **{attacker['name']}'s lifesteal awakens!** Heals 50% of damage dealt")
+            messages.append(f"🩸 **Lifesteal activated!** {attacker['name']} will heal from damage dealt")
     
-    elif ability_type == "low_hp_big_heal":  # Windy - Low HP: One-time 50% heal
-        if attacker["hp"] < (attacker["hp_max"] * 0.5) and not flags.get("windy_healed"):
-            heal = int(attacker["hp_max"] * 0.5)
-            attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal)
-            flags["windy_healed"] = True
-            if is_team_battle:
-                messages.append(f"🌬️ **Windy's emergency heal!** +{heal} HP")
-            else:
-                messages.append(f"🌬️ **{attacker['name']}'s emergency heal!** Heals {heal} HP")
+    # === ON-ATTACK (CRITICAL) ===
+    elif ability_id == "critical":
+        # Critical is handled in damage calculation (25% chance for +50% damage)
+        pass
     
-    elif ability_type == "low_hp_spd_boost":  # Nobunaga - Low HP: +50% SPD
-        # Check if we need to activate the ability (only if HP < 50% and not yet activated)
-        if attacker["hp"] < (attacker["hp_max"] * 0.5) and not flags.get("nobunaga_active"):
-            flags["nobunaga_active"] = True
-            if is_team_battle:
-                messages.append(f"⚡ **Nobunaga's speed!** Team SPD +50%")
-            else:
-                messages.append(f"⚡ **{attacker['name']}'s speed surge!** SPD +50%")
-        
-        # Apply the bonus ALWAYS if the ability is active (permanent)
-        if flags.get("nobunaga_active"):
-            if mode == "bonus":
-                bonuses["spd"] += 0.5
-            else:
-                attacker["spd"] = int(attacker["spd_base"] * 1.5)
+    # === FIRST-ATTACK EFFECT (PARALYZE) ===
+    elif ability_id == "paralyze":
+        # Paralyze is handled in battle logic (first attack paralyzes for 3 turns)
+        pass
     
-    elif ability_type == "low_hp_def_stack":  # Rei - Every turn if HP < 50%: +30% DEF (stacks, permanent)
-        # Stack when HP < 50% (new stack each turn below threshold)
-        if attacker["hp"] < (attacker["hp_max"] * 0.5):
-            flags["rei_stacks"] = flags.get("rei_stacks", 0) + 1
-            if is_team_battle:
-                messages.append(f"🛡️ **Rei's resolve!** Team DEF +{flags['rei_stacks'] * 30}%")
-            else:
-                messages.append(f"🛡️ **{attacker['name']}'s resolve strengthens!** DEF +{flags['rei_stacks'] * 30}%")
-        
-        # Apply bonus ALWAYS if stacks exist (permanent, like Bahamut)
-        if flags.get("rei_stacks", 0) > 0:
-            if mode == "bonus":
-                bonuses["def"] += 0.3 * flags["rei_stacks"]
-            else:
-                attacker["def"] = int(attacker["def_base"] * (1 + 0.3 * flags["rei_stacks"]))
+    # === PASSIVE (SURVIVE) ===
+    elif ability_id == "survive":
+        # Survive is handled in damage calculation (survive once with 1 HP)
+        pass
     
-    elif ability_type == "low_hp_atk_stack":  # Paipai - Every turn if HP < 50%: +30% ATK (stacks, permanent)
-        # Stack when HP < 50% (new stack each turn below threshold)
-        if attacker["hp"] < (attacker["hp_max"] * 0.5):
-            flags["paipai_stacks"] = flags.get("paipai_stacks", 0) + 1
-            if is_team_battle:
-                messages.append(f"⚔️ **Paipai's fury!** Team ATK +{flags['paipai_stacks'] * 30}%")
-            else:
-                messages.append(f"⚔️ **{attacker['name']}'s fury grows!** ATK +{flags['paipai_stacks'] * 30}%")
-        
-        # Apply bonus ALWAYS if stacks exist (permanent, like Bahamut)
-        if flags.get("paipai_stacks", 0) > 0:
-            if mode == "bonus":
-                bonuses["atk"] += 0.3 * flags["paipai_stacks"]
-            else:
-                attacker["atk"] = int(attacker["atk_base"] * (1 + 0.3 * flags["paipai_stacks"]))
-    
-    # === SCALING ABILITIES ===
-    elif ability_type == "def_boost_and_heal":  # Kasli - DEF comparison with stacking
-        if attacker["def"] > defender["def"]:
-            flags["kasli_stacks"] = flags.get("kasli_stacks", 0) + 1
-            if mode == "bonus":
-                bonuses["def"] += 0.2 * flags["kasli_stacks"]
-            else:
-                attacker["def"] = int(attacker["def_base"] * (1 + 0.2 * flags["kasli_stacks"]))
-            heal = int(attacker["hp_max"] * 0.2)
-            attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal)
-            if is_team_battle:
-                messages.append(f"🛡️ **Kasli's dominance!** DEF +{flags['kasli_stacks'] * 20}%, heals {heal}")
-            else:
-                messages.append(f"🛡️ **{attacker['name']}'s DEF dominance!** DEF +{flags['kasli_stacks'] * 20}% and heals {heal} HP")
-    
-    elif ability_type == "atk_boost_and_heal":  # Izanagi - ATK comparison with stacking
-        if attacker["atk"] > defender["atk"]:
-            flags["izanagi_stacks"] = flags.get("izanagi_stacks", 0) + 1
-            if mode == "bonus":
-                bonuses["atk"] += 0.2 * flags["izanagi_stacks"]
-            else:
-                attacker["atk"] = int(attacker["atk_base"] * (1 + 0.2 * flags["izanagi_stacks"]))
-            heal = int(attacker["hp_max"] * 0.2)
-            attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal)
-            if is_team_battle:
-                messages.append(f"⚔️ **Izanagi's power!** ATK +{flags['izanagi_stacks'] * 20}%, heals {heal}")
-            else:
-                messages.append(f"⚔️ **{attacker['name']}'s ATK dominance!** ATK +{flags['izanagi_stacks'] * 20}% and heals {heal} HP")
-    
-    elif ability_type == "atk_heal":  # Aphrodite - If ATK > enemy ATK, heal 30%
-        if attacker["atk"] > defender["atk"]:
-            heal = int(attacker["hp_max"] * 0.3)
-            attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal)
-            if is_team_battle:
-                messages.append(f"💖 **Aphrodite's blessing!** Team heals {heal} HP")
-            else:
-                messages.append(f"💖 **{attacker['name']}'s ATK dominance!** Heals {heal} HP")
-    
-    elif ability_type == "def_heal":  # Goddess - If DEF > enemy DEF, heal 30%
-        if attacker["def"] > defender["def"]:
-            heal = int(attacker["hp_max"] * 0.3)
-            attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal)
-            if is_team_battle:
-                messages.append(f"💖 **Goddess's blessing!** Team heals {heal} HP")
-            else:
-                messages.append(f"💖 **{attacker['name']}'s DEF dominance!** Heals {heal} HP")
-    
-    # === RAMPAGE/STACKING ABILITIES ===
-    elif ability_type == "rampage":  # Balrog - +20% ATK per turn
-        flags["balrog_stacks"] = flags.get("balrog_stacks", 0) + 1
-        if mode == "bonus":
-            bonuses["atk"] += 0.2 * flags["balrog_stacks"]
-        else:
-            attacker["atk"] = int(attacker["atk_base"] * (1 + 0.2 * flags["balrog_stacks"]))
-        if is_team_battle:
-            messages.append(f"🔥 **Balrog's rage!** Team ATK +{flags['balrog_stacks'] * 20}%")
-        else:
-            if flags["balrog_stacks"] == 1:
-                messages.append(f"🔥 **{attacker['name']}'s rage grows!** ATK +20% (Total: +{flags['balrog_stacks'] * 20}%)")
-            else:
-                messages.append(f"🔥 **{attacker['name']}'s rage intensifies!** ATK +20% (Total: +{flags['balrog_stacks'] * 20}%)")
-    
-    elif ability_type == "spd_rampage":  # Trixi - +20% SPD per turn
-        flags["trixi_stacks"] = flags.get("trixi_stacks", 0) + 1
-        if mode == "bonus":
-            bonuses["spd"] += 0.2 * flags["trixi_stacks"]
-        else:
-            attacker["spd"] = int(attacker["spd_base"] * (1 + 0.2 * flags["trixi_stacks"]))
-        if is_team_battle:
-            messages.append(f"💨 **Trixi's speed surge!** Team SPD +{flags['trixi_stacks'] * 20}%")
-        else:
-            messages.append(f"💨 **{attacker['name']}'s speed increases!** SPD +{flags['trixi_stacks'] * 20}%")
-    
-    # === SPECIAL DAMAGE/PASSIVE ABILITIES ===
-    # These are handled separately in damage calculation, but we track activation
-    elif ability_type == "turn3_bonus_damage":  # Sidmi - After turn 3: +50% bonus damage
-        if turn >= 3:
-            if not flags.get("sidmi_active"):
-                flags["sidmi_active"] = True
-            # DESIGN DECISION: Show message every turn from turn 3 onwards (to indicate bonus is active)
-            # This matches the behavior of Lunacia's speed_bonus which displays a message every turn
-            if is_team_battle:
-                messages.append(f"💥 **Sidmi's power!** +50% bonus damage")
-            else:
-                messages.append(f"💥 **{attacker['name']}'s true power!** +50% bonus damage")
-    
-    # === ANTI-ALIEN ABILITIES ===
-    # These are activated at initialization AND reapplied every turn in the loop
-    # to ensure buffs are always active
-    elif ability_type == "alien_def_spd_boost":  # Luminalia - If enemy is ALIEN: +50% DEF and SPD
-        enemy_type = defender.get("type", None)
-        if enemy_type == "ALIEN":
-            if mode == "bonus":
-                bonuses["def"] += 0.5
-                bonuses["spd"] += 0.5
-            # Message shown only once at initialization
-    
-    elif ability_type == "alien_atk_def_boost":  # Lilin - If enemy is ALIEN: +50% ATK and DEF
-        enemy_type = defender.get("type", None)
-        if enemy_type == "ALIEN":
-            if mode == "bonus":
-                bonuses["atk"] += 0.5
-                bonuses["def"] += 0.5
-            # Message shown only once at initialization
-    
-    elif ability_type == "alien_spd_boost":  # Jack - If enemy is ALIEN: +100% SPD
-        enemy_type = defender.get("type", None)
-        if enemy_type == "ALIEN":
-            if mode == "bonus":
-                bonuses["spd"] += 1.0
-            # Message shown only once at initialization
-    
-    # Note: speed_bonus, survive, and paralyze are handled in their respective sections
-    # (damage calculation, defender death, first attack) and don't need stat modifications here
+    # === PASSIVE (SHIELD_BREAKER) ===
+    elif ability_id == "shield_breaker":
+        # Shield breaker is handled at battle start
+        pass
     
     return {"messages": messages, "bonuses": bonuses}
 
@@ -2621,231 +2737,100 @@ async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user
             "def": def_,
             "spd_base": spd,
             "spd": spd,
-            "ability_type": card.get("ability_type", ""),
-            "ability": card.get("ability", ""),
+            "ability_id": card.get("ability_id", ""),
+            "target_types": card.get("target_types", []),
             "image": card.get("image", ""),
             "rarity": card.get("rarity", "Enemy"),
-            "level": lvl
+            "level": lvl,
+            "enemy_type": card.get("enemy_type", "NONE")
         }
     
     p1 = calc_player_stats(player1_card)
     p2 = calc_player_stats(player2_card)
     
-    # FALLBACK: if ability_type doesn't exist (old cards), determine from id
-    for p, card in [(p1, player1_card), (p2, player2_card)]:
-        if not p["ability_type"]:
-            char_id = card.get("id", "")
-            if char_id == "kai":
-                p["ability_type"] = "first_turn_def"
-            elif char_id == "valkyrie":
-                p["ability_type"] = "first_turn_spd"
-            elif char_id == "shishilan_pasalan":
-                p["ability_type"] = "first_turn_atk"
-            elif char_id == "kasli":
-                p["ability_type"] = "def_boost_and_heal"
-            elif char_id == "emma":
-                p["ability_type"] = "low_hp_def_boost"
-            elif char_id == "thundia":
-                p["ability_type"] = "paralyze"
-            elif char_id == "jeanne":
-                p["ability_type"] = "heal_and_def"
-            elif char_id == "balrog":
-                p["ability_type"] = "rampage"
-            elif char_id == "verbena":
-                p["ability_type"] = "survive"
-            elif char_id == "lunacia":
-                p["ability_type"] = "speed_bonus"
-            elif char_id == "bahamut":
-                p["ability_type"] = "low_hp_atk_boost"
-            elif char_id == "yukimura":
-                p["ability_type"] = "lifesteal"
-            elif char_id == "ruri":
-                p["ability_type"] = "def_boost_3turns"
-            elif char_id == "windy":
-                p["ability_type"] = "low_hp_big_heal"
-            elif char_id == "nobunaga":
-                p["ability_type"] = "low_hp_spd_boost"
-            elif char_id == "izanagi":
-                p["ability_type"] = "atk_boost_and_heal"
-            elif char_id == "luminalia":
-                p["ability_type"] = "spd_boost_3turns"
-            elif char_id == "kalisa":
-                p["ability_type"] = "turn3_atk_def_boost"
-            elif char_id == "trixi":
-                p["ability_type"] = "spd_rampage"
-            elif char_id == "sidmi":
-                p["ability_type"] = "turn3_bonus_damage"
-            elif char_id == "terun":
-                p["ability_type"] = "turn3_spd_boost"
-            elif char_id == "black_cat":
-                p["ability_type"] = "first_turn_atk_def"
-            elif char_id == "aphrodite":
-                p["ability_type"] = "atk_heal"
-            elif char_id == "goddess":
-                p["ability_type"] = "def_heal"
-            elif char_id == "rei":
-                p["ability_type"] = "low_hp_def_stack"
-            elif char_id == "paipai":
-                p["ability_type"] = "low_hp_atk_stack"
+    # Check if abilities are active based on enemy type
+    p1_ability_active = check_ability_active(player1_card, p2)
+    p2_ability_active = check_ability_active(player2_card, p1) if is_pvp else False
     
     # Initialize ability flags for player 1
     p1_flags = {
         "buff_applied": False,
-        "passive_damage_boost": False,
-        "low_hp_def_active": False,
+        "dodge_used": False,
+        "dodge_active": False,
         "paralyze_turns": 0,
-        "heal_and_def_used": False,
-        "jeanne_def_boost": 1.0,
-        "balrog_stacks": 0,
-        "verbena_survived": False,
-        "bahamut_active": False,
+        "paralyze_applied": False,
+        "survive_used": False,
         "lifesteal_active": False,
-        "ruri_turns": 0,
-        "windy_healed": False,
-        "nobunaga_active": False,
-        "sakura_turns": 0,
-        "mitama_healed": False,
-        "deale_boosted": False,
-        "kuu_boosted": False,
-        "himeyuri_healed": False,
-        "kasli_stacks": 0,
-        "izanagi_stacks": 0,
-        "kalisa_boosted": False,
-        "trixi_stacks": 0,
+        "rampage_atk_stacks": 0,
+        "rampage_spd_stacks": 0,
+        "low_hp_buff_atk_stacks": 0,
+        "low_hp_buff_def_stacks": 0,
+        "buff_atk_heal_stacks": 0,
+        "buff_def_heal_stacks": 0,
+        "first_attack_heal_done": False,
+        "first_attack_spd_done": False,
+        "heal_and_def_done": False,
         "sidmi_active": False,
-        "terun_boosted": False,
-        "black_cat_buffed": False,
-        "rei_stacks": 0,
-        "paipai_stacks": 0,
-        "luminalia_alien_boost": False,
-        "lilin_alien_boost": False,
-        "jack_alien_boost": False,
+        "team_paralyzed_turns": 0,
+        "titan_paralyzed": False,
+        "shield_turns": 3 if p1.get("enemy_type") == "ALIEN" else 0,  # ALIEN shield
+        "shield_broken": False
     }
     
     # Initialize ability flags for player 2
     p2_flags = {
         "buff_applied": False,
-        "passive_damage_boost": False,
-        "low_hp_def_active": False,
+        "dodge_used": False,
+        "dodge_active": False,
         "paralyze_turns": 0,
-        "heal_and_def_used": False,
-        "jeanne_def_boost": 1.0,
-        "balrog_stacks": 0,
-        "verbena_survived": False,
-        "bahamut_active": False,
+        "paralyze_applied": False,
+        "survive_used": False,
         "lifesteal_active": False,
-        "ruri_turns": 0,
-        "windy_healed": False,
-        "nobunaga_active": False,
-        "sakura_turns": 0,
-        "mitama_healed": False,
-        "deale_boosted": False,
-        "kuu_boosted": False,
-        "himeyuri_healed": False,
-        "kasli_stacks": 0,
-        "izanagi_stacks": 0,
-        "kalisa_boosted": False,
-        "trixi_stacks": 0,
+        "rampage_atk_stacks": 0,
+        "rampage_spd_stacks": 0,
+        "low_hp_buff_atk_stacks": 0,
+        "low_hp_buff_def_stacks": 0,
+        "buff_atk_heal_stacks": 0,
+        "buff_def_heal_stacks": 0,
+        "first_attack_heal_done": False,
+        "first_attack_spd_done": False,
+        "heal_and_def_done": False,
         "sidmi_active": False,
-        "terun_boosted": False,
-        "black_cat_buffed": False,
-        "rei_stacks": 0,
-        "paipai_stacks": 0,
-        "luminalia_alien_boost": False,
-        "lilin_alien_boost": False,
-        "jack_alien_boost": False,
+        "team_paralyzed_turns": 0,
+        "titan_paralyzed": False,
+        "shield_turns": 3 if p2.get("enemy_type") == "ALIEN" else 0,  # ALIEN shield
+        "shield_broken": False
     }
     
     ability_text = ""
     
-    # Apply passive and first-turn abilities for player 1 (initialization)
-    if p1["ability_type"] == "def_boost_3turns":  # Ruri
-        p1_flags["ruri_turns"] = 3
-        p1["def"] = int(p1["def_base"] * 1.5)
-        ability_text = f"✨ {p1['name']}'s ability activates!\n**{p1.get('ability', '')}**"
-    elif p1["ability_type"] == "spd_boost_3turns":  # Luminalia
-        p1_flags["sakura_turns"] = 3
-        p1["spd"] = int(p1["spd_base"] * 1.5)
-        ability_text = f"✨ {p1['name']}'s ability activates!\n**{p1.get('ability', '')}**"
-    elif p1["ability_type"] == "speed_bonus":  # Lunacia
-        ability_text = f"✨ {p1['name']}'s ability is ready!\n**{p1.get('ability', '')}**"
-    elif p1["ability_type"] == "rampage":  # Balrog
-        ability_text = f"✨ {p1['name']}'s ability is ready!\n**{p1.get('ability', '')}**"
-    elif p1["ability_type"] == "first_turn_def":  # Kai
-        p1["def"] = int(p1["def_base"] * 2)
-        p1_flags["buff_applied"] = True
-        ability_text = f"✨ {p1['name']}'s ability activates!\n**{p1.get('ability', '')}**"
-    elif p1["ability_type"] == "first_turn_spd":  # Valkyrie
-        p1["spd"] = int(p1["spd_base"] * 2)
-        p1_flags["buff_applied"] = True
-        ability_text = f"✨ {p1['name']}'s ability activates!\n**{p1.get('ability', '')}**"
-    elif p1["ability_type"] == "first_turn_atk":  # Shishilan
-        p1["atk"] = int(p1["atk_base"] * 1.5)
-        p1_flags["buff_applied"] = True
-        ability_text = f"✨ {p1['name']}'s ability activates!\n**{p1.get('ability', '')}**"
-    elif p1["ability_type"] == "first_turn_atk_def":  # Black Cat
-        p1["atk"] = int(p1["atk_base"] * 1.2)
-        p1["def"] = int(p1["def_base"] * 1.2)
-        p1_flags["black_cat_buffed"] = True
-        ability_text = f"✨ {p1['name']}'s ability activates!\n**{p1.get('ability', '')}**"
+    # Build ability text from ABILITIES dict for player 1
+    if p1_ability_active and p1["ability_id"]:
+        ability_info = ABILITIES.get(p1["ability_id"], {})
+        emoji = ability_info.get("emoji", "✨")
+        desc = ability_info.get("description", "")
+        ability_text = f"{emoji} {p1['name']}'s ability: {desc}"
     
-    # Apply passive and first-turn abilities for player 2 (only in PvP)
-    if is_pvp:
-        if p2["ability_type"] == "def_boost_3turns":  # Ruri
-            p2_flags["ruri_turns"] = 3
-            p2["def"] = int(p2["def_base"] * 1.5)
-            if ability_text:
-                ability_text += f"\n✨ {p2['name']}'s ability activates!\n**{p2.get('ability', '')}**"
-            else:
-                ability_text = f"✨ {p2['name']}'s ability activates!\n**{p2.get('ability', '')}**"
-        elif p2["ability_type"] == "spd_boost_3turns":  # Luminalia
-            p2_flags["sakura_turns"] = 3
-            p2["spd"] = int(p2["spd_base"] * 1.5)
-            if ability_text:
-                ability_text += f"\n✨ {p2['name']}'s ability activates!\n**{p2.get('ability', '')}**"
-            else:
-                ability_text = f"✨ {p2['name']}'s ability activates!\n**{p2.get('ability', '')}**"
-        elif p2["ability_type"] == "speed_bonus":  # Lunacia
-            if ability_text:
-                ability_text += f"\n✨ {p2['name']}'s ability is ready!\n**{p2.get('ability', '')}**"
-            else:
-                ability_text = f"✨ {p2['name']}'s ability is ready!\n**{p2.get('ability', '')}**"
-        elif p2["ability_type"] == "rampage":  # Balrog
-            if ability_text:
-                ability_text += f"\n✨ {p2['name']}'s ability is ready!\n**{p2.get('ability', '')}**"
-            else:
-                ability_text = f"✨ {p2['name']}'s ability is ready!\n**{p2.get('ability', '')}**"
-        elif p2["ability_type"] == "first_turn_def":  # Kai
-            p2["def"] = int(p2["def_base"] * 2)
-            p2_flags["buff_applied"] = True
-            if ability_text:
-                ability_text += f"\n✨ {p2['name']}'s ability activates!\n**{p2.get('ability', '')}**"
-            else:
-                ability_text = f"✨ {p2['name']}'s ability activates!\n**{p2.get('ability', '')}**"
-        elif p2["ability_type"] == "first_turn_spd":  # Valkyrie
-            p2["spd"] = int(p2["spd_base"] * 2)
-            p2_flags["buff_applied"] = True
-            if ability_text:
-                ability_text += f"\n✨ {p2['name']}'s ability activates!\n**{p2.get('ability', '')}**"
-            else:
-                ability_text = f"✨ {p2['name']}'s ability activates!\n**{p2.get('ability', '')}**"
-        elif p2["ability_type"] == "first_turn_atk":  # Shishilan
-            p2["atk"] = int(p2["atk_base"] * 1.5)
-            p2_flags["buff_applied"] = True
-            if ability_text:
-                ability_text += f"\n✨ {p2['name']}'s ability activates!\n**{p2.get('ability', '')}**"
-            else:
-                ability_text = f"✨ {p2['name']}'s ability activates!\n**{p2.get('ability', '')}**"
-        elif p2["ability_type"] == "first_turn_atk_def":  # Black Cat
-            p2["atk"] = int(p2["atk_base"] * 1.2)
-            p2["def"] = int(p2["def_base"] * 1.2)
-            p2_flags["black_cat_buffed"] = True
-            if ability_text:
-                ability_text += f"\n✨ {p2['name']}'s ability activates!\n**{p2.get('ability', '')}**"
-            else:
-                ability_text = f"✨ {p2['name']}'s ability activates!\n**{p2.get('ability', '')}**"
+    # Build ability text from ABILITIES dict for player 2 (only in PvP)
+    if is_pvp and p2_ability_active and p2["ability_id"]:
+        ability_info = ABILITIES.get(p2["ability_id"], {})
+        emoji = ability_info.get("emoji", "✨")
+        desc = ability_info.get("description", "")
+        if ability_text:
+            ability_text += f"\n{emoji} {p2['name']}'s ability: {desc}"
+        else:
+            ability_text = f"{emoji} {p2['name']}'s ability: {desc}"
     
-    # Determine turn order based on speed (after first-turn speed buffs)
+    # Add ALIEN shield message
+    if p1_flags["shield_turns"] > 0:
+        shield_msg = f"🛡️ **{p1['name']} has ALIEN SHIELD!** Blocks attacks for {p1_flags['shield_turns']} turns"
+        ability_text = (ability_text + "\n" + shield_msg) if ability_text else shield_msg
+    
+    if p2_flags["shield_turns"] > 0:
+        shield_msg = f"🛡️ **{p2['name']} has ALIEN SHIELD!** Blocks attacks for {p2_flags['shield_turns']} turns"
+        ability_text = (ability_text + "\n" + shield_msg) if ability_text else shield_msg
+    
+    # Determine turn order based on speed
     first_striker = None
     if p1["spd"] > p2["spd"]:
         turn_order = ["p1", "p2"]
@@ -2957,16 +2942,11 @@ async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user
             if attacker["hp"] <= 0 or defender["hp"] <= 0:
                 break
             
-            # Check if attacker is paralyzed
-            if attacker_flags["paralyze_turns"] > 0:
-                attacker_flags["paralyze_turns"] -= 1
-                round_log.append(f"⚡ **{attacker['name']} is paralyzed! Cannot attack.** ({attacker_flags['paralyze_turns']} turns left)")
-                continue
-            
-            # Apply abilities - only for players with abilities (not enemies in PvE)
-            if (not is_enemy or is_pvp):
+            # Apply abilities FIRST (passive abilities work even when paralyzed)
+            # Only for players with abilities (not enemies in PvE) and if ability is active
+            if (not is_enemy or is_pvp) and (is_enemy == False and p1_ability_active or is_enemy and is_pvp and p2_ability_active):
                 result = apply_ability(
-                    attacker["ability_type"],
+                    attacker["ability_id"],
                     attacker,
                     defender,
                     attacker_flags,
@@ -2975,25 +2955,63 @@ async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user
                 )
                 round_log.extend(result["messages"])
             
+            # Check if attacker is paralyzed (blocks attack but not passive abilities)
+            if attacker_flags["paralyze_turns"] > 0:
+                attacker_flags["paralyze_turns"] -= 1
+                round_log.append(f"⚡ **{attacker['name']} is paralyzed! Cannot attack.** ({attacker_flags['paralyze_turns']} turns left)")
+                continue
+            
             # Calculate damage
             base_dmg = damage_formula(attacker["atk"], defender["def"])
-            
-            # Apply attacker's damage modifiers (only if they have abilities)
             dmg = base_dmg
-            if (not is_enemy or is_pvp):
-                # Lunacia's speed bonus
-                if attacker["ability_type"] == "speed_bonus" and attacker["spd"] > defender["spd"]:
-                    bonus_dmg = int(attacker["atk"] * 0.5)
-                    dmg += bonus_dmg
-                    round_log.append(f"💨 **{attacker['name']}'s speed advantage!** +{bonus_dmg} bonus damage!")
-                
-                # Sidmi's bonus damage (after turn 3)
-                if attacker_flags.get("sidmi_active", False):
-                    bonus = int(attacker["atk"] * 0.5)
-                    dmg += bonus
             
-            # Deal damage
-            defender["hp"] -= dmg
+            # BUG 8 FIX: Check if defender has dodge active
+            if defender_flags.get("dodge_active", False):
+                dmg = 0
+                round_log.append(f"💨 **{defender['name']} dodges the attack!**")
+                defender_flags["dodge_active"] = False
+                defender_flags["dodge_used"] = True
+            else:
+                # BUG 5 FIX: Check for critical hit (attacker only)
+                attacker_ability = attacker.get("ability_id", "")
+                attacker_ability_active = (not is_enemy and p1_ability_active) or (is_enemy and is_pvp and p2_ability_active)
+                if attacker_ability_active and attacker_ability == "critical":
+                    if random.random() < 0.25:  # 25% chance
+                        dmg = int(dmg * 1.5)
+                        round_log.append(f"💥 **CRITICAL HIT!** {attacker['name']} deals 50% more damage!")
+                
+                # BUG 6 FIX: Apply paralyze on first attack (if attacker has paralyze ability)
+                if attacker_ability_active and attacker_ability == "paralyze" and not attacker_flags.get("paralyze_applied", False):
+                    defender_flags["paralyze_turns"] = 3
+                    attacker_flags["paralyze_applied"] = True
+                    round_log.append(f"⚡ **{attacker['name']} paralyzes {defender['name']} for 3 turns!**")
+            
+            # === ALIEN SHIELD SYSTEM ===
+            # Check if attacker has shield_breaker and defender has shield
+            if attacker_ability_active and attacker_ability == "shield_breaker":
+                if defender_flags["shield_turns"] > 0 and not defender_flags["shield_broken"]:
+                    defender_flags["shield_turns"] = 0
+                    defender_flags["shield_broken"] = True
+                    round_log.append(f"🔨 **{attacker['name']} breaks the shield!** {defender['name']}'s ALIEN shield destroyed!")
+            
+            # Check if defender's shield blocks the attack
+            shield_blocked = False
+            if defender_flags["shield_turns"] > 0:
+                shield_blocked = True
+                round_log.append(f"🛡️ **{defender['name']}'s ALIEN SHIELD blocks the attack!** ({defender_flags['shield_turns']} turns left)")
+            
+            # Deal damage (only if not blocked by shield)
+            if not shield_blocked:
+                defender["hp"] -= dmg
+            
+            # BUG 7 FIX: Check for survive ability (defender only)
+            defender_ability = defender.get("ability_id", "")
+            defender_ability_active = (actor == "p1" and p2_ability_active) or (actor == "p2" and p1_ability_active)
+            if defender_ability_active and defender_ability == "survive" and defender["hp"] <= 0 and not defender_flags.get("survive_used", False):
+                defender["hp"] = 1
+                defender_flags["survive_used"] = True
+                round_log.append(f"✨ **{defender['name']} survives with 1 HP!**")
+            
             defender["hp"] = max(0, defender["hp"])
             
             if is_enemy and not is_pvp:
@@ -3009,21 +3027,6 @@ async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user
                 heal_amount = int(dmg * 0.5)
                 attacker["hp"] = min(attacker["hp_max"], attacker["hp"] + heal_amount)
                 round_log.append(f"🩸 **{attacker['name']} drains life!** +{heal_amount} HP restored")
-            
-            # Verbena survive (only for defenders with abilities)
-            if defender["hp"] <= 0:
-                if (actor == "p2" and not is_pvp):  # Enemy defending in PvE - no survive
-                    pass
-                elif (actor == "p1" and not is_pvp) or is_pvp:  # Player or PvP
-                    if defender["ability_type"] == "survive" and not defender_flags["verbena_survived"]:
-                        defender["hp"] = 1
-                        defender_flags["verbena_survived"] = True
-                        round_log.append(f"💫 **{defender['name']} refuses to fall!** Survived with 1 HP!")
-            
-            # Thundia paralyze (first attack only, only for attackers with abilities)
-            if (not is_enemy or is_pvp) and attacker["ability_type"] == "paralyze" and current_round == 1:
-                defender_flags["paralyze_turns"] = 2
-                round_log.append(f"⚡ **{defender['name']} is paralyzed for 2 turns!**")
             
             # Update embed
             if is_pvp:
@@ -3073,29 +3076,19 @@ async def run_battle(ctx, player1_card, player2_card, player1_user, player2_user
             await message.edit(embed=embed)
             await asyncio.sleep(1.5)
             
-            # Reset first-turn buffs after first action
-            if attacker_flags["buff_applied"]:
-                attacker["atk"] = attacker["atk_base"]
-                attacker["def"] = attacker["def_base"]
-                attacker["spd"] = attacker["spd_base"]
-                attacker_flags["buff_applied"] = False
-            
             if defender["hp"] <= 0:
                 break
-            
-            # Ruri's DEF boost countdown
-            if (not is_enemy or is_pvp) and attacker["ability_type"] == "def_boost_3turns" and attacker_flags["ruri_turns"] > 0:
-                attacker_flags["ruri_turns"] -= 1
-                if attacker_flags["ruri_turns"] == 0:
-                    attacker["def"] = attacker["def_base"]
-                    # Note: DEF boost expiration message will show in next round
-            
-            # Luminalia's SPD boost countdown
-            if (not is_enemy or is_pvp) and attacker["ability_type"] == "spd_boost_3turns" and attacker_flags["sakura_turns"] > 0:
-                attacker_flags["sakura_turns"] -= 1
-                if attacker_flags["sakura_turns"] == 0:
-                    attacker["spd"] = attacker["spd_base"]
-                    round_log.append(f"💨 **{attacker['name']}'s SPD boost expired.**")
+        
+        # Decrement ALIEN shields at the end of each round
+        if p1_flags["shield_turns"] > 0:
+            p1_flags["shield_turns"] -= 1
+            if p1_flags["shield_turns"] == 0:
+                round_log.append(f"🛡️ {p1['name']}'s ALIEN shield expired!")
+        
+        if p2_flags["shield_turns"] > 0:
+            p2_flags["shield_turns"] -= 1
+            if p2_flags["shield_turns"] == 0:
+                round_log.append(f"🛡️ {p2['name']}'s ALIEN shield expired!")
     
     # Return battle result
     winner = 0
@@ -3308,14 +3301,11 @@ async def team_cmd(ctx, action: str = None, *args):
     
     sorted_inv = sort_inventory(inv)
     
-    # Helper function to get ability type from card (with fallback to CHARACTERS)
-    def get_ability_type(card):
-        if card.get("ability_type"):
-            return card["ability_type"]
-        # Fallback: look up from CHARACTERS
+    # Helper function to get ability id from card
+    def get_ability_id(card):
         base = CHARACTERS_BY_ID.get(card.get("id"))
-        if base and base.get("ability_type"):
-            return base["ability_type"]
+        if base:
+            return base.get("ability_id", "")
         return ""
     
     # Helper function to calculate combined stats
@@ -3430,14 +3420,13 @@ async def team_cmd(ctx, action: str = None, *args):
             team_display = []
             abilities_list = []
             for i, c in enumerate(team_cards, 1):
-                ability_type = get_ability_type(c)
-                ability_name = c.get("ability", "")
-                if not ability_name:
-                    base = CHARACTERS_BY_ID.get(c.get("id"))
-                    if base:
-                        ability_name = base.get("ability", "No ability")
+                ability_id = get_ability_id(c)
+                ability_info = ABILITIES.get(ability_id, {})
+                ability_emoji = ability_info.get("emoji", "")
+                ability_desc = ability_info.get("description", "No ability")
+                ability_name = f"{ability_emoji} {ability_desc}" if ability_id else "No ability"
                 team_display.append(f"`{i}.` **{c['name']}** `{c['rarity']}` Lv.{c.get('level', 1)}")
-                if ability_type:
+                if ability_id:
                     abilities_list.append(f"• **{c['name']}**: {ability_name}")
             
             embed.add_field(name="👥 Team Members", value="\n".join(team_display), inline=False)
@@ -3509,15 +3498,14 @@ async def team_cmd(ctx, action: str = None, *args):
                     inv_pos = j
                     break
             
-            ability_type = get_ability_type(c)
-            ability_name = c.get("ability", "")
-            if not ability_name:
-                base = CHARACTERS_BY_ID.get(c.get("id"))
-                if base:
-                    ability_name = base.get("ability", "No ability")
+            ability_id = get_ability_id(c)
+            ability_info = ABILITIES.get(ability_id, {})
+            ability_emoji = ability_info.get("emoji", "")
+            ability_desc = ability_info.get("description", "No ability")
+            ability_name = f"{ability_emoji} {ability_desc}" if ability_id else "No ability"
             
             team_display.append(f"`{i}.` **{c['name']}** `{c['rarity']}` Lv.{c.get('level', 1)} (inv #{inv_pos})")
-            if ability_type:
+            if ability_id:
                 abilities_list.append(f"• **{c['name']}**: {ability_name}")
     
     embed.add_field(name="🎴 Team Members", value="\n".join(team_display), inline=False)
@@ -3717,7 +3705,7 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
             "spd_base": phase["spd"],
             "spd": phase["spd"],
             "image": phase["image"],
-            "type": boss_data.get("type", None)  # ALIEN or None
+            "type": boss_data.get("enemy_type", None)  # FIX: usa enemy_type non type
         }
     
     boss = get_boss_stats(current_phase)
@@ -3753,87 +3741,30 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
         "luminalia_alien_boost": False,   # Luminalia
         "lilin_alien_boost": False,       # Lilin
         "jack_alien_boost": False,        # Jack
+        "boss_shield_turns": 3 if boss_data.get("enemy_type") == "ALIEN" else 0,  # ALIEN shield
+        "boss_shield_broken": False,      # Track if boss shield was broken
     }
     
-    # Get all ability types from team
-    team_abilities = [c.get("ability_type", "") for c in team_cards]
+    # Get all ability IDs from team and check if they're active against boss
+    boss_enemy_type = boss_data.get("enemy_type", "NONE")
+    team_ability_ids = []
+    for c in team_cards:
+        ability_id = c.get("ability_id", "")
+        if ability_id and check_ability_active(c, {"type": boss_enemy_type}):
+            team_ability_ids.append(ability_id)
+        else:
+            team_ability_ids.append("")  # Keep None/empty for cards without active abilities
     
     # Apply first-turn abilities
     ability_text = ""
     
-    # ===== SISTEMA BUFF ADDITIVO - BUFF INIZIALI =====
-    # Traccia i bonus separatamente
-    initial_atk_bonus = 0.0
-    initial_def_bonus = 0.0
-    initial_spd_bonus = 0.0
+    # ===== BUFF INIZIALI RIMOSSI =====
+    # Tutti i buff sono ora gestiti dinamicamente da apply_ability nel loop di battaglia
+    # con verifica corretta di target_types
     
-    # Kai - First turn +100% DEF (based on total)
-    if "first_turn_def" in team_abilities:
-        initial_def_bonus += 1.0
-        team_flags["buff_applied"] = True
-        ability_text += "🛡️ **Kai's ability!** Team DEF +100%\n"
-    
-    # Valkyrie - First turn +100% SPD
-    if "first_turn_spd" in team_abilities:
-        initial_spd_bonus += 1.0
-        team_flags["buff_applied"] = True
-        ability_text += "💨 **Valkyrie's ability!** Team SPD +100%\n"
-    
-    # Shishilan - First turn +50% ATK
-    if "first_turn_atk" in team_abilities:
-        initial_atk_bonus += 0.5
-        team_flags["buff_applied"] = True
-        ability_text += "⚔️ **Shishilan's ability!** Team ATK +50%\n"
-    
-    # Ruri - 3 turns +50% DEF
-    if "def_boost_3turns" in team_abilities:
-        team_flags["ruri_turns"] = 3
-        initial_def_bonus += 0.5
-        ability_text += "🛡️ **Ruri's ability!** Team DEF +50% for 3 turns\n"
-    
-    # Sakura - 3 turns +50% SPD
-    if "spd_boost_3turns" in team_abilities:
-        team_flags["sakura_turns"] = 3
-        initial_spd_bonus += 0.5
-        ability_text += "💨 **Sakura's ability!** Team SPD +50% for 3 turns\n"
-    
-    # NOTE: First attack abilities (Mitama, Deale, Jeanne) are now handled
-    # in the battle loop when the team attacks for the first time (current_round == 1)
-    
-    # Black Cat - First turn +20% ATK and DEF
-    if "first_turn_atk_def" in team_abilities:
-        initial_atk_bonus += 0.2
-        initial_def_bonus += 0.2
-        team_flags["black_cat_buffed"] = True
-        ability_text += "✨ **Black Cat's ability!** Team ATK +20%, DEF +20%\n"
-    
-    # === ANTI-ALIEN ABILITIES (attivate se boss è ALIEN) ===
-    boss_type = boss_data.get("type", None)
-    
-    # Luminalia - If enemy is ALIEN: +50% DEF and SPD
-    if "alien_def_spd_boost" in team_abilities and boss_type == "ALIEN":
-        initial_def_bonus += 0.5
-        initial_spd_bonus += 0.5
-        team_flags["luminalia_alien_boost"] = True
-        ability_text += "👽 **Luminalia's ALIEN hunter instinct!** Team DEF +50%, SPD +50%\n"
-    
-    # Lilin - If enemy is ALIEN: +50% ATK and DEF
-    if "alien_atk_def_boost" in team_abilities and boss_type == "ALIEN":
-        initial_atk_bonus += 0.5
-        initial_def_bonus += 0.5
-        team_flags["lilin_alien_boost"] = True
-        ability_text += "👽 **Lilin's ALIEN slayer power!** Team ATK +50%, DEF +50%\n"
-    
-    # Jack - If enemy is ALIEN: +100% SPD
-    if "alien_spd_boost" in team_abilities and boss_type == "ALIEN":
-        initial_spd_bonus += 1.0
-        team_flags["jack_alien_boost"] = True
-        ability_text += "👽 **Jack's ALIEN hunter speed!** Team SPD +100%\n"
-    
-    # Applica i buff iniziali
-    team["atk"] = int(team["atk_base"] * (1 + initial_atk_bonus))
-    team["def"] = int(team["def_base"] * (1 + initial_def_bonus))
-    team["spd"] = int(team["spd_base"] * (1 + initial_spd_bonus))
+    # Add ALIEN shield message if boss has shield
+    if team_flags["boss_shield_turns"] > 0:
+        ability_text = f"🛡️ **{boss_data['name']} has ALIEN SHIELD!** Blocks all attacks for {team_flags['boss_shield_turns']} turns"
     
     # Create initial embed
     embed = discord.Embed(
@@ -3901,22 +3832,23 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
                 break
             
             if actor == "team":
-                # Check if paralyzed (by boss abilities like Crazed Titan)
-                if team_flags.get("team_paralyzed_turns", 0) > 0:
-                    team_flags["team_paralyzed_turns"] -= 1
-                    round_log.append(f"⚡ **Team is paralyzed!** Cannot attack. ({team_flags['team_paralyzed_turns']} turns left)")
-                    continue
-                
                 # ===== SISTEMA BUFF ADDITIVO =====
                 # Traccia tutti i moltiplicatori separatamente, poi somma alla fine
                 atk_bonus = 0.0  # bonus additivo (es: +0.2 = +20%)
                 def_bonus = 0.0
                 spd_bonus = 0.0
                 
-                # Apply individual abilities
-                for ability in team_abilities:
+                # Apply individual abilities FIRST (passive abilities work even when paralyzed)
+                for ability in team_ability_ids:
                     if not ability:
                         continue
+                    
+                    # Find which card has this ability to get its target_types
+                    card_target_types = []
+                    for card in team_cards:
+                        if card.get("ability_id") == ability:
+                            card_target_types = card.get("target_types", [])
+                            break
                     
                     # Create a temporary team dict with current bonuses applied for stat comparisons
                     # IMPORTANTE: Per i confronti condizionali (Kasli, Izanagi), usa le stats del round PRECEDENTE
@@ -3941,6 +3873,7 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
                         team_with_bonuses["spd"] = int(team["spd_base"] * (1 + spd_bonus))
                     
                     team_with_bonuses["name"] = "Team"
+                    team_with_bonuses["target_types"] = card_target_types  # Use the specific card's target types
                     
                     result = apply_ability(
                         ability,
@@ -3968,22 +3901,50 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
                 team["def"] = int(team["def_base"] * (1 + def_bonus))
                 team["spd"] = int(team["spd_base"] * (1 + spd_bonus))
                 
+                # Check if paralyzed (blocks attack but not passive abilities)
+                if team_flags.get("team_paralyzed_turns", 0) > 0:
+                    team_flags["team_paralyzed_turns"] -= 1
+                    round_log.append(f"⚡ **Team is paralyzed!** Cannot attack. ({team_flags['team_paralyzed_turns']} turns left)")
+                    continue
+                
                 # Calculate damage
                 dmg = max(1, int(team["atk"] - boss["def"] * 0.5))
                 
-                # Lunacia speed bonus
-                if "speed_bonus" in team_abilities and team["spd"] > boss["spd"]:
-                    bonus = int(team["atk"] * 0.5)
-                    dmg += bonus
-                    round_log.append(f"💨 **Lunacia's speed bonus!** +{bonus} damage")
+                # Critical hit check (25% chance for +50% damage)
+                for card in team_cards:
+                    if card.get("ability_id") == "critical":
+                        if check_ability_active(card, boss):
+                            if random.random() < 0.25:  # 25% chance
+                                dmg = int(dmg * 1.5)
+                                round_log.append(f"💥 **CRITICAL HIT!** {card['name']} deals 50% more damage!")
+                                break  # Only one critical per attack
                 
                 # Sidmi bonus damage (after turn 3)
                 if team_flags.get("sidmi_active", False):
                     bonus = int(team["atk"] * 0.5)
                     dmg += bonus
                 
-                boss["hp"] -= dmg
-                round_log.append(f"⚔️ **Team attacks!** Deals `{dmg}` damage")
+                # === ALIEN SHIELD SYSTEM ===
+                # Check if any card has shield_breaker ability
+                if team_flags["boss_shield_turns"] > 0 and not team_flags["boss_shield_broken"]:
+                    for card in team_cards:
+                        if card.get("ability_id") == "shield_breaker":
+                            if check_ability_active(card, boss):
+                                team_flags["boss_shield_turns"] = 0
+                                team_flags["boss_shield_broken"] = True
+                                round_log.append(f"🔨 **{card['name']} breaks the shield!** {boss_data['name']}'s ALIEN shield destroyed!")
+                                break
+                
+                # Check if boss shield blocks the attack
+                shield_blocked = False
+                if team_flags["boss_shield_turns"] > 0:
+                    shield_blocked = True
+                    round_log.append(f"🛡️ **{boss_data['name']}'s ALIEN SHIELD blocks the attack!** ({team_flags['boss_shield_turns']} turns left)")
+                
+                # Deal damage (only if not blocked by shield)
+                if not shield_blocked:
+                    boss["hp"] -= dmg
+                    round_log.append(f"⚔️ **Team attacks!** Deals `{dmg}` damage")
                 
                 # Lifesteal
                 if team_flags["lifesteal_active"]:
@@ -3992,14 +3953,14 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
                     round_log.append(f"🩸 **Lifesteal!** +{heal} HP")
                 
                 # Thundia paralyze (first round only)
-                if "paralyze" in team_abilities and current_round == 1:
+                if "paralyze" in team_ability_ids and current_round == 1:
                     team_flags["paralyze_turns"] = 2
                     round_log.append(f"⚡ **Thundia paralyzes the boss for 2 turns!**")
                 
                 # === FIRST ATTACK ABILITIES (round 1 only) ===
                 
                 # Mitama - First attack: Heals 50% max HP
-                if "first_attack_heal" in team_abilities and current_round == 1:
+                if "first_attack_heal" in team_ability_ids and current_round == 1:
                     if not team_flags.get("first_attack_heal_done"):
                         heal = int(team["hp_max"] * 0.5)
                         team["hp"] = min(team["hp_max"], team["hp"] + heal)
@@ -4007,14 +3968,14 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
                         round_log.append(f"💖 **Mitama's blessing!** Team heals {heal} HP")
                 
                 # Deale - First attack: +50% SPD
-                if "first_attack_spd" in team_abilities and current_round == 1:
+                if "first_attack_spd" in team_ability_ids and current_round == 1:
                     if not team_flags.get("first_attack_spd_done"):
                         spd_bonus += 0.5
                         team_flags["first_attack_spd_done"] = True
                         round_log.append(f"⚡ **Deale's swiftness!** Team SPD +50%")
                 
                 # Jeanne - First attack: Heal 30% HP, +30% DEF
-                if "heal_and_def" in team_abilities and current_round == 1:
+                if "heal_and_def" in team_ability_ids and current_round == 1:
                     if not team_flags.get("heal_and_def_done"):
                         heal = int(team["hp_max"] * 0.3)
                         team["hp"] = min(team["hp_max"], team["hp"] + heal)
@@ -4052,11 +4013,12 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
                 
                 # Boss ability: Raging Bahamut - ATK boost if no anti-ALIEN or SPD superiority
                 if boss_ability == "boss_bahamut_rage":
-                    # Check if team has at least one anti-ALIEN character
+                    # Check if team has at least one anti-ALIEN character (NEW SYSTEM)
+                    # Characters with ALIEN in target_types are anti-ALIEN
                     has_anti_alien = False
-                    anti_alien_types = ["alien_def_spd_boost", "alien_atk_def_boost", "alien_spd_boost"]
-                    for ability in team_abilities:
-                        if ability in anti_alien_types:
+                    for card in team_cards:
+                        target_types = card.get("target_types", [])
+                        if "ALIEN" in target_types:
                             has_anti_alien = True
                             break
                     
@@ -4071,9 +4033,21 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
                 
                 # Boss attacks
                 dmg = max(1, int(boss["atk"] - team["def"] * 0.5)) + boss_dmg_bonus
-                team["hp"] -= dmg
-                team["hp"] = max(0, team["hp"])
-                round_log.append(f"👹 **{boss_data['name']} attacks!** Deals `{dmg}` damage")
+                
+                # Check for dodge ability (first turn only)
+                dodged = False
+                if current_round == 1:
+                    for card in team_cards:
+                        if card.get("ability_id") == "dodge":
+                            if check_ability_active(card, boss):
+                                dodged = True
+                                round_log.append(f"💨 **{card['name']} dodges!** No damage taken!")
+                                break
+                
+                if not dodged:
+                    team["hp"] -= dmg
+                    team["hp"] = max(0, team["hp"])
+                    round_log.append(f"👹 **{boss_data['name']} attacks!** Deals `{dmg}` damage")
                 
                 # Boss ability: DEF-based heal (Crazed Fish)
                 if boss_ability == "boss_def_heal" and boss["def"] > team["def"]:
@@ -4094,21 +4068,10 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
                     round_log.append(f"⚡ **{boss_data['name']} paralyzes your team for 2 turns!**")
                 
                 # Verbena survive
-                if team["hp"] <= 0 and "survive" in team_abilities and not team_flags["verbena_survived"]:
+                if team["hp"] <= 0 and "survive" in team_ability_ids and not team_flags["verbena_survived"]:
                     team["hp"] = 1
                     team_flags["verbena_survived"] = True
                     round_log.append(f"💫 **Verbena refuses to fall!** Team survives with 1 HP!")
-        
-        # Decrement timed buffs (le stats vengono ricalcolate ogni turno con il sistema additivo)
-        if team_flags["ruri_turns"] > 0:
-            team_flags["ruri_turns"] -= 1
-            if team_flags["ruri_turns"] == 0:
-                round_log.append("🛡️ Ruri's DEF boost expired.")
-        
-        if team_flags["sakura_turns"] > 0:
-            team_flags["sakura_turns"] -= 1
-            if team_flags["sakura_turns"] == 0:
-                round_log.append("💨 Sakura's SPD boost expired.")
         
         # Update embed
         embed = discord.Embed(
@@ -4134,6 +4097,12 @@ async def run_boss_battle(ctx, team_cards, boss_data, user):
         
         await message.edit(embed=embed)
         await asyncio.sleep(1.5)
+        
+        # Decrement ALIEN shield at the end of each round
+        if team_flags["boss_shield_turns"] > 0:
+            team_flags["boss_shield_turns"] -= 1
+            if team_flags["boss_shield_turns"] == 0:
+                round_log.append(f"🛡️ {boss_data['name']}'s ALIEN shield expired!")
     
     # Determine winner
     if team["hp"] > 0 and boss["hp"] <= 0 and current_phase >= len(phases) - 1:
@@ -4168,8 +4137,8 @@ async def boss_cmd(ctx, boss_number: int = None):
         user = ensure_user(user_id)
         
         # Check stamina
-        if user.get("stamina", 0) < 15:
-            await ctx.send("❌ Not enough stamina. You need **15** stamina for boss battles.")
+        if user.get("stamina", 0) < 20:
+            await ctx.send("❌ Not enough stamina. You need **20** stamina for boss battles.")
             return
         
         # Check if team is set
@@ -4234,7 +4203,7 @@ async def boss_cmd(ctx, boss_number: int = None):
         boss_data = BOSSES[boss_number - 1]
         
         # Deduct stamina atomically within the lock
-        user["stamina"] -= 15
+        user["stamina"] -= 20
         await save_data()
         
         # Set the lock
