@@ -1506,7 +1506,7 @@ class GachaView(View):
         roll = random.random()
         if roll < 0.01:
             rarity = "Legendary"
-        elif roll < 0.15:
+        elif roll < 0.10:
             rarity = "Epic"
         elif roll < 0.40:
             rarity = "Rare"
@@ -1555,7 +1555,7 @@ class GachaView(View):
             roll = random.random()
             if roll < 0.01:
                 rarity = "Legendary"
-            elif roll < 0.15:
+            elif roll < 0.10:
                 rarity = "Epic"
             elif roll < 0.40:
                 rarity = "Rare"
@@ -1620,8 +1620,8 @@ async def gacha_cmd(ctx):
         name="📊 Drop Rates",
         value=(
             "⚪ **Common**: 60%\n"
-            "🔵 **Rare**: 25%\n"
-            "🟣 **Epic**: 14%\n"
+            "🔵 **Rare**: 30%\n"
+            "🟣 **Epic**: 9%\n"
             "🟡 **Legendary**: 1%"
         ),
         inline=True
